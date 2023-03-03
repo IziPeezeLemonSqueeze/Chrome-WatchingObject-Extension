@@ -1,0 +1,42 @@
+{
+	"name": "Watching Object!",
+	"description": "Aspetto per te l'aggiornamento dei record!",
+	"version": "1.2.1",
+	"manifest_version": 3,
+	"permissions": [
+		"notifications",
+		"storage",
+        "activeTab",
+        "cookies",
+        "tabs"
+	],
+    "host_permissions": [
+        "https://*.force.com/*",
+        "https://*.salesforce.com/*"
+    ],
+	"background": {
+	  "service_worker": "background.js"
+	},
+	"content_scripts": [
+      {
+		"run_at": "document_end",
+        "matches": [
+			"https://*.force.com/*",
+        	"https://*.salesforce.com/*"
+		],
+        "js": ["content_script.js"]
+      }
+    ],
+	"action": {
+	  "default_icon": {
+		"48": "images/icon.png",
+		"128": "images/icon.png"
+	  },
+	  "default_title": "Object Watching List!",
+      "default_popup": "popup.html"
+	},
+	"icons": {
+		"48": "images/icon.png",
+		"128": "images/icon.png"
+	}
+}
