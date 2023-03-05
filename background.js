@@ -142,7 +142,6 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                 {
                     await chrome.storage.session.clear();
                     response('res');
-
                 });
 
             }

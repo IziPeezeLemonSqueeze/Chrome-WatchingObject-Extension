@@ -91,10 +91,14 @@ const stopWatchingProcess = async () =>
     console.log('clicked stop')
     await chrome.runtime.sendMessage({
         type: 'stopWatchProcess'
-    }, async (e) =>
+    }, async e =>
     {
-        console.log('@DEBUG RES STOPWATCHING', e);
-        await initWatchingList();
+        setTimeout(async e =>
+        {
+            console.log('@DEBUG RES STOPWATCHING', e);
+            await initWatchingList();
+
+        }, 2000);
     });
 }
 
@@ -108,7 +112,7 @@ const removeFromWatchingList = async e =>
     });
     await chrome.runtime.sendMessage({
         type: 'updatePopup'
-    }, async (e) =>
+    }, async e =>
     {
         console.log('@DEBUG RES REMOVEWATCHING', e);
         await initWatchingList();
