@@ -1,7 +1,8 @@
 # WatchingObject
 
-When there is a change to the record, Watching Object! will notify you with a notification and update the affected tab,
-plus it helps you navigate by taking you directly to the tab of the record among the dozens of tabs you have open!
+Watching Object! is a chrome extension to aid in development and helps keep track of records that are waiting for a change, updating the affected tab only the moment there is a change to the record, whether due to an integration or something else, so that you don't have to be always hitting F5 to refresh the page.
+
+When there is a change to the record, Watching Object! will notify you with a notification and update the affected tab, plus it helps you navigate by taking you directly to the tab of the record among the dozens of tabs you have open!
 
 
 # Security and Privacy
