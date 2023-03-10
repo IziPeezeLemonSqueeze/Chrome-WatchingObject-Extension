@@ -111,10 +111,10 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                     } catch (e) { }
 
                     chrome.storage.session.set({
-                        [obj.Id]: [resInspect, obj.tab]
+                        [obj.Id]: [resInspect, obj.tab, { domain: domains.customDomainHttps, sid: sid[0].value }]
                     });
 
-                    startWatchingProcess(domains.customDomainHttps, sid[0].value);
+                    startWatchingProcess();
                 }
 
             });
@@ -159,14 +159,14 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 });
 
 var notificationID = [];
-function startWatchingProcess(domain, sid)
+function startWatchingProcess()
 {
+
+
     if (!watchingP)
     {
         watchingP = setInterval(() =>
         {
-            console.log('WATCHING PROCESS');
-
             chrome.storage.session.get(null, async (items) =>
             {
                 if (await items)
@@ -179,11 +179,11 @@ function startWatchingProcess(domain, sid)
 
                             let result = null;
                             await fetch(
-                                domain + "/services/data/v57.0/query/?q=SELECT+LastModifiedDate+FROM+" + data[k][0].attributes.type + "+WHERE+id+=+'" + data[k][0].Id + "'",
+                                data[k][2].domain + "/services/data/v57.0/query/?q=SELECT+LastModifiedDate+FROM+" + data[k][0].attributes.type + "+WHERE+id+=+'" + data[k][0].Id + "'",
                                 {
                                     method: "GET",
                                     headers: {
-                                        Authorization: "Bearer " + sid,
+                                        Authorization: "Bearer " + data[k][2].sid,
                                         "Content-Type": "application/json",
                                     }
                                 }
@@ -191,7 +191,7 @@ function startWatchingProcess(domain, sid)
                                 .then((response) => response.json())
                                 .then((res) => (result = res))
                                 .catch((error) => console.log("error", error));
-                            console.log('RESULT QUERY', result);
+                            console.log('RESULT QUERY', result, data[k][2]);
 
                             console.log('RES_QUERY', result.records[0], 'DATA_', data[k][0].LastModifiedDate);
                             if (result.records[0].LastModifiedDate != data[k][0].LastModifiedDate)
@@ -218,8 +218,6 @@ function startWatchingProcess(domain, sid)
                                 }
                                 );
                             }
-
-
                         });
                     });
                 }
