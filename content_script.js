@@ -8,7 +8,7 @@
         //console.log('ARRIVED CS', obj);
         if (obj.response)
         {
-            // GERSTIONE RESPONSE FROM BACKGROUND.JS
+            // GESTIONE RESPONSE FROM BACKGROUND.JS
             switch (obj.response)
             {
                 case 'resetNewWatch':
@@ -109,4 +109,42 @@
     }
 
     //newWatching();
+
+    document.onmouseup = function ()
+    {
+        let selectedText = window.getSelection()
+        console.log('SELECTED_TEXT', selectedText);
+
+        if (selectedText.toString().length == 18)
+        {
+            /*  let sect = document.createElement('section');
+             sect.id = "help";
+             let div = document.createElement('div');
+             div.className = "slds-popover slds-popover_tooltip slds-nubbin_bottom-left";
+             div.style = `position:absolute;top:${selectedText.anchorNode.parentElement.getBoundingClientRect().top};left:${selectedText.anchorNode.parentElement.getBoundingClientRect().left}`;
+             div.role = "tooltip";
+ 
+             // div.style = "position:absolute;top:-4px;left:35px";
+             let divv = document.createElement('div');
+             divv.className = "slds-popover__body";
+             divv.innerText = 'TEST';
+             sect.appendChild(div);
+             div.appendChild(divv);
+ 
+             console.log(selectedText.focusNode.nextElementSibling)
+             selectedText.anchorNode.parentNode.appendChild(sect); */
+
+            chrome.runtime.sendMessage({
+                type: 'createContextMenu'
+            });
+        } else 
+        {
+            chrome.runtime.sendMessage({
+                type: 'removeContextMenu'
+            });
+        }
+
+    }
+
+
 })();

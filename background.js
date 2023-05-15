@@ -66,6 +66,24 @@ chrome.runtime.onInstalled.addListener(() =>
     chrome.storage.session.clear();
 });
 
+
+chrome.contextMenus.onClicked.addListener((info, tab) =>
+{
+    console.log('CONTEXT_MENU_CLICKED', info, tab);
+    if (info.selectionText.length == 18 && info.selectionText) 
+    {
+        let urlToGo = getCurrentUrl(tab).customDomainHttps;
+        chrome.tabs.create({
+            active: true,
+            url: urlToGo + '/' + info.selectionText
+        });
+
+    }
+});
+
+
+
+
 let watchingP;
 function clearWatchingProcess()
 {
@@ -152,6 +170,21 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 
         case 'updatePopup':
             response('res');
+            break;
+
+        case 'createContextMenu':
+            chrome.contextMenus.create({
+                title: "Apri in una nuova tab \"%s\"",
+                contexts: ["selection"],
+                id: "1",
+                documentUrlPatterns: [
+                    "https://*.force.com/*",
+                    "https://*.salesforce.com/*"
+                ]
+            });
+            break;
+        case 'removeContextMenu':
+            chrome.contextMenus.removeAll();
             break;
 
     }
