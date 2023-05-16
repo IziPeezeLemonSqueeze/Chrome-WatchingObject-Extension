@@ -3,6 +3,7 @@
     let salesforceBody;
     let currentObject = {};
     let watchingBtn;
+    let woToolBtn;
     chrome.runtime.onMessage.addListener((obj, sender, response) =>
     {
         //console.log('ARRIVED CS', obj);
@@ -35,6 +36,7 @@
                         Id: Id
                     };
                     newWatching();
+
                 } catch (e)
                 {
                     console.log(e);
@@ -44,6 +46,7 @@
                 removeFromWatchingList();
             }
         }
+        newDock();
     });
 
     const newWatching = () =>
@@ -56,7 +59,7 @@
             //watchingBtn.type = 'button';
             watchingBtn.className = 'watching-btn slds-button slds-button_brand';
             watchingBtn.innerText = `Aggiungi ${currentObject.title.split('|')[0]} alla Watchlist`;
-            watchingBtn.style = 'bottom: 10px; position: fixed; right: 10px; z-index:10;';
+            watchingBtn.style = 'bottom: 10px; position: fixed; right: 30px; z-index:10;';
 
             /*  salesforceBody = document.getElementsByClassName('slds-global-header')[0]; slds-context-bar */
             setTimeout(() =>
@@ -70,6 +73,61 @@
         }
     }
 
+    const newDock = () =>
+    {
+        salesforceBody = document.getElementsByClassName('desktop')[0];
+        if (!document.getElementsByClassName('WOtool-btn slds-button slds-button_brand')[0])
+        {
+            woToolBtn = document.createElement('button');
+            woToolBtn.className = 'WOtool-btn slds-button slds-button_brand';
+            woToolBtn.innerText = '🛠️';
+            woToolBtn.style = 'bottom: 11px; position: fixed; right: -12px; z-index:9; height: 30px';
+            woToolBtn.addEventListener('click', showHideWOTools);
+
+            salesforceBody.appendChild(woToolBtn);
+        }
+        chrome.storage.local.get(['toolOpen'], (items) =>
+        {
+            if (items.toolOpen)
+            {
+                if (!document.getElementsByClassName('WOTOOL')[0]) 
+                {
+                    let div = document.createElement('div');
+                    div.id = 'WOTOOL';
+                    div.style =
+                        'z-index: 1000;display: flex;position: fixed;bottom: 40px;right: 0px;vertical-align: middle;';
+                    let frame = document.createElement('iframe');
+                    frame.src = chrome.runtime.getURL('dock.html');
+                    frame.style = 'height: 255px';
+                    div.appendChild(frame);
+
+                    salesforceBody.appendChild(div);
+                }
+            } else
+            {
+                try
+                {
+                    salesforceBody.removeChild(document.getElementById('WOTOOL'));
+                } catch (e)
+                { }
+            }
+        });
+
+    }
+
+    const showHideWOTools = async () =>
+    {
+        chrome.storage.local.get(['toolOpen'], (items) =>
+        {
+            chrome.storage.local.set({
+                'toolOpen': !items.toolOpen
+            }).then(() =>
+            {
+                newDock();
+            });
+        });
+    }
+
     const removeFromWatchingList = () =>
     {
         salesforceBody.removeChild(watchingBtn);
@@ -77,7 +135,6 @@
 
     const addToWatchList = async () =>
     {
-
         watchingBtn.setAttribute('disabled', '');
         watchingBtn.className = 'watching-btn slds-button slds-button_outline-brand';
         watchingBtn.innerText = 'In Watching! 🔍';
@@ -104,36 +161,15 @@
             sObject: currentObject.sObject,
             tab: currentObject.tab
         });
-
-
     }
-
-    //newWatching();
 
     document.onmouseup = function ()
     {
         let selectedText = window.getSelection()
-        console.log('SELECTED_TEXT', selectedText);
+        //console.log('SELECTED_TEXT', selectedText);
 
         if (selectedText.toString().length == 18)
         {
-            /*  let sect = document.createElement('section');
-             sect.id = "help";
-             let div = document.createElement('div');
-             div.className = "slds-popover slds-popover_tooltip slds-nubbin_bottom-left";
-             div.style = `position:absolute;top:${selectedText.anchorNode.parentElement.getBoundingClientRect().top};left:${selectedText.anchorNode.parentElement.getBoundingClientRect().left}`;
-             div.role = "tooltip";
- 
-             // div.style = "position:absolute;top:-4px;left:35px";
-             let divv = document.createElement('div');
-             divv.className = "slds-popover__body";
-             divv.innerText = 'TEST';
-             sect.appendChild(div);
-             div.appendChild(divv);
- 
-             console.log(selectedText.focusNode.nextElementSibling)
-             selectedText.anchorNode.parentNode.appendChild(sect); */
-
             chrome.runtime.sendMessage({
                 type: 'createContextMenu'
             });

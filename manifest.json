@@ -1,7 +1,7 @@
 {
 	"name": "Watching Object!",
 	"description": "Aspetto per te l'aggiornamento dei record!",
-	"version": "1.3.0",
+	"version": "1.4.0",
 	"manifest_version": 3,
 	"permissions": [
 		"notifications",
@@ -18,6 +18,15 @@
 	"background": {
 	  "service_worker": "background.js"
 	},
+	"web_accessible_resources": [
+		{
+			"resources": ["dock.html"],
+			"matches":  [
+				"https://*.force.com/*",
+				"https://*.salesforce.com/*"
+			]
+		}
+	],
 	"content_scripts": [
       {
 		"run_at": "document_end",

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="salesforce-lightning-design-system.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script type="module" src="dock.js"></script>
+  </head>
+
+  <body>
+    <div class="slds-page-header">
+      <div class="slds-page-header__row">
+        <div class="slds-page-header__col-title">
+          <div class="slds-media">
+            <div class="slds-media__figure">
+              <span class="slds-icon_container slds-icon-standard-opportunity">
+                <img src="/images/icon.png" width="25px" height="25px" />
+              </span>
+            </div>
+            <div class="slds-media__body">
+              <div class="slds-page-header__name">
+                <div class="slds-page-header__name-title">
+                  <h1>
+                    <span
+                      class="slds-page-header__title slds-truncate"
+                      title="Watching Object! Tools"
+                      >Watching Object! Tools</span
+                    >
+                  </h1>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="slds-align_absolute-center"
+      style="text-align: center; height: 12rem"
+    >
+      <ul class="slds-has-block-links_space">
+        <li style="margin: 1px">
+          <button
+            title="Apri una nuova tab nelle impostazioni Object Manager"
+            class="slds-button slds-button_brand"
+            style="width: 150px"
+            id="btnObjectManager"
+          >
+            Object Manager
+          </button>
+        </li>
+        <li style="margin: 1px">
+          <button
+            title="Apri una nuova tab nelle impostazioni Custom Metadata"
+            class="slds-button slds-button_brand"
+            style="width: 150px"
+            id="btnMdt"
+          >
+            Custom Metadata
+          </button>
+        </li>
+        <li style="margin: 1px">
+          <button
+            title="Apri una nuova tab nelle impostazioni Apex Jobs (Batch)"
+            class="slds-button slds-button_brand"
+            style="width: 150px"
+            id="btnApexJobs"
+          >
+            Apex Jobs
+          </button>
+        </li>
+        <li style="margin: 1px">
+          <button
+            title="Apri una nuova tab nelle impostazioni USERS"
+            class="slds-button slds-button_brand"
+            style="width: 150px"
+            id="btnUsers"
+          >
+            Setup Users
+          </button>
+        </li>
+        <li style="margin: 1px">
+          <button
+            title="Cancella tutti gli Apex Logs"
+            class="slds-button slds-button_destructive"
+            style="width: 150px"
+            id="btnApexLog"
+          >
+            Cancella Apex Logs
+          </button>
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>

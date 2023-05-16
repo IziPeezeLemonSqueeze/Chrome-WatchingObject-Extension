@@ -64,6 +64,7 @@ chrome.storage.onChanged.addListener((changes, namespace) =>
 chrome.runtime.onInstalled.addListener(() =>
 {
     chrome.storage.session.clear();
+    chrome.storage.local.set({ 'toolOpen': false });
 });
 
 
@@ -80,9 +81,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
 
     }
 });
-
-
-
 
 let watchingP;
 function clearWatchingProcess()
@@ -129,7 +127,10 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                     } catch (e) { }
 
                     chrome.storage.session.set({
-                        [obj.Id]: [resInspect, obj.tab, { domain: domains.customDomainHttps, sid: sid[0].value }]
+                        [obj.Id]: [resInspect, obj.tab, {
+                            domain: domains.customDomainHttps,
+                            sid: sid[0].value
+                        }]
                     });
 
                     startWatchingProcess();
@@ -183,8 +184,114 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                 ]
             });
             break;
+
         case 'removeContextMenu':
             chrome.contextMenus.removeAll();
+            break;
+
+        case 'WO_TOOL_goToObjectManager':
+            chrome.tabs.create({
+                active: true,
+                url: getCurrentUrl(sender.tab).customDomainHttps + '/lightning/setup/ObjectManager/home'
+            });
+            break;
+
+        case 'WO_TOOL_goToCustomMetadata':
+            chrome.tabs.create({
+                active: true,
+                url: getCurrentUrl(sender.tab).customDomainHttps + '/lightning/setup/CustomMetadata/home'
+            });
+            break;
+
+        case 'WO_TOOL_goToApexJobs':
+            chrome.tabs.create({
+                active: true,
+                url: getCurrentUrl(sender.tab).customDomainHttps + '/lightning/setup/AsyncApexJobs/home'
+            });
+            break;
+
+        case 'WO_TOOL_goToUsers':
+            chrome.tabs.create({
+                active: true,
+                url: getCurrentUrl(sender.tab).customDomainHttps + '/lightning/setup/ManageUsers/home'
+            });
+            break;
+
+        case 'WO_TOOL_goToApexLog':
+            const sid = await chrome.cookies.getAll({
+                name: "sid",
+                domain: getCurrentUrl(sender.tab).customDomain,
+            });
+            var res = null;
+            await fetch(
+                getCurrentUrl(sender.tab).customDomainHttps +
+                "/services/data/v57.0/query/?q=SELECT+Id+FROM+ApexLog", {
+                method: "GET",
+                headers: {
+                    Authorization: "Bearer " + sid[0].value,
+                    "Content-Type": "application/json",
+                }
+            })
+                .then(async response => res = await response.json())
+                .then(result => console.log(result))
+                .catch(error => console.log('error', error));
+            if (await res.totalSize > 0)
+            {
+                console.log('APEX LOGS', await res.totalSize);
+                const urlToSendDelete = getCurrentUrl(sender.tab).customDomainHttps + '/services/data/v57.0/composite/sobjects?ids=';
+
+                let chunkComposite = [];
+                for (let c = 0; c < res.records.length; c += 200)
+                {
+                    chunkComposite.push(res.records.slice(c, c + 200));
+                }
+                chunkComposite.forEach(async (chunk) =>
+                {
+                    let composite = urlToSendDelete;
+                    chunk.forEach((cId) =>
+                    {
+                        composite += cId.Id + ',';
+                    });
+                    composite = composite.slice(0, composite.length - 1);
+                    console.log('COMPOSITE', composite);
+                    await fetch(composite, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json; charset=UTF-8",
+                            Accept: "application/json",
+                            Authorization: "Bearer " + sid[0].value
+                        }
+                    })
+                        .then(async response =>
+                        {
+                            console.log('COMPOSITE RESPONSE', await response.json());
+                        })
+                        .then(result => console.log(result))
+                        .catch(error => console.log('error', error));
+
+                    setTimeout(() => { console.log(composite) }, 2500);
+                    composite = '';
+                });
+                chrome.notifications.create(
+                    '',
+                    {
+                        type: 'basic',
+                        title: 'CANCELLAZIONE APEX LOG',
+                        message: await res.totalSize + ' ApexLog eliminati!',
+                        iconUrl: 'images/icon.png'
+                    });
+
+            } else
+            {
+                chrome.notifications.create(
+                    '',
+                    {
+                        type: 'basic',
+                        title: 'CANCELLAZIONE APEX LOG',
+                        message: 'Non ci sono abbastanza log per effettuare l\'operazione. Trovati: ' + res.totalSize,
+                        iconUrl: 'images/icon.png'
+                    });
+            }
             break;
 
     }
@@ -248,8 +355,7 @@ function startWatchingProcess()
                                     notificationID.push({
                                         notifId: id, tabId: data[k][1].id
                                     });
-                                }
-                                );
+                                });
                             }
                         });
                     });
@@ -317,9 +423,7 @@ async function login(domain, sid, SObject, ID)
     console.log(SObject, ID);
 
     var myHeaders = new Headers();
-    myHeaders.append("Authorization", "Bearer " + sid);/* 
-    myHeaders.append("Cookie", "BrowserId=o4dZ97ErEe2I8nW07bR1ww; CookieConsentPolicy=0:0; LSKey-c$CookieConsentPolicy=0:0"); */
-
+    myHeaders.append("Authorization", "Bearer " + sid);
     var requestOptions = {
         method: 'GET',
         headers: myHeaders,
@@ -334,33 +438,6 @@ async function login(domain, sid, SObject, ID)
         .catch(error => console.log('error', error));
 
     return res;
-
-    /* 
-        return await fetch(
-            domain + "/services/data/v57.0/sobjects/" + SObject + "/" + ID,
-            {
-                method: "GET",
-                headers: {
-                    Authorization: "Bearer " + sid,
-                    "Content-Type": "application/json",
-                },
-                redirect: 'follow'
-            }
-        )
-            .then((response) => { return response.json() })
-            .then((res) => (result = res))
-            .catch((error) => console.log("error", error));
-      */
 }
 
 
-
-
-/* chrome.contextMenus.onClicked.addListener((info, tab) =>
-{
-    console.log(info, tab);
-    if ('test' === info.menuItemId)
-    {
-        login(info.selectionText);
-    }
-}); */
