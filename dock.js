@@ -2,6 +2,7 @@ const btnObjectManager = document.getElementById('btnObjectManager');
 const btnMdt = document.getElementById('btnMdt');
 const btnApexJobs = document.getElementById('btnApexJobs');
 const btnUsers = document.getElementById('btnUsers');
+const btnDeploy = document.getElementById('btnDeploy');
 const btnApexLog = document.getElementById('btnApexLog');
 
 
@@ -22,6 +23,10 @@ document.addEventListener("DOMContentLoaded", async () =>
     btnUsers.addEventListener('click', () =>
     {
         usersEvent();
+    });
+    btnDeploy.addEventListener('click', () =>
+    {
+        deployEvent();
     });
     btnApexLog.addEventListener('click', () =>
     {
@@ -54,6 +59,13 @@ const usersEvent = () =>
 {
     chrome.runtime.sendMessage({
         type: 'WO_TOOL_goToUsers'
+    });
+}
+
+const deployEvent = () =>
+{
+    chrome.runtime.sendMessage({
+        type: 'WO_TOOL_goToDeploy'
     });
 }
 

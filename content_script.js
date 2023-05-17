@@ -4,6 +4,7 @@
     let currentObject = {};
     let watchingBtn;
     let woToolBtn;
+    let toolOpen = false;
     chrome.runtime.onMessage.addListener((obj, sender, response) =>
     {
         //console.log('ARRIVED CS', obj);
@@ -73,6 +74,7 @@
         }
     }
 
+
     const newDock = () =>
     {
         salesforceBody = document.getElementsByClassName('desktop')[0];
@@ -86,46 +88,38 @@
 
             salesforceBody.appendChild(woToolBtn);
         }
-        chrome.storage.local.get(['toolOpen'], (items) =>
+        if (toolOpen)
         {
-            if (items.toolOpen)
+            console.log('CHECK WOTOOL', document.getElementById('WOTOOL'));
+            if (!document.getElementById('WOTOOL')) 
             {
-                if (!document.getElementsByClassName('WOTOOL')[0]) 
-                {
-                    let div = document.createElement('div');
-                    div.id = 'WOTOOL';
-                    div.style =
-                        'z-index: 1000;display: flex;position: fixed;bottom: 40px;right: 0px;vertical-align: middle;';
-                    let frame = document.createElement('iframe');
-                    frame.src = chrome.runtime.getURL('dock.html');
-                    frame.style = 'height: 255px';
-                    div.appendChild(frame);
+                let div = document.createElement('div');
+                div.id = 'WOTOOL';
+                div.style =
+                    'z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
+                let frame = document.createElement('iframe');
+                frame.src = chrome.runtime.getURL('dock.html');
+                frame.style = 'width: 275px; height: 285px; border: 0; border-bottom-right-radius: 0px; border-top-right-radius: 15px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;';
+                div.appendChild(frame);
 
-                    salesforceBody.appendChild(div);
-                }
-            } else
-            {
-                try
-                {
-                    salesforceBody.removeChild(document.getElementById('WOTOOL'));
-                } catch (e)
-                { }
+                salesforceBody.appendChild(div);
             }
-        });
-
+        } else
+        {
+            try
+            {
+                salesforceBody.removeChild(document.getElementById('WOTOOL'));
+            } catch (e)
+            {
+                console.log(e);
+            }
+        }
     }
 
     const showHideWOTools = async () =>
     {
-        chrome.storage.local.get(['toolOpen'], (items) =>
-        {
-            chrome.storage.local.set({
-                'toolOpen': !items.toolOpen
-            }).then(() =>
-            {
-                newDock();
-            });
-        });
+        toolOpen = !toolOpen;
+        newDock();
     }
 
     const removeFromWatchingList = () =>

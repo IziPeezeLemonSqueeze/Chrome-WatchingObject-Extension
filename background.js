@@ -217,6 +217,14 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
             });
             break;
 
+        case 'WO_TOOL_goToDeploy':
+            chrome.tabs.create({
+                active: true,
+                url: getCurrentUrl(sender.tab).customDomainHttps + '/lightning/setup/DeployStatus/home'
+            });
+            break;
+
+
         case 'WO_TOOL_goToApexLog':
             const sid = await chrome.cookies.getAll({
                 name: "sid",
