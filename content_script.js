@@ -1,13 +1,21 @@
 (() =>
 {
     let salesforceBody;
+
+    let windowAnonymCode;
+    let consoleIntervalSearch;
+    let btnCodeSnippet;
+    let codeSnippetOpen = false;
+    let frameSnippet = null;
+
     let currentObject = {};
     let watchingBtn;
     let woToolBtn;
     let toolOpen = false;
+
     chrome.runtime.onMessage.addListener((obj, sender, response) =>
     {
-        //console.log('ARRIVED CS', obj);
+        console.log('ARRIVED CS ', obj);
         if (obj.response)
         {
             // GESTIONE RESPONSE FROM BACKGROUND.JS
@@ -21,7 +29,22 @@
                         watchingBtn.innerText = `Aggiungi ${currentObject.title.split('|')[0]} alla Watchlist`;
                     }, 1000);
                     break;
-
+                case 'devConsole':
+                    consoleIntervalSearch = setInterval(() =>
+                    {
+                        devConsoleTool();
+                    }, 2000);
+                    break;
+                case 'popupNameSnippet':
+                    let nameSnippet = prompt('Nome Snippet?');
+                    // TODO CONTORLLO SUI DUPLICATI
+                    chrome.storage.local.set({
+                        ['snippet_' + nameSnippet]: obj.payload
+                    });
+                    break;
+                case 'copyApexSnippet':
+                    copyApexSnippet(obj.payload);
+                    break;
             }
         } else
         {
@@ -74,45 +97,100 @@
         }
     }
 
+    const devConsoleTool = () => 
+    {
+        windowAnonymCode = document.getElementById('executeHighlightedButton').parentElement;
+        //console.log('START DEV CONSOLE TOOL: ', windowAnonymCode);
+
+        if (windowAnonymCode)
+        {
+            clearInterval(consoleIntervalSearch);
+            if (!document.getElementsByClassName('DCSnippet')[0])
+            {
+                btnCodeSnippet = document.createElement('button');
+                btnCodeSnippet.className = 'DCSnippet x-btn x-box-item x-toolbar-item x-btn-default-toolbar-small x-noicon x-btn-noicon x-btn-default-toolbar-small-noicon';
+                btnCodeSnippet.innerText = 'Code Snippet';
+                btnCodeSnippet.style = 'height: 22px';
+
+                windowAnonymCode.appendChild(btnCodeSnippet);
+
+                btnCodeSnippet.addEventListener('click', showHideCodeSnippet);
+            }
+        }
+    }
+
+    const showHideCodeSnippet = () => 
+    {
+        let div = document.createElement('div');
+        div.id = 'DCTOOL';
+        div.style =
+            'z-index: 1000;display: flex;position: relative;bottom: 137px;left: 77px;';
+
+        let windowApexCode = windowAnonymCode.parentElement.parentElement.parentElement.parentElement.parentElement;
+        if (!codeSnippetOpen)
+        {
+            codeSnippetOpen = true;
+            frameSnippet = document.createElement('iframe');
+            frameSnippet.src = chrome.runtime.getURL('snippet.html');
+            frameSnippet.style = 'width: 430px; height: 285px; border: 0; ';
+            div.appendChild(frameSnippet);
+            windowApexCode.appendChild(div);
+        } else
+        {
+            codeSnippetOpen = false;
+            windowApexCode.removeChild(document.getElementById('DCTOOL'));
+        }
+    }
+
+    const copyApexSnippet = (codeTxt) =>
+    {
+        copyToClipboard(codeTxt);
+    }
 
     const newDock = () =>
     {
-        salesforceBody = document.getElementsByClassName('desktop')[0];
-        if (!document.getElementsByClassName('WOtool-btn slds-button slds-button_brand')[0])
+        try
         {
-            woToolBtn = document.createElement('button');
-            woToolBtn.className = 'WOtool-btn slds-button slds-button_brand';
-            woToolBtn.innerText = '🛠️';
-            woToolBtn.style = 'bottom: 11px; position: fixed; right: -12px; z-index:9; height: 30px';
-            woToolBtn.addEventListener('click', showHideWOTools);
+            salesforceBody = document.getElementsByClassName('desktop')[0];
+            if (!document.getElementsByClassName('WOtool-btn slds-button slds-button_brand')[0])
+            {
+                woToolBtn = document.createElement('button');
+                woToolBtn.className = 'WOtool-btn slds-button slds-button_brand';
+                woToolBtn.innerText = '🛠️';
+                woToolBtn.style = 'bottom: 11px; position: fixed; right: -12px; z-index:9; height: 30px';
+                woToolBtn.addEventListener('click', showHideWOTools);
 
-            salesforceBody.appendChild(woToolBtn);
-        }
-        if (toolOpen)
-        {
-            console.log('CHECK WOTOOL', document.getElementById('WOTOOL'));
-            if (!document.getElementById('WOTOOL')) 
+                salesforceBody.appendChild(woToolBtn);
+            }
+            if (toolOpen)
             {
-                let div = document.createElement('div');
-                div.id = 'WOTOOL';
-                div.style =
-                    'z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
-                let frame = document.createElement('iframe');
-                frame.src = chrome.runtime.getURL('dock.html');
-                frame.style = 'width: 275px; height: 285px; border: 0; border-bottom-right-radius: 0px; border-top-right-radius: 15px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;';
-                div.appendChild(frame);
+                console.log('CHECK WOTOOL', document.getElementById('WOTOOL'));
+                if (!document.getElementById('WOTOOL')) 
+                {
+                    let div = document.createElement('div');
+                    div.id = 'WOTOOL';
+                    div.style =
+                        'z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
+                    let frame = document.createElement('iframe');
+                    frame.src = chrome.runtime.getURL('dock.html');
+                    frame.style = 'width: 275px; height: 285px; border: 0; border-bottom-right-radius: 0px; border-top-right-radius: 15px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;';
+                    div.appendChild(frame);
 
-                salesforceBody.appendChild(div);
+                    salesforceBody.appendChild(div);
+                }
+            } else
+            {
+                try
+                {
+                    salesforceBody.removeChild(document.getElementById('WOTOOL'));
+                } catch (e)
+                {
+                    console.log(e);
+                }
             }
-        } else
+        } catch (e)
         {
-            try
-            {
-                salesforceBody.removeChild(document.getElementById('WOTOOL'));
-            } catch (e)
-            {
-                console.log(e);
-            }
+            console.log(e);
         }
     }
 
@@ -167,6 +245,13 @@
             chrome.runtime.sendMessage({
                 type: 'createContextMenu'
             });
+        } else if (windowAnonymCode && selectedText.toString().length > 0)
+        {
+
+            chrome.runtime.sendMessage({
+                type: 'createContextMenuDC'
+            });
+
         } else 
         {
             chrome.runtime.sendMessage({
@@ -176,5 +261,18 @@
 
     }
 
+
+    const copyToClipboard = (textToCopy) =>
+    {
+        const t = document.createElement('textarea');
+        t.value = textToCopy;
+        t.setAttribute('readonly', '');
+        t.style.position = 'absolute';
+        t.style.left = '-9999px';
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
+    }
 
 })();

@@ -13,14 +13,20 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
             {
 
                 let matches = getCurrentSObjectNameAndID(tab);
-                console.log(matches);
-                if (matches[1] && matches[2])
+                console.log('MATCHES ', matches);
+                if (matches && matches[1] && matches[2])
                 {
                     chrome.tabs.sendMessage(tabId, {
                         tab: tab,
                         title: changeInfo.title,
                         sObject: matches[1],
                         Id: matches[2]
+                    });
+                } else if (!matches && changeInfo.title == 'Developer Console')
+                {
+                    console.log('INIT DEV CONSOLE TOOL');
+                    chrome.tabs.sendMessage(tabId, {
+                        response: 'devConsole'
                     });
                 }
             }
@@ -64,7 +70,6 @@ chrome.storage.onChanged.addListener((changes, namespace) =>
 chrome.runtime.onInstalled.addListener(() =>
 {
     chrome.storage.session.clear();
-    chrome.storage.local.set({ 'toolOpen': false });
 });
 
 
@@ -79,6 +84,22 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
             url: urlToGo + '/' + info.selectionText
         });
 
+    } else
+    {
+        let formattedSnippet = info.selectionText.toString().replaceAll(';', ';\n');
+        let snippet = '';
+        let rows = formattedSnippet.split('\n');
+        rows.forEach((row) =>
+        {
+            snippet += (row.trim() + '\n');
+        });
+
+        console.log(snippet);
+
+        chrome.tabs.sendMessage(tab.id, {
+            response: 'popupNameSnippet',
+            payload: snippet
+        });
     }
 });
 
@@ -185,6 +206,18 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
             });
             break;
 
+        case 'createContextMenuDC':
+            chrome.contextMenus.create({
+                title: "Salva selezione come CodeSnippet",
+                contexts: ["selection"],
+                id: "10",
+                documentUrlPatterns: [
+                    "https://*.force.com/*",
+                    "https://*.salesforce.com/*"
+                ]
+            });
+            break;
+
         case 'removeContextMenu':
             chrome.contextMenus.removeAll();
             break;
@@ -223,7 +256,6 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                 url: getCurrentUrl(sender.tab).customDomainHttps + '/lightning/setup/DeployStatus/home'
             });
             break;
-
 
         case 'WO_TOOL_goToApexLog':
             const sid = await chrome.cookies.getAll({
@@ -300,6 +332,53 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                         iconUrl: 'images/icon.png'
                     });
             }
+            break;
+
+        case 'WO_CODESNIPPET_edit':
+            chrome.tabs.sendMessage(sender.tab.id, {
+                response: 'copyApexSnippet',
+                payload: obj.payload
+            });
+            break;
+
+        case 'WO_CODESNIPPET_run':
+
+            const _URL_ = sender.tab.url.split('salesforce.com')
+            newUrl = _URL_[0] + "salesforce.com";
+            console.log('----', newUrl.replace("https://", ""))
+            const sid_ = await chrome.cookies.getAll({
+                name: "sid",
+                domain: newUrl.replace("https://", ""),
+            });
+            console.log('SID----- ', sid_)
+            const urlToSendDelete = newUrl + '/services/data/v57.0/tooling/executeAnonymous/?anonymousBody=';
+            let toSend = urlToSendDelete + obj.payload;
+            console.log('APEX CALL: ', toSend);
+            await fetch(toSend, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json; charset=UTF-8",
+                    Accept: "application/json",
+                    Authorization: "Bearer " + sid_[0].value
+                }
+            }).then(async response =>
+            {
+                console.log('APEX ANONYMOUS RESPONSE', await response.json());
+                /*
+                TODO AGGIUNGERE NOTIFICA DI AVVENUTA OK
+                {
+                    "line": -1,
+                    "column": -1,
+                    "compiled": true,
+                    "success": true,
+                    "compileProblem": null,
+                    "exceptionStackTrace": null,
+                    "exceptionMessage": null
+                }
+                */
+            })
+                .then(result => console.log(result))
+                .catch(error => console.log('error', error));
             break;
 
     }
