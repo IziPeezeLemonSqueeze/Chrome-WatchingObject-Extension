@@ -342,7 +342,6 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
             break;
 
         case 'WO_CODESNIPPET_run':
-
             const _URL_ = sender.tab.url.split('salesforce.com')
             newUrl = _URL_[0] + "salesforce.com";
             console.log('----', newUrl.replace("https://", ""))
@@ -379,6 +378,10 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
             })
                 .then(result => console.log(result))
                 .catch(error => console.log('error', error));
+
+            chrome.tabs.sendMessage(sender.tab.id, {
+                response: 'resetCodeSnippet'
+            });
             break;
 
     }

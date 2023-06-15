@@ -7,6 +7,8 @@
     let btnCodeSnippet;
     let codeSnippetOpen = false;
     let frameSnippet = null;
+    let windowApexCode;
+    let divDCTOOL;
 
     let currentObject = {};
     let watchingBtn;
@@ -36,14 +38,15 @@
                     }, 2000);
                     break;
                 case 'popupNameSnippet':
-                    let nameSnippet = prompt('Nome Snippet?');
-                    // TODO CONTORLLO SUI DUPLICATI
-                    chrome.storage.local.set({
-                        ['snippet_' + nameSnippet]: obj.payload
-                    });
+                    makeSnippet(obj.payload);
                     break;
                 case 'copyApexSnippet':
                     copyApexSnippet(obj.payload);
+                    hideCS(windowApexCode);
+                    break;
+                case 'resetCodeSnippet':
+                    console.log('RESET')
+                    hideCS(windowApexCode);
                     break;
             }
         } else
@@ -99,47 +102,80 @@
 
     const devConsoleTool = () => 
     {
-        windowAnonymCode = document.getElementById('executeHighlightedButton').parentElement;
-        //console.log('START DEV CONSOLE TOOL: ', windowAnonymCode);
-
-        if (windowAnonymCode)
+        try
         {
-            clearInterval(consoleIntervalSearch);
-            if (!document.getElementsByClassName('DCSnippet')[0])
+            windowAnonymCode = document.getElementById('executeHighlightedButton').parentElement;
+            //console.log('START DEV CONSOLE TOOL: ', windowAnonymCode);
+
+            if (windowAnonymCode)
             {
-                btnCodeSnippet = document.createElement('button');
-                btnCodeSnippet.className = 'DCSnippet x-btn x-box-item x-toolbar-item x-btn-default-toolbar-small x-noicon x-btn-noicon x-btn-default-toolbar-small-noicon';
-                btnCodeSnippet.innerText = 'Code Snippet';
-                btnCodeSnippet.style = 'height: 22px';
+                clearInterval(consoleIntervalSearch);
+                if (!document.getElementsByClassName('DCSnippet')[0])
+                {
+                    btnCodeSnippet = document.createElement('button');
+                    btnCodeSnippet.className = 'DCSnippet x-btn x-box-item x-toolbar-item x-btn-default-toolbar-small x-noicon x-btn-noicon x-btn-default-toolbar-small-noicon';
+                    btnCodeSnippet.innerText = 'Code Snippet';
+                    btnCodeSnippet.style = 'height: 22px';
 
-                windowAnonymCode.appendChild(btnCodeSnippet);
+                    windowAnonymCode.appendChild(btnCodeSnippet);
 
-                btnCodeSnippet.addEventListener('click', showHideCodeSnippet);
+                    btnCodeSnippet.addEventListener('click', showHideCodeSnippet);
+                }
             }
-        }
+        } catch (e) { console.log(e) }
     }
 
     const showHideCodeSnippet = () => 
     {
-        let div = document.createElement('div');
-        div.id = 'DCTOOL';
-        div.style =
+        divDCTOOL = document.createElement('div');
+        divDCTOOL.id = 'DCTOOL';
+        divDCTOOL.style =
             'z-index: 1000;display: flex;position: relative;bottom: 137px;left: 77px;';
 
-        let windowApexCode = windowAnonymCode.parentElement.parentElement.parentElement.parentElement.parentElement;
+        windowApexCode = windowAnonymCode.parentElement.parentElement.parentElement.parentElement.parentElement;
         if (!codeSnippetOpen)
         {
-            codeSnippetOpen = true;
-            frameSnippet = document.createElement('iframe');
-            frameSnippet.src = chrome.runtime.getURL('snippet.html');
-            frameSnippet.style = 'width: 430px; height: 285px; border: 0; ';
-            div.appendChild(frameSnippet);
-            windowApexCode.appendChild(div);
+            showCS(divDCTOOL, windowApexCode);
         } else
         {
-            codeSnippetOpen = false;
-            windowApexCode.removeChild(document.getElementById('DCTOOL'));
+            hideCS(windowApexCode);
         }
+    }
+
+    const showCS = (div, windowApexCode) =>
+    {
+        codeSnippetOpen = true;
+        frameSnippet = document.createElement('iframe');
+        frameSnippet.src = chrome.runtime.getURL('snippet.html');
+        frameSnippet.style = 'width: 600px; height: 285px; border: 0; ';
+        div.appendChild(frameSnippet);
+        windowApexCode.appendChild(div);
+    }
+
+    const hideCS = (windowApexCode) =>
+    {
+        codeSnippetOpen = false;
+        console.log('WINDOW', windowApexCode)
+        windowApexCode.removeChild(document.getElementById('DCTOOL'));
+    }
+
+    // indentifierVariabileOnCode + ivc
+
+    const makeSnippet = (payload) =>
+    {
+        const name = prompt('Nome Snippet?');
+        // TODO CONTORLLO SUI DUPLICATI
+        const regexIVC = /@\b[\@V\@ID\@INT\@BOL\@STR]\w+(?='*)/g;
+        const countIVC = String(payload).match(regexIVC);
+        console.log(countIVC);
+
+        chrome.storage.local.set({
+            ['snippet_' + name]: {
+                code: payload,
+                ivcFound: countIVC
+            }
+        });
+
     }
 
     const copyApexSnippet = (codeTxt) =>
@@ -202,7 +238,10 @@
 
     const removeFromWatchingList = () =>
     {
-        salesforceBody.removeChild(watchingBtn);
+        try
+        {
+            salesforceBody.removeChild(watchingBtn);
+        } catch (e) { }
     }
 
     const addToWatchList = async () =>
