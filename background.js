@@ -111,6 +111,7 @@ function clearWatchingProcess()
     watchingP = null;
 }
 
+let timeoutFORCEResetDialog;
 chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 {
     console.log('ARRIVED BE', obj);
@@ -362,23 +363,33 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                 }
             }).then(async response =>
             {
-                console.log('APEX ANONYMOUS RESPONSE', await response.json());
-                /*
-                TODO AGGIUNGERE NOTIFICA DI AVVENUTA OK
+
+                const resp = await response.json();
+                console.log('APEX ANONYMOUS RESPONSE', resp);
+                if (!resp.success)
                 {
-                    "line": -1,
-                    "column": -1,
-                    "compiled": true,
-                    "success": true,
-                    "compileProblem": null,
-                    "exceptionStackTrace": null,
-                    "exceptionMessage": null
+                    chrome.tabs.sendMessage(sender.tab.id, {
+                        response: 'snippet_showErrorDialog',
+                        payload: resp.compileProblem
+                    });
+                    timeoutFORCEResetDialog = setTimeout(() =>
+                    {
+                        chrome.tabs.sendMessage(sender.tab.id, {
+                            response: 'resetCodeSnippet'
+                        });
+                    }, obj.resetTimeoutDialogTime * 1000);
+                } else
+                {
+                    chrome.tabs.sendMessage(sender.tab.id, {
+                        response: 'resetCodeSnippet'
+                    });
                 }
-                */
             })
                 .then(result => console.log(result))
                 .catch(error => console.log('error', error));
-
+            break;
+        case 'WO_CODESNIPPET_forceResetDialog':
+            clearTimeout(timeoutFORCEResetDialog);
             chrome.tabs.sendMessage(sender.tab.id, {
                 response: 'resetCodeSnippet'
             });

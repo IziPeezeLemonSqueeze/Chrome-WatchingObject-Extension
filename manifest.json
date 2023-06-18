@@ -1,7 +1,7 @@
 {
 	"name": "Watching Object!",
 	"description": "Aspetto per te l'aggiornamento dei record!",
-	"version": "1.5.1",
+	"version": "1.5.2",
 	"manifest_version": 3,
 	"permissions": [
 		"notifications",

@@ -1,7 +1,9 @@
 const root = document.getElementById('snippet_body');
-const list = root.childNodes[1].childNodes[3]
+console.log(root.childNodes)
+let list = root.childNodes[3].childNodes[3]
 let nButton = [];
-
+let dialog = document.getElementById('dialog');
+let mapValue = new Map();
 
 chrome.storage.onChanged.addListener(async (changes, namespace) =>
 {
@@ -17,6 +19,25 @@ chrome.storage.onChanged.addListener(async (changes, namespace) =>
     }
 });
 
+chrome.runtime.onMessage.addListener((obj, sender, response) =>
+{
+    console.log('ARRIVED SNIPPET', obj);
+    if (obj.response && obj.response.includes('snippet_'))
+    {
+        switch (obj.response)
+        {
+            case 'snippet_resetDialog':
+                hideHandlerDialogInfo();
+                break;
+            case 'snippet_showErrorDialog':
+                console.log(obj.payload);
+                showHandlerDialogError(obj.payload);
+                break;
+        }
+    }
+});
+
+
 const createObjectList = () =>
 {
     chrome.storage.local.get(null, async (items) =>
@@ -28,6 +49,7 @@ const createObjectList = () =>
         }
     });
 }
+
 
 const creatorElementList = async (items) =>
 {
@@ -46,24 +68,28 @@ const creatorElementList = async (items) =>
             let btnRun = document.createElement('button');
             btnRun.innerText = 'Run 🚀';
             btnRun.style = items[k].ivcFound ?
-                "background-color: darkorange;margin-left: auto; margin-right: 1%" :
-                "margin-left: auto; margin-right: 1%"
+                "background-color: darkorange;margin-left: auto;margin-right: 1%;size: unset;max-height: 25px;" :
+                "margin-left: auto;margin-right: 1%;size: unset;max-height: 25px;"
 
             btnRun.id = k + '-run';
             btnRun.title = items[k].ivcFound ?
                 'Esegui subito il codice!\n--⚠️-- ATTENZIONE --⚠️--\n Inserirai delle variabili prima della vera esecuzione!' :
                 'Esegui subito il codice!'
+            btnRun.className = 'slds-button slds-button_success';
 
             let btnMod = document.createElement('button');
             btnMod.innerText = '💾';
             btnMod.id = k + '-mod';
             btnMod.title = 'Copia il codice!'
+            btnMod.className = 'slds-button slds-button_outline-brand';
+            btnMod.style = 'max-height: 25px;';
 
             let btnRemove = document.createElement('button');
             btnRemove.innerText = '🚽';
             btnRemove.id = k + '-del';
             btnRemove.title = 'Butta il codice!'
-
+            btnRemove.className = 'slds-button slds-button_outline-brand';
+            btnRemove.style = 'max-height: 25px;';
 
             let span = document.createElement('span');
             span.innerText = k.replace('snippet_', '');
@@ -99,7 +125,7 @@ const creatorElementList = async (items) =>
                 console.log(id[0], 'RUN');
                 btnIdx.doc.addEventListener('click', () =>
                 {
-                    handler_run(btnIdx.payload);
+                    handler_run(btnIdx.doc, btnIdx.payload);
                 });
                 break;
             case 'mod':
@@ -119,16 +145,92 @@ const creatorElementList = async (items) =>
 
         }
     });
-
 }
 
-const handler_run = (args) =>
+let intervalHideErrorDIalog;
+let secAutoClose = 5;
+let divErrorDialog = document.createElement('div');
+const showHandlerDialogError = (textObj) =>
 {
-    console.log('HANDLING RUN BUTTON', args);
-    let mapValue = new Map();
-    if (args.ivcFound != null && args.ivcFound.length > 0)
+    //initDialog();
+    console.log('TESTO ERRORE DIALOG', textObj);
+    divErrorDialog.id = 'divErrorDialog';
+    divErrorDialog.className = 'column';
+    divErrorDialog.style = "-webkit-text-stroke-width: medium;text-align-last: center;"
+    let span = document.createElement('span');
+    span.innerText = textObj;
+    let btn = document.createElement('button');
+    btn.className = 'slds-button slds-button_brand';
+
+
+    btn.addEventListener('click', () =>
     {
-        args.ivcFound.forEach((ivc) =>
+        hideHandlerDialogError();
+        chrome.runtime.sendMessage({
+            type: 'WO_CODESNIPPET_forceResetDialog'
+        });
+    });
+
+    intervalHideErrorDIalog = setInterval(() =>
+    {
+        if (secAutoClose <= 1)
+        {
+            hideHandlerDialogError();
+        }
+        secAutoClose--;
+        btn.innerText = `Ok ...${secAutoClose}`;
+    }, 1000);
+
+    divErrorDialog.appendChild(span);
+    divErrorDialog.appendChild(document.createElement('br'));
+    divErrorDialog.appendChild(btn);
+
+    dialog.innerText = 'ERRORE: ';
+    dialog.appendChild(divErrorDialog);
+    dialog.setAttribute('open', '');
+}
+
+const hideHandlerDialogError = () =>
+{
+    try
+    {
+        clearInterval(intervalHideErrorDIalog);
+    } catch (e) { }
+    secAutoClose = 5;
+
+    dialog.innerHTML = '';
+    hideHandlerDialogInfo();
+}
+
+const showHandlerDialogInfo = (textDialog) =>
+{
+    dialog.innerText = textDialog;
+    dialog.setAttribute('open', '');
+
+    nButton.forEach(btn =>
+    {
+        btn.doc.setAttribute('disabled', '');
+    });
+}
+
+const hideHandlerDialogInfo = () =>
+{
+    dialog.innerText = '';
+    dialog.removeAttribute('open');
+    nButton.forEach(btn =>
+    {
+        btn.doc.removeAttribute('disabled');
+    });
+}
+
+const handler_run = (doc, payload) =>
+{
+    console.log('HANDLING RUN BUTTON', doc, payload);
+    showHandlerDialogInfo('Snippet in RUN...Attendere!', [doc.id]);
+
+    if (payload.ivcFound != null && payload.ivcFound.length > 0)
+    {
+        payload.ivcFound.forEach((ivc) =>
         {
             console.log(ivc);
             if (ivc.includes('@ID'))
@@ -189,7 +291,7 @@ const handler_run = (args) =>
 
         mapValue.forEach(k =>
         {
-            let rows = args.code.split('\n');
+            let rows = payload.code.split('\n');
             rows.forEach(row =>
             {
                 let rowGood = row;
@@ -210,7 +312,7 @@ const handler_run = (args) =>
                                     k.type == 'BOL' ?
                                         'BOOLEANO' :
                                         k.type == 'V' ?
-                                            'QUALSIASI, Variabile senza segno, QUA SI PUOSSONO USARE LE VIRGOLETTE!' :
+                                            'QUALSIASI, Variabile senza tipo, QUA SI POSSONO USARE LE VIRGOLETTE!' :
                                             null
                         }
                     ${k.type != 'V' ?
@@ -251,19 +353,19 @@ const handler_run = (args) =>
         mapValue.forEach(k =>
         {
             console.log('CHECK 3', k);
-            while (args.code.includes(k.ivc))
+            while (payload.code.includes(k.ivc))
             {
                 let splitted = [];
 
                 if (k.type == 'V')
                 {
-                    splitted = args.code.split(k.ivc);
+                    splitted = payload.code.split(k.ivc);
                 } else
                 {
-                    splitted = args.code.split("'" + k.ivc + "'");
+                    splitted = payload.code.split("'" + k.ivc + "'");
                 }
                 console.log('QUI', splitted)
-                args.code = String(splitted[0] +
+                payload.code = String(splitted[0] +
                     (k.type == 'STR' || k.type == 'ID' ?
                         ("'" + k.value + "'") :
                         k.value)
@@ -271,13 +373,14 @@ const handler_run = (args) =>
 
             }
         });
-        console.log('FINAL ', args.code);
-        args.code = args.code.replaceAll('\n', '');
+        console.log('FINAL ', payload.code);
+        payload.code = payload.code.replaceAll('\n', '');
     }
 
     chrome.runtime.sendMessage({
         type: 'WO_CODESNIPPET_run',
-        payload: args.code
+        payload: payload.code,
+        resetTimeoutDialogTime: secAutoClose
     });
 }
 

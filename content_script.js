@@ -47,6 +47,7 @@
                 case 'resetCodeSnippet':
                     console.log('RESET')
                     hideCS(windowApexCode);
+                    showCS(divDCTOOL, windowApexCode);
                     break;
             }
         } else
@@ -156,6 +157,10 @@
     {
         codeSnippetOpen = false;
         console.log('WINDOW', windowApexCode)
+        divDCTOOL = document.createElement('div');
+        divDCTOOL.id = 'DCTOOL';
+        divDCTOOL.style =
+            'z-index: 1000;display: flex;position: relative;bottom: 137px;left: 77px;';
         windowApexCode.removeChild(document.getElementById('DCTOOL'));
     }
 
@@ -175,7 +180,6 @@
                 ivcFound: countIVC
             }
         });
-
     }
 
     const copyApexSnippet = (codeTxt) =>
