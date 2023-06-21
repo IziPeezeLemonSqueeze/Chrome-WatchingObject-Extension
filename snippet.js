@@ -1,5 +1,4 @@
 const root = document.getElementById('snippet_body');
-console.log(root.childNodes)
 let list = root.childNodes[3].childNodes[3]
 let nButton = [];
 let dialog = document.getElementById('dialog');
@@ -125,7 +124,7 @@ const creatorElementList = async (items) =>
                 console.log(id[0], 'RUN');
                 btnIdx.doc.addEventListener('click', () =>
                 {
-                    handler_run(btnIdx.doc, btnIdx.payload);
+                    handler_run(btnIdx.doc, btnIdx.payload, btnIdx.id);
                 });
                 break;
             case 'mod':
@@ -204,6 +203,7 @@ const hideHandlerDialogError = () =>
 
 const showHandlerDialogInfo = (textDialog) =>
 {
+    dialog.setAttribute('z-index', '2000000000000000000');
     dialog.innerText = textDialog;
     dialog.setAttribute('open', '');
 
@@ -223,9 +223,9 @@ const hideHandlerDialogInfo = () =>
     });
 }
 
-const handler_run = (doc, payload) =>
+const handler_run = (doc, payload, id) =>
 {
-    console.log('HANDLING RUN BUTTON', doc, payload);
+    console.log('HANDLING RUN BUTTON', payload);
     showHandlerDialogInfo('Snippet in RUN...Attendere!', [doc.id]);
 
     if (payload.ivcFound != null && payload.ivcFound.length > 0)
@@ -288,100 +288,47 @@ const handler_run = (doc, payload) =>
             }
         });
         console.log('CHECK 1', mapValue);
+        chrome.runtime.sendMessage({
+            type: 'WO_CODESNIPPET_openDialogVar',
+            payload: [Object.fromEntries(mapValue), payload.code, id]
 
-        mapValue.forEach(k =>
-        {
-            let rows = payload.code.split('\n');
-            rows.forEach(row =>
-            {
-                let rowGood = row;
-                if (rowGood.includes('//'))
+        });
+        /* 
+                console.log('CHECK 2', mapValue.values());
+                mapValue.forEach(k =>
                 {
-                    rowGood = rowGood.replace('//', '/*')
-                    rowGood += '*/'
-                }
-                if (rowGood.includes(k.ivc))
-                {
-                    let promptRow = `Inserisci il valore per ${k.name}
-                    Tipo: ${k.type == 'STR' ?
-                            'STRINGA' :
-                            k.type == 'ID' ?
-                                'STRINGA' :
-                                k.type == 'NMB' ?
-                                    'NUMERO' :
-                                    k.type == 'BOL' ?
-                                        'BOOLEANO' :
-                                        k.type == 'V' ?
-                                            'QUALSIASI, Variabile senza tipo, QUA SI POSSONO USARE LE VIRGOLETTE!' :
-                                            null
-                        }
-                    ${k.type != 'V' ?
-                            'NON INSERIRE MAI LE VIRGOLETTE  ""' : null} 
-                    ------   CODE_LINE_START  ------
-                    ${rowGood}  
-                    ------   CODE_LINE_STOP   ------`;
-
-                    let vPrompt = '';
-                    switch (k.type)
+                    console.log('CHECK 3', k);
+                    while (payload.code.includes(k.ivc))
                     {
-                        case 'ID':
-                            let insertError = false;
-                            let okId = false
-                            while (!okId)
-                            {
-                                if (insertError)
-                                {
-                                    promptRow += '\nInserito ID che non rispetta i 18 caratteri';
-                                }
-                                vPrompt = prompt(promptRow);
-                                vPrompt.length < 18 ?
-                                    insertError = true : okId = true;
-                            }
-                            k.value = vPrompt;
-                            break;
-                        default:
-                            k.value = prompt(promptRow);
-                            break;
+                        let splitted = [];
+        
+                        if (k.type == 'V')
+                        {
+                            splitted = payload.code.split(k.ivc);
+                        } else
+                        {
+                            splitted = payload.code.split("'" + k.ivc + "'");
+                        }
+                        console.log('QUI', splitted)
+                        payload.code = String(splitted[0] +
+                            (k.type == 'STR' || k.type == 'ID' ?
+                                ("'" + k.value + "'") :
+                                k.value)
+                            + splitted[1]);
+        
                     }
-
-                    console.log(mapValue.id)
-
-                }
-            })
+                });
+                console.log('FINAL ', payload.code);
+                payload.code = payload.code.replaceAll('\n', ''); */
+    } else
+    {
+        chrome.runtime.sendMessage({
+            type: 'WO_CODESNIPPET_run',
+            payload: payload.code.replaceAll('\n', ''),
+            resetTimeoutDialogTime: secAutoClose
         });
-        console.log('CHECK 2', mapValue.values());
-        mapValue.forEach(k =>
-        {
-            console.log('CHECK 3', k);
-            while (payload.code.includes(k.ivc))
-            {
-                let splitted = [];
-
-                if (k.type == 'V')
-                {
-                    splitted = payload.code.split(k.ivc);
-                } else
-                {
-                    splitted = payload.code.split("'" + k.ivc + "'");
-                }
-                console.log('QUI', splitted)
-                payload.code = String(splitted[0] +
-                    (k.type == 'STR' || k.type == 'ID' ?
-                        ("'" + k.value + "'") :
-                        k.value)
-                    + splitted[1]);
-
-            }
-        });
-        console.log('FINAL ', payload.code);
-        payload.code = payload.code.replaceAll('\n', '');
     }
 
-    chrome.runtime.sendMessage({
-        type: 'WO_CODESNIPPET_run',
-        payload: payload.code,
-        resetTimeoutDialogTime: secAutoClose
-    });
 }
 
 const handler_mod = (args) =>

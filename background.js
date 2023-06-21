@@ -350,7 +350,6 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                 name: "sid",
                 domain: newUrl.replace("https://", ""),
             });
-            console.log('SID----- ', sid_)
             const urlToSendDelete = newUrl + '/services/data/v57.0/tooling/executeAnonymous/?anonymousBody=';
             let toSend = urlToSendDelete + obj.payload;
             console.log('APEX CALL: ', toSend);
@@ -388,12 +387,24 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
                 .then(result => console.log(result))
                 .catch(error => console.log('error', error));
             break;
+
+        case 'WO_CODESNIPPET_openDialogVar':
+            chrome.tabs.sendMessage(sender.tab.id, {
+                response: 'openDialogVar',
+                payload: obj.payload
+            });
+            break;
+
+
+
         case 'WO_CODESNIPPET_forceResetDialog':
             clearTimeout(timeoutFORCEResetDialog);
             chrome.tabs.sendMessage(sender.tab.id, {
                 response: 'resetCodeSnippet'
             });
             break;
+
+
 
     }
 

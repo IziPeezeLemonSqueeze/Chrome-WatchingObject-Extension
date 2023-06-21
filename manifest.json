@@ -1,7 +1,7 @@
 {
 	"name": "Watching Object!",
 	"description": "Aspetto per te l'aggiornamento dei record!",
-	"version": "1.5.2",
+	"version": "1.5.3",
 	"manifest_version": 3,
 	"permissions": [
 		"notifications",
@@ -20,7 +20,11 @@
 	},
 	"web_accessible_resources": [
 		{
-			"resources": ["dock.html", "snippet.html"],
+			"resources": [
+				"dock.html",
+				"snippet.html",
+				"snippet.css"
+			],
 			"matches":  [
 				"https://*.force.com/*",
 				"https://*.salesforce.com/*"
@@ -35,6 +39,7 @@
         	"https://*.salesforce.com/*"
 		],
         "js": ["content_script.js"],
+		"css": ["snippet.css"],
 		"all_frames": true
       }
     ],

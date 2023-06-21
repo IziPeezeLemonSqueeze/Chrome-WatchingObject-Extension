@@ -1,0 +1,54 @@
+#textarea-dialogvar, #elemlist, #spantextarea-dialogvar, #btnAnnulla-dialogvar, #btnRunClose-dialogvar, #btnRun-dialogvar {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+#textarea-dialogvar, #elemlist {
+    padding: 10px;
+    max-width: 100%;
+    line-height: 1.5;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 1px 1px 1px #999;
+}
+
+#btnRunClose-dialogvar, #btnRun-dialogvar, #btnAnnulla-dialogvar
+{
+    height: 25px;
+    width: 200px;
+}
+
+#btnRunClose-dialogvar :hover
+{
+    background-color: green;
+}
+
+
+#btnRun-dialogvar :hover
+{
+    background-color: cornflowerblue;
+
+}
+
+#btnAnnulla-dialogvar :hover
+{
+    background-color: red;
+
+}
+
+#spantestovarname 
+{
+    font-size: 0.6rem;
+}
+
+.dialoggood {
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: green;
+}
+.dialogerror {
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: red;
+}
+
+
