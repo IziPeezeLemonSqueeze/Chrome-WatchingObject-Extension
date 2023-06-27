@@ -293,33 +293,6 @@ const handler_run = (doc, payload, id) =>
             payload: [Object.fromEntries(mapValue), payload.code, id]
 
         });
-        /* 
-                console.log('CHECK 2', mapValue.values());
-                mapValue.forEach(k =>
-                {
-                    console.log('CHECK 3', k);
-                    while (payload.code.includes(k.ivc))
-                    {
-                        let splitted = [];
-        
-                        if (k.type == 'V')
-                        {
-                            splitted = payload.code.split(k.ivc);
-                        } else
-                        {
-                            splitted = payload.code.split("'" + k.ivc + "'");
-                        }
-                        console.log('QUI', splitted)
-                        payload.code = String(splitted[0] +
-                            (k.type == 'STR' || k.type == 'ID' ?
-                                ("'" + k.value + "'") :
-                                k.value)
-                            + splitted[1]);
-        
-                    }
-                });
-                console.log('FINAL ', payload.code);
-                payload.code = payload.code.replaceAll('\n', ''); */
     } else
     {
         chrome.runtime.sendMessage({

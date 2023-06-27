@@ -1,0 +1,36 @@
+{
+    "iconaOcchioWatchingObject": {
+        "it": "Questo oggetto è attualmente in uno stato di osservazione, non cambiare pagina, non chiudere la tab e non chiudere chrome, qui ci penso io... appena ho un aggiornamento, aggiorno la pagina e ti mando una notifica. Clicca qui per interrompere lo stato di osservazione.",
+        "en": "This object is currently in an observation state, don't change the page, don't close the tab and don't close chrome, I'll take care of it here--as soon as I have an update, I'll refresh the page and send you a notification. Click here to stop the observation state."
+    },
+
+    "promptCancellazioneOcchioWatchingObject": {
+        "it": "Vuoi veramente cancellare lo stato di osservazione?",
+        "en": "Do you really want to cancel the observation status?"
+    },
+
+    "showAllData": {
+        "it": "Mostra tutti i dati.",
+        "en": "Show All Data."
+    },
+
+    "showAllDataCampoDiRicerca": {
+        "it": "Ricerca 🔎",
+        "en": "Search 🔎"
+    },
+
+    "btnSalvaDatiModificati": {
+        "it": "Salva 💾",
+        "en": "Save 💾"
+    },
+
+    "btnAggiornaDati": {
+        "it": "Aggiorna 🔄️",
+        "en": "Update 🔄️"
+    },
+
+    "LabelUltimoAggiornamentoData": {
+        "it": "Ultimo aggiornamento: ",
+        "en": "Last update: "
+    }
+}
