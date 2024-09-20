@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link
-      href="salesforce-lightning-design-system.min.css"
-      rel="stylesheet"
-      type="text/css"
-    />
 
-    <script type="module" src="snippet.js"></script>
-  </head>
-  <body id="snippet_body">
-    <dialog
-      id="dialog"
-      style="
+	<head>
+		<link href="salesforce-lightning-design-system.min.css"
+			rel="stylesheet"
+			type="text/css" />
+
+		<script type="module"
+			src="snippet.js"></script>
+	</head>
+
+	<body id="snippet_body">
+		<dialog id="dialog"
+			style="
         border-radius: 30px;
         position: absolute;
         top: 15%;
@@ -20,30 +20,36 @@
         border-color: chartreuse;
         background-color: rgba(0, 0, 0, 0.2);
         z-index: 1;
-      "
-    ></dialog>
-    <div style="padding: 1%">
-      <div class="slds-form-element">
-        <div class="slds-form-element__control">
-          <div
-            class="slds-checkbox"
-            style="
+      "></dialog>
+		<div style="padding: 1%">
+			<div class="slds-form-element">
+				<div class="slds-form-element__control"
+					style="background-color: slategray;
+						display: flex;
+						flex-direction: row;
+						flex-wrap: nowrap;
+						justify-content: center;
+						align-items: center;">
+					<div class="slds-checkbox"
+						style="
               background-color: slategrey;
               -webkit-text-fill-color: white;
               text-align: center;
-            "
-          >
-            <label class="slds-checkbox__label"
-              ><b>Watching Object! [CODE SNIPPET]</b>
-            </label>
-          </div>
-        </div>
-      </div>
-      <ul
-        id="list"
-        style="max-height: 130px; overflow-y: scroll"
-        class="slds-has-block-links_space"
-      ></ul>
-    </div>
-  </body>
+            ">
+						<label class="slds-checkbox__label"><b>[CODE SNIPPET]</b>
+						</label>
+					</div>
+					<button title="BACKUP SNIPPETS"
+						class="slds-button slds-button_brand"
+						style="max-block-size: -webkit-fill-available;position: absolute;right: 31px;width: 116px;"
+						id="btnBackupSnippets">
+					</button>
+				</div>
+			</div>
+			<ul id="list"
+				style="max-height: 130px; overflow-y: scroll"
+				class="slds-has-block-links_space"></ul>
+		</div>
+	</body>
+
 </html>

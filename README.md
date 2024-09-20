@@ -25,3 +25,11 @@ By Stefano Pastore
 License
 -----
 MIT
+
+v1.6.0
+-----
+Added shortcut to FLOWs
+Removed Watching Button
+Improved CODE SNIPPET
+Added BACKUP Button on CODE SNIPPET
+Improved DOCK Shortcut

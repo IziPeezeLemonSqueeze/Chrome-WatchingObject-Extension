@@ -4,74 +4,86 @@ const btnApexJobs = document.getElementById('btnApexJobs');
 const btnUsers = document.getElementById('btnUsers');
 const btnDeploy = document.getElementById('btnDeploy');
 const btnApexLog = document.getElementById('btnApexLog');
+const btnFlow = document.getElementById('btnFlw');
 
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
-    btnObjectManager.addEventListener('click', () =>
-    {
-        objectManagerEvent();
-    });
-    btnMdt.addEventListener('click', () =>
-    {
-        customMetadataEvent();
-    });
-    btnApexJobs.addEventListener('click', () =>
-    {
-        apexJobsEvent();
-    });
-    btnUsers.addEventListener('click', () =>
-    {
-        usersEvent();
-    });
-    btnDeploy.addEventListener('click', () =>
-    {
-        deployEvent();
-    });
-    btnApexLog.addEventListener('click', () =>
-    {
-        apexLogEvent();
-    });
+	btnObjectManager.addEventListener('click', () =>
+	{
+		objectManagerEvent();
+	});
+	btnMdt.addEventListener('click', () =>
+	{
+		customMetadataEvent();
+	});
+	btnApexJobs.addEventListener('click', () =>
+	{
+		apexJobsEvent();
+	});
+	btnUsers.addEventListener('click', () =>
+	{
+		usersEvent();
+	});
+	btnDeploy.addEventListener('click', () =>
+	{
+		deployEvent();
+	});
+	btnApexLog.addEventListener('click', () =>
+	{
+		apexLogEvent();
+	});
+	btnFlow.addEventListener('click', () =>
+	{
+		flowEvent();
+	});
 });
 
 const objectManagerEvent = () =>
 {
-    chrome.runtime.sendMessage({
-        type: 'WO_TOOL_goToObjectManager'
-    });
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_goToObjectManager'
+	});
 }
 
 const customMetadataEvent = () =>
 {
-    chrome.runtime.sendMessage({
-        type: 'WO_TOOL_goToCustomMetadata'
-    });
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_goToCustomMetadata'
+	});
 }
 
 const apexJobsEvent = () =>
 {
-    chrome.runtime.sendMessage({
-        type: 'WO_TOOL_goToApexJobs'
-    });
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_goToApexJobs'
+	});
 }
 
 const usersEvent = () =>
 {
-    chrome.runtime.sendMessage({
-        type: 'WO_TOOL_goToUsers'
-    });
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_goToUsers'
+	});
 }
 
 const deployEvent = () =>
 {
-    chrome.runtime.sendMessage({
-        type: 'WO_TOOL_goToDeploy'
-    });
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_goToDeploy'
+	});
 }
 
 const apexLogEvent = () =>
 {
-    chrome.runtime.sendMessage({
-        type: 'WO_TOOL_goToApexLog'
-    });
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_goToApexLog'
+	});
+}
+
+const flowEvent = () =>
+{
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_goToFlow'
+	});
 }
