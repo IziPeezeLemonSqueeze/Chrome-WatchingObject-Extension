@@ -318,7 +318,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					'',
 					{
 						type: 'basic',
-						title: 'CANCELLAZIONE APEX LOG',
+						title: 'DELETING APEX LOGS',
 						message: await res.totalSize + ' ApexLog eliminati!',
 						iconUrl: 'images/icon.png'
 					});
@@ -329,8 +329,8 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					'',
 					{
 						type: 'basic',
-						title: 'CANCELLAZIONE APEX LOG',
-						message: 'Non ci sono abbastanza log per effettuare l\'operazione. Trovati: ' + res.totalSize,
+						title: 'DELETING APEX LOGS',
+						message: 'There are not enough logs to perform the operation. Found: ' + res.totalSize,
 						iconUrl: 'images/icon.png'
 					});
 			}

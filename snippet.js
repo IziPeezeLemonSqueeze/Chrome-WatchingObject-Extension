@@ -97,21 +97,21 @@ const creatorElementList = async (items) =>
 
 			btnRun.id = k + '-run';
 			btnRun.title = items[k].ivcFound ?
-				'Esegui subito il codice!\n--⚠️-- ATTENZIONE --⚠️--\n Inserirai delle variabili prima della vera esecuzione!' :
-				'Esegui subito il codice!'
+				'Run the code now!\n--⚠️-- WARNING --⚠️--\n You will insert variables before the actual execution!' :
+				'Run the code now!'
 			btnRun.className = 'slds-button slds-button_success';
 
 			let btnMod = document.createElement('button');
 			btnMod.innerText = '💾';
 			btnMod.id = k + '-mod';
-			btnMod.title = 'Copia il codice!'
+			btnMod.title = 'Copy the code!'
 			btnMod.className = 'slds-button slds-button_outline-brand';
 			btnMod.style = 'max-height: 25px;';
 
 			let btnRemove = document.createElement('button');
 			btnRemove.innerText = '🚽';
 			btnRemove.id = k + '-del';
-			btnRemove.title = 'Butta il codice!'
+			btnRemove.title = 'Trash the code!'
 			btnRemove.className = 'slds-button slds-button_outline-brand';
 			btnRemove.style = 'max-height: 25px;';
 
@@ -250,7 +250,7 @@ const hideHandlerDialogInfo = () =>
 const handler_run = (doc, payload, id) =>
 {
 	console.log('HANDLING RUN BUTTON', payload);
-	showHandlerDialogInfo('Snippet in RUN...Attendere!', [doc.id]);
+	showHandlerDialogInfo('Snippet in RUN...Waiting!', [doc.id]);
 
 	if (payload.ivcFound != null && payload.ivcFound.length > 0)
 	{

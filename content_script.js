@@ -399,7 +399,7 @@
 		let dialog = document.createElement('dialog');
 		dialog.id = 'dialogvar';
 		let title = document.createElement('h4');
-		title.innerText = 'CODE SNIPPET - Assegnazione valori!\nNOME SNIPPET: ' + id.replace('snippet_', '');
+		title.innerText = 'CODE SNIPPET - Value assignment!\nNAME SNIPPET: ' + id.replace('snippet_', '');
 
 		dialog.setAttribute('open', '');
 		dialog.style = "background-color: rgba(255, 255, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;margin: 5%;min-width: -webkit-fill-available;position: fixed;z-index: 1000000000;top: 1%;box-shadow: rgba(0, 0, 0, 0.11) 0px 0 7px 9px;height: 520px;"
@@ -436,11 +436,12 @@
 		div.appendChild(divRight);
 		const mapType = new Map(
 			[
-				['ID', 'ID, qui puoi mettere solo ID, c\'è il controllo dei 18 caratteri!.\nNIENTE VIRGOLETTE O APICI'],
-				['NMB', 'Numero, qui puoi mettere solo numeri, rappresenta qualsiasi tipo di numero: Int, Float, Decimal ecc...\nNIENTE VIRGOLETTE O APICI'],
-				['STR', 'Stringa, qui puoi mettere solo del testo.\nNIENTE VIRGOLETTE O APICI'],
-				['BOL', 'Boolean, qui puoi mettere true o false\nNIENTE VIRGOLETTE O APICI'],
-				['V', 'Any, qui puoi mettere qualsiasi cosa. QUI LE VIRGOLETTE SONO AMMESSE, dipende dai casi. Utile nella concatenazione di Stringhe'],
+				['ID', 'ID, here you can put only ID, there is the 18-character check!.\nNO SUPERSCRIPTS OR QUOTATION MARKS'],
+				['NMB', 'Number, here you can put only numbers, it represents any kind of number: Int, Float, Decimal etc...\nNO SUPERSCRIPTS OR QUOTATION MARKS'],
+				['STR', 'String, here you can put only text.\n NO SUPERSCRIPTS OR QUOTATION MARKS'],
+				['BOL', 'Boolean, here you can put true or false.'],
+				['V', 'Any, here you can put anything. HERE SUPERSCRIPTS OR QUOTATION MARKS ARE ALLOWED, depending on the case. Useful in String concatenation'],
+
 			]);
 		//console.log('mapValue', mapValue);
 
@@ -456,14 +457,14 @@
 			let nameVar = document.createElement('h2');
 			nameVar.innerText = el.name;
 			spanTestoTipo.innerText =
-				'Inserisci il valore per la variabile: ';
+				'Enter the value for the variable: ';
 			spanTestoTipo.appendChild(nameVar);
 
 			let spanTestoVarName = document.createElement('p');
 			spanTestoVarName.id = 'spantestovarname';
 			spanTestoVarName.innerText =
-				`La variabile è di tipo: ${mapType.get(el.type) ? el.type : 'UNDEFINED'}
-                Descrizione Tipo: ${mapType.get(el.type)}
+				`The variable is of type: ${mapType.get(el.type) ? el.type : 'UNDEFINED'}
+                Description Type: ${mapType.get(el.type)}
                 `;
 
 			let isInvalidField = false;
@@ -472,7 +473,7 @@
 			input.setAttribute('type', 'text');
 			input.className = "dialogerror";
 			input.style = "width: -webkit-fill-available;"
-			input.placeholder = 'Inserisci qui il valore che vuoi assegnare!';
+			input.placeholder = 'Enter the value you want to assign here!';
 
 			input.addEventListener('input', (e) =>
 			{
@@ -653,7 +654,7 @@
 		divCenter.appendChild(list);
 		let spanTextArea = document.createElement('span');
 		spanTextArea.id = 'spantextarea-dialogvar';
-		spanTextArea.innerText = 'Codice risultante';
+		spanTextArea.innerText = 'Resulting code';
 		let textArea = document.createElement('textarea');
 		textArea.id = 'textarea-dialogvar';
 		textArea.setAttribute('row', 50);
@@ -698,7 +699,7 @@
 				{
 					allValue = false;
 					elemlist.style = 'border-color: red;';
-					elemlist.title = 'Qua c\'è un problema... ';
+					elemlist.title = 'Here is a problem... ';
 				}
 			});
 
@@ -741,7 +742,7 @@
 				{
 					allValue = false;
 					elemlist.style = 'border-color: red;';
-					elemlist.title = 'Qua c\'è un problema... ';
+					elemlist.title = 'Here is a problem... ';
 				}
 			});
 
@@ -772,7 +773,7 @@
 		});
 
 		let btnAnnulla = document.createElement('button');
-		btnAnnulla.innerText = 'ANNULLA ❌';
+		btnAnnulla.innerText = 'CANCEL ❌';
 		btnAnnulla.id = 'btnAnnulla-dialogvar';
 		btnAnnulla.className = 'x-btn-inner';
 		btnAnnulla.addEventListener('click', (e) =>
