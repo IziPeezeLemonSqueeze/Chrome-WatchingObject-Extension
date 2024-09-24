@@ -1,7 +1,7 @@
 {
 	"name": "Salesforce Enhancer",
 	"description": "Developer tool for Salesforce, designed to help and speed up what the developer has to do!",
-	"version": "1.6.0",
+	"version": "1.6.1",
 	"manifest_version": 3,
 	"permissions": [
 		"notifications",
@@ -48,7 +48,7 @@
 		"48": "images/icon.png",
 		"128": "images/icon.png"
 	  },
-	  "default_title": "Object Watching List!",
+	  "default_title": "Salesforce Enhancer",
       "default_popup": "popup.html"
 	},
 	"icons": {

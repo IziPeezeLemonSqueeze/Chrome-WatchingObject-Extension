@@ -11,7 +11,7 @@
 
 	<body>
 		<div class="slds-page-header"
-			style="padding: 0.3rem;">
+			style="padding: 0.2rem;">
 			<div class="slds-page-header__row">
 				<div class="slds-page-header__col-title">
 					<div class="slds-media">
@@ -41,10 +41,30 @@
 			</div>
 		</div>
 		<div class="slds-align_absolute-center"
-			style="text-align: center; height: 15rem">
+			style="text-align: center; height: 21rem">
 			<ul class="slds-has-block-links_space">
 				<li style="margin: 1px">
-					<button title="Apri una nuova tab nelle impostazioni Object Manager"
+					<button title="Show the api name of the object fields"
+						class="slds-button slds-button_brand"
+						style="text-wrap: nowrap; width: 150px"
+						id="btnApiFields">
+						Show API name FIELDS
+					</button>
+				</li>
+				<li style="margin: 1px">
+					<button title="Show the CODE SNIPPET screen"
+						class="slds-button slds-button_brand"
+						style="text-wrap: nowrap; width: 150px"
+						id="btnFastCodeSnippet">
+						CODE SNIPPET
+					</button>
+				</li>
+				<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+				<div
+					style="padding: 1px;background-clip: text;background-color: #eef4ff;-webkit-text-stroke-width: medium;z-index: 100;position: absolute;bottom: 64%;left: 39%;">
+					Shortcuts</div>
+				<li style="margin: 1px">
+					<button title="Open a new tab in the Object Manager settings"
 						class="slds-button slds-button_brand"
 						style="width: 150px"
 						id="btnObjectManager">
@@ -52,14 +72,14 @@
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Apri una nuova tab nelle impostazioni Custom Metadata"
+					<button title="Open a new tab in the Custom Metadata settings"
 						class="slds-button slds-button_brand"
 						style="width: 150px"
 						id="btnMdt">
 						Custom Metadata
 					</button>
 				<li style="margin: 1px">
-					<button title="Apri una nuova tab nelle impostazioni Flow"
+					<button title="Open a new tab in the Flow settings"
 						class="slds-button slds-button_brand"
 						style="width: 150px"
 						id="btnFlw">
@@ -67,7 +87,7 @@
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Apri una nuova tab nelle impostazioni Apex Jobs (Batch)"
+					<button title="Open a new tab in the Apex Jobs (Batch) settings"
 						class="slds-button slds-button_brand"
 						style="width: 150px"
 						id="btnApexJobs">
@@ -75,7 +95,7 @@
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Apri una nuova tab nelle impostazioni USERS"
+					<button title="Open a new tab in the USERS settings"
 						class="slds-button slds-button_brand"
 						style="width: 150px"
 						id="btnUsers">
@@ -83,7 +103,7 @@
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Apri una nuova tab nelle impostazioni Deploy"
+					<button title="Open a new tab in the Deploy"
 						class="slds-button slds-button_brand"
 						style="width: 150px"
 						id="btnDeploy">
@@ -91,7 +111,7 @@
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Cancella tutti gli Apex Logs"
+					<button title="Delete all Apex Logs"
 						class="slds-button slds-button_destructive"
 						style="width: 150px"
 						id="btnApexLog">

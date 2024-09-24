@@ -6,7 +6,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 
 		if (changeInfo.title && !changeInfo.title.includes('Lightning Experience'))
 		{
-
 			console.log(changeInfo.title, changeInfo.status);
 
 			if (changeInfo.status == undefined)
@@ -16,6 +15,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 				console.log('MATCHES ', matches);
 				if (matches && matches[1] && matches[2])
 				{
+					chrome.tabs.sendMessage(tab.id, {
+						response: 'resetApiFieldArray',
+					});
 					chrome.tabs.sendMessage(tabId, {
 						tab: tab,
 						title: changeInfo.title,
@@ -30,6 +32,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 					});
 				}
 			}
+
+
 		} else
 		{
 			chrome.tabs.sendMessage(tabId, {
@@ -39,18 +43,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 				Id: null
 			});
 		}
-		/*     let domains = await chrome.scripting.executeScript({
-					  target: { tabId: tab.id, allFrames: true },
-					  func: getCurrentUrl,
-					  args: [tab]
-				  });
-			   */
-		/* 
-				chrome.action.onClicked.addListener(async (tab) =>
-				{
-	    
-			  
-				}); */
 	}
 });
 
@@ -75,7 +67,7 @@ chrome.runtime.onInstalled.addListener(() =>
 
 chrome.contextMenus.onClicked.addListener((info, tab) =>
 {
-	console.log('CONTEXT_MENU_CLICKED', info, tab);
+	//console.log('CONTEXT_MENU_CLICKED', info, tab);
 	if (info.selectionText.length == 18 && info.selectionText) 
 	{
 		let urlToGo = getCurrentUrl(tab).customDomainHttps;
@@ -114,78 +106,10 @@ function clearWatchingProcess()
 let timeoutFORCEResetDialog;
 chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 {
-	console.log('ARRIVED BE', obj);
+	//console.log('ARRIVED BE', obj);
 
 	switch (obj.type)
 	{
-		/* 		case 'newWatch':
-					chrome.storage.session.get([obj.Id], async data =>
-					{
-						if (data[obj.Id] == null)  
-						{
-							let domains = getCurrentUrl(obj.tab);
-							console.log(domains);
-							const sid = await chrome.cookies.getAll({
-								name: "sid",
-								domain: domains.customDomain,
-							});
-							console.log("SID", sid);
-		
-							let resInspect = await login(
-								domains.customDomainHttps,
-								sid[0].value,
-								obj.sObject,
-								obj.Id
-							);
-							console.log("RESULT INSPECT", resInspect);
-		
-							try
-							{
-								await initStorageCache;
-							} catch (e) { }
-		
-							chrome.storage.session.set({
-								[obj.Id]: [resInspect, obj.tab, {
-									domain: domains.customDomainHttps,
-									sid: sid[0].value
-								}]
-							});
-		
-							startWatchingProcess();
-						}
-		
-					});
-					break;
-				
-				case 'stopWatchProcess':
-					if (watchingP)
-					{
-						clearWatchingProcess();
-						chrome.storage.session.get(null, async (items) =>
-						{
-							if (await items)
-							{
-								Object.keys(await items).forEach(k =>
-								{
-		
-									chrome.storage.session.get([k], async data =>
-									{
-										chrome.tabs.reload(data[k][1].id);
-										chrome.storage.session.remove([k]);
-									});
-								});
-							}
-						}).then(async () =>
-						{
-							await chrome.storage.session.clear();
-							response('res');
-						});
-		
-					}
-					
-					break;
-			*/
-
 		case 'updatePopup':
 			response('res');
 			break;
@@ -257,6 +181,81 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			chrome.tabs.create({
 				active: true,
 				url: getCurrentUrl(sender.tab).customDomainHttps + '/lightning/setup/Flows/home'
+			});
+			break;
+
+		case 'WO_TOOL_requestFields':
+			console.log('WO_TOOL_requestFields ARRIVED');
+			chrome.tabs.sendMessage(sender.tab.id, {
+				response: 'getPageFields',
+			}).then(async (responseField) =>
+			{
+				console.log('BG RESPONSE', responseField);
+				if (responseField)
+				{
+					const sidApiField = await chrome.cookies.getAll({
+						name: "sid",
+						domain: getCurrentUrl(sender.tab).customDomain,
+					});
+
+					const idObjSplitted = String(sender.tab.url).split('/');
+					const ObjectType = idObjSplitted[idObjSplitted.length - 3];
+
+					let recordTypeFounded = null;
+					await fetch(
+						getCurrentUrl(sender.tab).customDomainHttps +
+						`/services/data/v57.0/query/?q=SELECT+RecordTypeId+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
+						method: "GET",
+						headers: {
+							Authorization: "Bearer " + sidApiField[0].value,
+							"Content-Type": "application/json",
+						}
+					}).then(async respRecordType =>
+					{
+						recordTypeFounded = await respRecordType.json();
+						console.log(recordTypeFounded)
+						try
+						{
+							if (recordTypeFounded[0].errorCode)
+							{
+								recordTypeFounded = null;
+							}
+						} catch (err)
+						{
+							recordTypeFounded = recordTypeFounded.records[0].RecordTypeId;
+						}
+						console.log('RECORD TYPE ID ', recordTypeFounded)
+					}).catch(err =>
+					{
+						console.log(err);
+					});
+
+					var resApiName = null;
+					const query = !recordTypeFounded ?
+						`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' :
+						`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
+					await fetch(
+						getCurrentUrl(sender.tab).customDomainHttps + query,
+						{
+							method: 'GET',
+							headers: {
+								'Content-Type': 'application/json; charset=UTF-8',
+								Accept: 'application/json',
+								Authorization: 'Bearer ' + sidApiField[0].value,
+							},
+						}).then(async responseFetchDescribe =>
+						{
+							resApiName = await responseFetchDescribe.json();
+							console.log(' API FIELD RESP', await resApiName);
+							if (resApiName)
+							{
+								chrome.tabs.sendMessage(sender.tab.id, {
+									response: 'setApiToField',
+									payload: { recordTypeFound: !recordTypeFounded ? false : true, apiField: resApiName }
+								});
+							}
+						});
+				}
 			});
 			break;
 
@@ -355,12 +354,26 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			const _URL_ = sender.tab.url.split('salesforce.com')
 			newUrl = _URL_[0] + "salesforce.com";
 			console.log('----', newUrl.replace("https://", ""))
-			const sid_ = await chrome.cookies.getAll({
+
+			let urlToSendAnonymous = newUrl + '/services/data/v57.0/tooling/executeAnonymous/?anonymousBody=';
+
+			let sid_ = await chrome.cookies.getAll({
 				name: "sid",
 				domain: newUrl.replace("https://", ""),
 			});
-			const urlToSendDelete = newUrl + '/services/data/v57.0/tooling/executeAnonymous/?anonymousBody=';
-			let toSend = urlToSendDelete + obj.payload;
+			console.log('SID ON SNIPPET RUN', sid_)
+			if (sid_.length === 0)
+			{
+				sid_ = await chrome.cookies.getAll({
+					name: "sid",
+					domain: getCurrentUrl(sender.tab).customDomain,
+				});
+				console.log('SID ON SNIPPET RUN SALESFORCE BODY', sid_)
+				urlToSendAnonymous = getCurrentUrl(sender.tab).customDomainHttps.split('/lightning')[0] + '/services/data/v57.0/tooling/executeAnonymous/?anonymousBody=';
+				console.log('----', urlToSendAnonymous)
+			}
+
+			let toSend = urlToSendAnonymous + obj.payload;
 			console.log('APEX CALL: ', toSend);
 			await fetch(toSend, {
 				method: "GET",
@@ -404,8 +417,6 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			});
 			break;
 
-
-
 		case 'WO_CODESNIPPET_forceResetDialog':
 			clearTimeout(timeoutFORCEResetDialog);
 			chrome.tabs.sendMessage(sender.tab.id, {
@@ -421,6 +432,11 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			});
 			break;
 
+		case 'WO_TOOL_showCodeSnippet':
+			chrome.tabs.sendMessage(sender.tab.id, {
+				response: 'openFastCodeSnippet',
+			})
+			break;
 
 
 	}
@@ -428,81 +444,6 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 });
 
 var notificationID = [];
-
-/**
- * DISMESSO
- */
-/* function startWatchingProcess()
-{
-	if (!watchingP)
-	{
-		watchingP = setInterval(() =>
-		{
-			chrome.storage.session.get(null, async (items) =>
-			{
-				if (await items)
-				{
-					Object.keys(await items).forEach(k =>
-					{
-
-						chrome.storage.session.get([k], async data =>
-						{
-
-							let result = null;
-							await fetch(
-								data[k][2].domain + "/services/data/v57.0/query/?q=SELECT+LastModifiedDate+FROM+" + data[k][0].attributes.type + "+WHERE+id+=+'" + data[k][0].Id + "'",
-								{
-									method: "GET",
-									headers: {
-										Authorization: "Bearer " + data[k][2].sid,
-										"Content-Type": "application/json",
-									}
-								}
-							)
-								.then((response) => response.json())
-								.then((res) => (result = res))
-								.catch((error) => console.log("error", error));
-							console.log('RESULT QUERY', result, data[k][2]);
-
-							console.log('RES_QUERY', result.records[0], 'DATA_', data[k][0].LastModifiedDate);
-							if (result.records[0].LastModifiedDate != data[k][0].LastModifiedDate)
-							{
-								console.log('TAB TO RELOAD', data[k][1].id);
-								chrome.tabs.reload(data[k][1].id);
-								chrome.tabs.sendMessage(data[k][1].id, {
-									response: 'resetNewWatch'
-								});
-								chrome.storage.session.remove([k]);
-								chrome.notifications.create(
-									'',
-									{
-										type: 'basic',
-										title: data[k][0].Id + ' - ' + data[k][0].attributes.type + ' AGGIORNATO!',
-										message: 'Ho appena aggiornato la tab di questo oggetto!',
-										iconUrl: 'images/icon.png',
-										buttons: [{ title: 'GOTO TAB' }]
-									}, (id) =>
-								{
-									notificationID.push({
-										notifId: id, tabId: data[k][1].id
-									});
-								});
-							}
-						});
-					});
-				}
-
-				if (Object.keys(await items).length === 0)
-				{
-					clearWatchingProcess();
-				}
-				console.log(await items);
-			});
-		}, 60000);
-	}
-
-}
- */
 
 chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) =>
 {

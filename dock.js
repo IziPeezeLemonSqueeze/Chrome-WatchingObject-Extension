@@ -6,9 +6,13 @@ const btnDeploy = document.getElementById('btnDeploy');
 const btnApexLog = document.getElementById('btnApexLog');
 const btnFlow = document.getElementById('btnFlw');
 
+const btnApiFields = document.getElementById('btnApiFields');
+const btnCodeSnippet = document.getElementById('btnFastCodeSnippet');
+
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
+
 	btnObjectManager.addEventListener('click', () =>
 	{
 		objectManagerEvent();
@@ -36,6 +40,14 @@ document.addEventListener("DOMContentLoaded", async () =>
 	btnFlow.addEventListener('click', () =>
 	{
 		flowEvent();
+	});
+	btnApiFields.addEventListener('click', () =>
+	{
+		apiFieldsEvent();
+	});
+	btnCodeSnippet.addEventListener('click', () =>
+	{
+		codeSnippetEvent();
 	});
 });
 
@@ -85,5 +97,17 @@ const flowEvent = () =>
 {
 	chrome.runtime.sendMessage({
 		type: 'WO_TOOL_goToFlow'
+	});
+}
+
+const apiFieldsEvent = () =>
+{
+	chrome.runtime.sendMessage({ type: 'WO_TOOL_requestFields' });
+}
+
+const codeSnippetEvent = () =>
+{
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_showCodeSnippet'
 	});
 }

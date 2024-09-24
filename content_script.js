@@ -10,32 +10,25 @@
 	let codeSnippetOpen = false;
 	let dialogVarOpen = false;
 	let frameSnippet = null;
+	let frameFastSnippet = null;
 	let windowApexCode;
 	let divDCTOOL;
+	let divFastDCTOOL;
 
-	let currentObject = {};
-	let watchingBtn;
 	let woToolBtn;
 	let toolOpen = false;
 
+	let pageFields = null;
+	var apiFieldExist = [];
+
 	chrome.runtime.onMessage.addListener((obj, sender, response) =>
 	{
-		console.log('ARRIVED CS ', obj);
+		//console.log('ARRIVED CS ', obj);
 		if (obj.response)
 		{
 			// GESTIONE RESPONSE FROM BACKGROUND.JS
 			switch (obj.response)
 			{
-				/*
-					case 'resetNewWatch':
-					setTimeout(() =>
-					{
-						watchingBtn.removeAttribute('disabled');
-						watchingBtn.className = 'watching-btn slds-button slds-button_brand';
-						watchingBtn.innerText = `Aggiungi ${currentObject.title.split('|')[0]} alla Watchlist`;
-					}, 1000);
-					break;
-				*/
 				case 'devConsole':
 					consoleIntervalSearch = setInterval(() =>
 					{
@@ -61,15 +54,48 @@
 					}
 					break;
 
-
-
 				case 'resetCodeSnippet':
 					//console.log('RESET')
 					hideCS(windowApexCode);
 					showCS(divDCTOOL, windowApexCode);
 					break;
 
+				case 'getPageFields':
+					if (apiFieldExist.length > 0)
+					{
+						removeApiNameToFields();
+						return;
+					}
+					pageFields = document.getElementsByClassName('test-id__field-label').length > 0 ? document.getElementsByClassName('test-id__field-label') : null;
+					if (!pageFields)
+					{
+						return;
+					}
+					const fields = [];
+					for (let elem of pageFields)
+					{
+						fields.push(elem.innerText);
+					};
+					response(fields);
+					break;
 
+				case 'setApiToField':
+					if (apiFieldExist.length === 0)
+					{
+						try
+						{
+							setApiNameToFields(obj.payload);
+						} catch (err) { }
+					}
+					break;
+
+				case 'resetApiFieldArray':
+					removeApiNameToFields();
+					break;
+
+				case 'openFastCodeSnippet':
+					showFastCS();
+					break;
 			}
 		} else
 		{
@@ -84,8 +110,6 @@
 						sObject: sObject,
 						Id: Id
 					};
-					//newWatching();
-
 				} catch (e)
 				{
 					console.log(e);
@@ -98,34 +122,90 @@
 		newDock();
 	});
 
-	/**
-	 * DISMESSO
-	 */
-	/*  
-	const newWatching = () =>
+	const removeApiNameToFields = () =>
 	{
-		const watchingBtnExist = document.getElementsByClassName('watching-btn slds-button slds-button_brand')[0];
-
-		if (!watchingBtnExist)
+		apiFieldExist.forEach(id =>
 		{
-			watchingBtn = document.createElement('button');
-			//watchingBtn.type = 'button';
-			watchingBtn.className = 'watching-btn slds-button slds-button_brand';
-			watchingBtn.innerText = `Aggiungi ${currentObject.title.split('|')[0]} alla Watchlist`;
-			watchingBtn.style = 'bottom: 10px; position: fixed; right: 30px; z-index:10;';
-
-			/*  salesforceBody = document.getElementsByClassName('slds-global-header')[0]; slds-context-bar 
-			setTimeout(() =>
+			try
 			{
-				salesforceBody = document.getElementsByClassName('desktop')[0];
-				//console.log('BODY TO ATTACH', salesforceBody);
-				salesforceBody.appendChild(watchingBtn);
-				watchingBtn.addEventListener('click', addToWatchList);
-			}, 1000);
+				const el = document.getElementById(id);
+				el.remove();
+			} catch (err) { }
 
+		});
+
+		apiFieldExist = [];
+	}
+
+	const setApiNameToFields = (api) =>
+	{
+		if (!api.recordTypeFound)
+		{
+			api.apiField.layouts[0].detailLayoutSections.forEach(section =>
+			{
+				section.layoutRows.forEach(row =>
+				{
+					row.layoutItems.forEach(item =>
+					{
+						if (item.layoutComponents.length > 0)
+						{
+							for (let elem of pageFields)
+							{
+								if (elem.innerText == item.label)
+								{
+									let newElemementOnHTML = document.createElement('span');
+									newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
+									newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;';
+									newElemementOnHTML.innerText = item.layoutComponents[0].value;
+									newElemementOnHTML.title = 'click to copy on clipboard';
+									newElemementOnHTML.addEventListener('click', (e) =>
+									{
+										copyToClipboard(newElemementOnHTML.innerText);
+									});
+									elem.parentNode.appendChild(newElemementOnHTML);
+
+									apiFieldExist.push(newElemementOnHTML.id);
+								}
+							};
+						}
+					});
+				});
+			});
+		} else
+		{
+			api.apiField.detailLayoutSections.forEach(section =>
+			{
+				section.layoutRows.forEach(row =>
+				{
+					row.layoutItems.forEach(item =>
+					{
+						if (item.layoutComponents.length > 0)
+						{
+							for (let elem of pageFields)
+							{
+								if (elem.innerText == item.label)
+								{
+									let newElemementOnHTML = document.createElement('span');
+									newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
+									newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;';
+									newElemementOnHTML.innerText = item.layoutComponents[0].value;
+									newElemementOnHTML.title = 'click to copy on clipboard';
+									newElemementOnHTML.addEventListener('click', (e) =>
+									{
+										copyToClipboard(newElemementOnHTML.innerText);
+									});
+									elem.parentNode.appendChild(newElemementOnHTML);
+
+									apiFieldExist.push(newElemementOnHTML.id);
+								}
+							};
+						}
+					});
+				});
+			});
 		}
 	}
-	*/
+
 	const devConsoleTool = () => 
 	{
 		try
@@ -171,11 +251,43 @@
 	const showCS = (div, windowApexCode) =>
 	{
 		codeSnippetOpen = true;
-		frameSnippet = document.createElement('iframe');
-		frameSnippet.src = chrome.runtime.getURL('snippet.html');
-		frameSnippet.style = 'width: 600px; height: 285px; border: 0; ';
-		div.appendChild(frameSnippet);
-		windowApexCode.appendChild(div);
+		try
+		{
+			if (document.getElementById('DCTOOL'))
+			{
+				console.log('RETURN')
+				return;
+			}
+
+			frameSnippet = document.createElement('iframe');
+			frameSnippet.src = chrome.runtime.getURL('snippet.html');
+			frameSnippet.style = 'width: 600px; height: 285px; border: 0;';
+			div.appendChild(frameSnippet);
+			windowApexCode.appendChild(div);
+		} catch (err)
+		{
+			showFastCS();
+		}
+	}
+
+	const showFastCS = () =>
+	{
+		const fastDCTOOL = document.getElementById('fastDCTOOL')
+		if (fastDCTOOL)
+		{
+			fastDCTOOL.remove();
+			return;
+		}
+		divFastDCTOOL = document.createElement('div');
+		divFastDCTOOL.id = 'fastDCTOOL';
+		divFastDCTOOL.style = 'z-index: 1000;display: flex;position: fixed;bottom: 0px;right: 50%;';
+		frameFastSnippet = document.createElement('iframe');
+		frameFastSnippet.src = chrome.runtime.getURL('snippet.html');
+		frameFastSnippet.style = 'width: 600px; height: 171px; border: 0;';
+		divFastDCTOOL.appendChild(frameFastSnippet);
+		salesforceBody.appendChild(divFastDCTOOL);
+
+
 	}
 
 	const hideCS = (windowApexCode) =>
@@ -186,7 +298,14 @@
 		divDCTOOL.id = 'DCTOOL';
 		divDCTOOL.style =
 			'z-index: 1000;display: flex;position: relative;bottom: 137px;left: 77px;';
-		windowApexCode.removeChild(document.getElementById('DCTOOL'));
+		try
+		{
+			windowApexCode.removeChild(document.getElementById('DCTOOL'));
+			console.log('REMOVED DCTOOL')
+		} catch (err)
+		{
+			salesforceBody.removeChild(document.getElementById('fastDCTOOL'));
+		}
 	}
 
 	// indentifierVariabileOnCode + ivc
@@ -197,7 +316,7 @@
 		// TODO CONTORLLO SUI DUPLICATI
 		const regexIVC = /@\b[\@V\@ID\@INT\@BOL\@STR]\w+(?='*)/g;
 		const countIVC = String(payload).match(regexIVC);
-		console.log(countIVC);
+		//console.log(countIVC);
 
 		chrome.storage.local.set({
 			['snippet_' + name]: {
@@ -254,7 +373,13 @@
 		const dialogDeleteAlreadyExist = document.getElementById('deleteSnippet') ? true : false;
 		if (!dialogDeleteAlreadyExist)
 		{
-			divDCTOOL.appendChild(dialogDelete);
+			try
+			{
+				divDCTOOL.appendChild(dialogDelete);
+			} catch (err)
+			{
+				divFastDCTOOL.appendChild(dialogDelete);
+			}
 		}
 	}
 
@@ -277,7 +402,7 @@
 		title.innerText = 'CODE SNIPPET - Assegnazione valori!\nNOME SNIPPET: ' + id.replace('snippet_', '');
 
 		dialog.setAttribute('open', '');
-		dialog.style = "background-color: rgba(255, 255, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;margin: 5%;min-width: -webkit-fill-available;position: absolute;z-index: 1000000000;top: 1%;box-shadow: rgba(0, 0, 0, 0.11) 0px 0 7px 9px;height: 506px;"
+		dialog.style = "background-color: rgba(255, 255, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;margin: 5%;min-width: -webkit-fill-available;position: fixed;z-index: 1000000000;top: 1%;box-shadow: rgba(0, 0, 0, 0.11) 0px 0 7px 9px;height: 520px;"
 
 		let list = document.createElement('ul');
 		list.style = "min-height: 130px; overflow-y: scroll";
@@ -632,7 +757,13 @@
 				{
 					delete v[1].value;
 				});
-				developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+				try
+				{
+					developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+				} catch (err)
+				{
+					salesforceBody.removeChild(document.getElementById('dialogvar'));
+				}
 				dialogVarOpen = false;
 				chrome.runtime.sendMessage({
 					type: 'WO_CODESNIPPET_forceResetDialog'
@@ -650,7 +781,13 @@
 			{
 				delete v[1].value;
 			});
-			developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+			try
+			{
+				developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+			} catch (err)
+			{
+				salesforceBody.removeChild(document.getElementById('dialogvar'));
+			}
 			dialogVarOpen = false;
 			chrome.runtime.sendMessage({
 				type: 'WO_CODESNIPPET_forceResetDialog'
@@ -663,7 +800,13 @@
 
 		dialog.appendChild(title);
 		dialog.appendChild(div);
-		developerConsoleBody.appendChild(dialog);
+		try
+		{
+			developerConsoleBody.appendChild(dialog);
+		} catch (err)
+		{
+			salesforceBody.appendChild(dialog);
+		}
 
 	}
 
@@ -693,7 +836,7 @@
 						'z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
 					let frame = document.createElement('iframe');
 					frame.src = chrome.runtime.getURL('dock.html');
-					frame.style = 'width: 248px; height: 290px; border: 0; border-bottom-right-radius: 0px; border-top-right-radius: 15px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;';
+					frame.style = 'width: 248px; height: 385px; border: 0; border-bottom-right-radius: 0px; border-top-right-radius: 15px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;';
 					div.appendChild(frame);
 
 					salesforceBody.appendChild(div);
@@ -705,7 +848,7 @@
 					salesforceBody.removeChild(document.getElementById('WOTOOL'));
 				} catch (e)
 				{
-					console.log(e);
+					//console.log(e);
 				}
 			}
 		} catch (e)
@@ -719,53 +862,7 @@
 		toolOpen = !toolOpen;
 		newDock();
 	}
-	/**
-	 * DISMESSO
-	 */
-	/*
-	const removeFromWatchingList = () =>
-	{
-		try
-		{
-			salesforceBody.removeChild(watchingBtn);
-		} catch (e) { }
-	}
-	*/
 
-	/**
-	 * DISMESSO
-	 */
-	/* 
-	const addToWatchList = async () =>
-	{
-		watchingBtn.setAttribute('disabled', '');
-		watchingBtn.className = 'watching-btn slds-button slds-button_outline-brand';
-		watchingBtn.innerText = 'In Watching! 🔍';
-
-		chrome.storage.session.set({
-			[currentObject.Id]: null
-		});
-
-		chrome.storage.session.get([currentObject.Id], (obj) =>
-		{
-			console.log('GET STORAGE', obj);
-		});
-
-		chrome.storage.session.get(null, function (items)
-		{
-			console.log(items);
-			var allKeys = Object.keys(items);
-			console.log(allKeys);
-		});
-
-		await chrome.runtime.sendMessage({
-			type: 'newWatch',
-			Id: currentObject.Id,
-			sObject: currentObject.sObject,
-			tab: currentObject.tab
-		});
-	}
- */
 	document.onmouseup = function ()
 	{
 		let selectedText = window.getSelection()

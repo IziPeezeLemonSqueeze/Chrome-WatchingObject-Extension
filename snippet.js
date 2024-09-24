@@ -1,5 +1,6 @@
 const root = document.getElementById('snippet_body');
 const btnBackup = document.getElementById('btnBackupSnippets');
+const btnRestore = document.getElementById('btnRestoreSnippets');
 let list = root.childNodes[3].childNodes[3]
 let nButton = [];
 let dialog = document.getElementById('dialog');
@@ -20,6 +21,12 @@ document.addEventListener("DOMContentLoaded", async () =>
 		vLink.setAttribute('download', vName);
 		vLink.click();
 	});
+
+	btnRestore.innerText = 'RESTORE 📄';
+	/* 	btnRestore.addEventListener((e) =>
+		{
+	
+		}); */
 });
 
 chrome.storage.onChanged.addListener(async (changes, namespace) =>
@@ -126,7 +133,7 @@ const creatorElementList = async (items) =>
 			list.appendChild(hr);
 
 
-			snippetsBackup.push(items[k]);
+			snippetsBackup.push({ "name": k, "code": items[k].code, "ivcFound": items[k].ivcFound });
 			nButton.push({ doc: document.getElementById(k + '-run'), payload: items[k], id: k });
 			nButton.push({ doc: document.getElementById(k + '-mod'), payload: items[k], id: k });
 			nButton.push({ doc: document.getElementById(k + '-del'), payload: null, id: k });
@@ -135,7 +142,6 @@ const creatorElementList = async (items) =>
 
 	nButton.forEach(btnIdx =>
 	{
-		console.log(nButton);
 		let id = String(btnIdx.doc.id).split('-')
 		switch (id[1])
 		{
@@ -160,7 +166,6 @@ const creatorElementList = async (items) =>
 					handler_del(btnIdx.id);
 				});
 				break;
-
 		}
 	});
 }
@@ -352,7 +357,7 @@ const handler_run = (doc, payload, id) =>
 
 const handler_mod = (args) =>
 {
-	console.log('HANDLING MOD BUTTON', args);
+	//console.log('HANDLING MOD BUTTON', args);
 	chrome.runtime.sendMessage({
 		type: 'WO_CODESNIPPET_edit',
 		payload: args
