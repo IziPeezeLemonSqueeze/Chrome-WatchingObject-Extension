@@ -1,7 +1,7 @@
 const root = document.getElementById('snippet_body');
 const btnBackup = document.getElementById('btnBackupSnippets');
 const btnRestore = document.getElementById('btnRestoreSnippets');
-let list = root.childNodes[3].childNodes[3]
+const btnRestoreSpan = document.getElementById('btnRestoreSnippetsSpan');
 let nButton = [];
 let dialog = document.getElementById('dialog');
 let mapValue = new Map();
@@ -22,11 +22,46 @@ document.addEventListener("DOMContentLoaded", async () =>
 		vLink.click();
 	});
 
-	btnRestore.innerText = 'RESTORE 📄';
-	/* 	btnRestore.addEventListener((e) =>
+	btnRestoreSpan.innerText = 'RESTORE 📄';
+	btnRestore.addEventListener("change", function ()
+	{
+		if (this.files && this.files[0])
 		{
-	
-		}); */
+			var myFile = this.files[0];
+			var reader = new FileReader();
+
+			reader.addEventListener('load', function (e)
+			{
+				const payloadRestore = JSON.parse(e.target.result);
+				//console.log(payloadRestore);
+
+				const checkValidJSON = Object.keys(payloadRestore[0]);
+				if (checkValidJSON[0] != 'name' || checkValidJSON[1] != 'code' || checkValidJSON[2] != 'ivcFound')
+				{
+					console.log('[CODE SNIPPET] : CANT RESTORE, NOT VALID JSON')
+					return;
+				}
+
+				payloadRestore.forEach(p =>
+				{
+					chrome.storage.local.get(p.name, async (items) =>
+					{
+						if (!Object.keys(await items)[0])
+						{
+							chrome.storage.local.set({
+								[p.name]: {
+									code: p.code,
+									ivcFound: p.ivcFound
+								}
+							});
+						}
+					});
+				});
+			});
+
+			reader.readAsText(myFile);
+		}
+	});
 });
 
 chrome.storage.onChanged.addListener(async (changes, namespace) =>
@@ -78,6 +113,7 @@ const createObjectList = () =>
 const creatorElementList = async (items) =>
 {
 	//console.log('CREATOR : ', items);
+	const listUL = document.getElementById('list');
 	Object.keys(await items).forEach((k, i) =>
 	{
 		if (k.includes('snippet_'))
@@ -117,6 +153,7 @@ const creatorElementList = async (items) =>
 
 			let span = document.createElement('span');
 			span.innerText = k.replace('snippet_', '');
+			span.style = "margin-left: 1%;"
 			span.title = items[k].code;
 			span.id = k + '-span';
 
@@ -126,11 +163,12 @@ const creatorElementList = async (items) =>
 			div.appendChild(btnRemove);
 			li.appendChild(div);
 
-			list.appendChild(li);
+
 			let hr = document.createElement('hr');
 			hr.style = "margin-bottom: -0.2%;margin-top: 0.6%;"
 			hr.id = k;
-			list.appendChild(hr);
+			listUL.appendChild(div);
+			listUL.appendChild(hr);
 
 
 			snippetsBackup.push({ "name": k, "code": items[k].code, "ivcFound": items[k].ivcFound });
