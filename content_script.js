@@ -24,6 +24,7 @@
 	chrome.runtime.onMessage.addListener((obj, sender, response) =>
 	{
 		//console.log('ARRIVED CS ', obj);
+		newDock();
 		if (obj.response)
 		{
 			// GESTIONE RESPONSE FROM BACKGROUND.JS
@@ -114,12 +115,8 @@
 				{
 					console.log(e);
 				}
-			} else
-			{
-				removeFromWatchingList();
 			}
 		}
-		newDock();
 	});
 
 	const removeApiNameToFields = () =>
@@ -261,7 +258,7 @@
 
 			frameSnippet = document.createElement('iframe');
 			frameSnippet.src = chrome.runtime.getURL('snippet.html');
-			frameSnippet.style = 'width: 600px; height: 285px; border: 0;';
+			frameSnippet.style = 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 285px;border: 0px;';
 			div.appendChild(frameSnippet);
 			windowApexCode.appendChild(div);
 		} catch (err)
@@ -280,10 +277,10 @@
 		}
 		divFastDCTOOL = document.createElement('div');
 		divFastDCTOOL.id = 'fastDCTOOL';
-		divFastDCTOOL.style = 'z-index: 1000;display: flex;position: fixed;bottom: 0px;right: 50%;';
+		divFastDCTOOL.style = 'z-index: 1000;display: flex;position: fixed;bottom: -18px;right: 50%;';
 		frameFastSnippet = document.createElement('iframe');
 		frameFastSnippet.src = chrome.runtime.getURL('snippet.html');
-		frameFastSnippet.style = 'width: 600px; height: 171px; border: 0;';
+		frameFastSnippet.style = 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 173px;border: 0px;';
 		divFastDCTOOL.appendChild(frameFastSnippet);
 		salesforceBody.appendChild(divFastDCTOOL);
 
@@ -293,7 +290,7 @@
 	const hideCS = (windowApexCode) =>
 	{
 		codeSnippetOpen = false;
-		console.log('WINDOW', windowApexCode)
+		//console.log('WINDOW', windowApexCode)
 		divDCTOOL = document.createElement('div');
 		divDCTOOL.id = 'DCTOOL';
 		divDCTOOL.style =
@@ -301,7 +298,7 @@
 		try
 		{
 			windowApexCode.removeChild(document.getElementById('DCTOOL'));
-			console.log('REMOVED DCTOOL')
+			//console.log('REMOVED DCTOOL')
 		} catch (err)
 		{
 			salesforceBody.removeChild(document.getElementById('fastDCTOOL'));
@@ -333,13 +330,15 @@
 
 	const confirmDeleteSnippet = (payload) =>
 	{
+		//console.log('divFastDCTOOL', divFastDCTOOL)
+		//console.log('divDCTOOL', divDCTOOL)
 		let dialogDelete = document.createElement('dialog');
 		dialogDelete.id = 'deleteSnippet';
 		let titleDelete = document.createElement('h4');
 		titleDelete.innerText = `Confirm delete snippet: [${payload.split('_')[1]}]`;
 
 		dialogDelete.setAttribute('open', '');
-		dialogDelete.style = "border: 2px solid black; border-radius: 5px; background-color: #9b8e8e;display: flex;flex-direction: column;justify-content: flex-start;align-items: center;flex-wrap: nowrap;";
+		dialogDelete.style = "border: 2px solid black;border-radius: 5px;background-color: rgba(155, 142, 142, 0.79);display: flex;flex-flow: column;justify-content: center;align-items: baseline;flex-direction: column;flex-wrap: wrap;align-content: stretch;";
 
 		let okDeleteBtn = document.createElement('buttonOkDelete');
 		okDeleteBtn.id = 'okDeleteButton';
@@ -356,8 +355,8 @@
 		let denyDeleteBtn = document.createElement('buttonDenyDelete');
 		denyDeleteBtn.id = 'denyDeleteButton';
 		denyDeleteBtn.style = 'margin-top: 5px;background-color: #bd0000;cursor: pointer;size: unset;max-height: 25px; border: 2px solid black; border-radius: 5px;padding:3px';
-		denyDeleteBtn.innerText = 'No 🙂‍↔️';
-		denyDeleteBtn.className = 'slds-button slds-button_outline-brand';
+		denyDeleteBtn.innerText = 'No 🙂‍';
+		denyDeleteBtn.className = 'slds-button slds-button_destructive';
 		denyDeleteBtn.addEventListener('click', (e) =>
 		{
 			chrome.runtime.sendMessage({
@@ -371,14 +370,16 @@
 		dialogDelete.appendChild(okDeleteBtn);
 
 		const dialogDeleteAlreadyExist = document.getElementById('deleteSnippet') ? true : false;
+		//console.log('dialogDeleteAlreadyExist', dialogDeleteAlreadyExist)
 		if (!dialogDeleteAlreadyExist)
 		{
 			try
 			{
-				divDCTOOL.appendChild(dialogDelete);
+				divFastDCTOOL.appendChild(dialogDelete);
 			} catch (err)
 			{
-				divFastDCTOOL.appendChild(dialogDelete);
+				divDCTOOL.appendChild(dialogDelete);
+				console.log(err)
 			}
 		}
 	}
@@ -451,7 +452,7 @@
 		Object.entries(mapValue).forEach((elem, idx) =>
 		{
 			let el = elem[1];
-			console.log(el, idx);
+			//console.log(el, idx);
 			let spanTestoTipo = document.createElement('p');
 			spanTestoTipo.id = 'spantestotipo';
 			let nameVar = document.createElement('h2');
@@ -485,7 +486,7 @@
 
 			input.addEventListener('focusout', (e) =>
 			{
-				console.log(e.target.value);
+				//console.log(e.target.value);
 				try
 				{
 					if (!input.className.includes('dialoggood'))
@@ -639,7 +640,7 @@
 						input.className = 'dialogerror';
 					}
 				}
-				console.log(lastValueInserted)
+				//console.log(lastValueInserted)
 				textArea.innerText = codeModified;
 			});
 
@@ -681,9 +682,9 @@
 			Object.entries(mapValue).forEach((v, id) =>
 			{
 				let elemlist_input = document.getElementById('input-dialogvar' + nomeSnippet + '_' + v[1].name);
-				console.log(elemlist_input);
+				//console.log(elemlist_input);
 				let elemlist = elemlist_input.parentElement;
-				console.log(v[1]);
+				//console.log(v[1]);
 				if ((v[1].value != null || v[1].value != undefined) &&
 					(
 						!v[1].value.includes('@STR') &&
@@ -705,7 +706,7 @@
 
 			if (allValue)
 			{
-				console.log(codeModified);
+				//console.log(codeModified);
 				chrome.runtime.sendMessage({
 					type: 'WO_CODESNIPPET_run',
 					payload: codeModified.replaceAll('\n', ''),
@@ -724,9 +725,9 @@
 			Object.entries(mapValue).forEach((v, id) =>
 			{
 				let elemlist_input = document.getElementById('input-dialogvar' + nomeSnippet + '_' + v[1].name);
-				console.log(elemlist_input);
+				//console.log(elemlist_input);
 				let elemlist = elemlist_input.parentElement;
-				console.log(v[1]);
+				//console.log(v[1]);
 				if ((v[1].value != null || v[1].value != undefined) &&
 					(
 						!v[1].value.includes('@STR') &&
@@ -748,7 +749,7 @@
 
 			if (allValue)
 			{
-				console.log(codeModified);
+				//console.log(codeModified);
 				chrome.runtime.sendMessage({
 					type: 'WO_CODESNIPPET_run',
 					payload: codeModified.replaceAll('\n', ''),
@@ -854,7 +855,7 @@
 			}
 		} catch (e)
 		{
-			console.log(e);
+			//console.log(e);
 		}
 	}
 
