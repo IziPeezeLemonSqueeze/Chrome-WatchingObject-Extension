@@ -12,8 +12,8 @@ document.addEventListener("DOMContentLoaded", async () =>
 	btnBackup.innerText = 'BACKUP 💾';
 	btnBackup.addEventListener('click', async (e) =>
 	{
-		var _myArray = JSON.stringify(snippetsBackup, null, 4);
-		var vLink = document.createElement('a'),
+		const _myArray = JSON.stringify(snippetsBackup, null, 4);
+		const vLink = document.createElement('a'),
 			vBlob = new Blob([_myArray], { type: "application/json" }),
 			vName = 'snippets_BACKUP.json',
 			vUrl = window.URL.createObjectURL(vBlob);
@@ -27,8 +27,8 @@ document.addEventListener("DOMContentLoaded", async () =>
 	{
 		if (this.files && this.files[0])
 		{
-			var myFile = this.files[0];
-			var reader = new FileReader();
+			const myFile = this.files[0];
+			const reader = new FileReader();
 
 			reader.addEventListener('load', function (e)
 			{
@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener((obj, sender, response) =>
 				hideHandlerDialogInfo();
 				break;
 			case 'snippet_showErrorDialog':
-				console.log(obj.payload);
+				//console.log(obj.payload);
 				showHandlerDialogError(obj.payload);
 				break;
 		}
@@ -214,7 +214,7 @@ let divErrorDialog = document.createElement('div');
 const showHandlerDialogError = (textObj) =>
 {
 	//initDialog();
-	console.log('TESTO ERRORE DIALOG', textObj);
+	//console.log('TESTO ERRORE DIALOG', textObj);
 	divErrorDialog.id = 'divErrorDialog';
 	divErrorDialog.className = 'column';
 	divErrorDialog.style = "-webkit-text-stroke-width: medium;text-align-last: center;"
@@ -287,14 +287,14 @@ const hideHandlerDialogInfo = () =>
 
 const handler_run = (doc, payload, id) =>
 {
-	console.log('HANDLING RUN BUTTON', payload);
+	//console.log('HANDLING RUN BUTTON', payload);
 	showHandlerDialogInfo('Snippet in RUN...Waiting!', [doc.id]);
 
 	if (payload.ivcFound != null && payload.ivcFound.length > 0)
 	{
 		payload.ivcFound.forEach((ivc) =>
 		{
-			console.log(ivc);
+			//console.log(ivc);
 			if (ivc.includes('@ID'))
 			{
 				let name = ivc.replace('@ID', '');

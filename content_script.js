@@ -290,7 +290,7 @@
 	const hideCS = (windowApexCode) =>
 	{
 		codeSnippetOpen = false;
-		console.log('WINDOW', windowApexCode)
+		//console.log('WINDOW', windowApexCode)
 		divDCTOOL = document.createElement('div');
 		divDCTOOL.id = 'DCTOOL';
 		divDCTOOL.style =
@@ -452,7 +452,7 @@
 		Object.entries(mapValue).forEach((elem, idx) =>
 		{
 			let el = elem[1];
-			console.log(el, idx);
+			//console.log(el, idx);
 			let spanTestoTipo = document.createElement('p');
 			spanTestoTipo.id = 'spantestotipo';
 			let nameVar = document.createElement('h2');
@@ -486,7 +486,7 @@
 
 			input.addEventListener('focusout', (e) =>
 			{
-				console.log(e.target.value);
+				//console.log(e.target.value);
 				try
 				{
 					if (!input.className.includes('dialoggood'))
@@ -640,7 +640,7 @@
 						input.className = 'dialogerror';
 					}
 				}
-				console.log(lastValueInserted)
+				//console.log(lastValueInserted)
 				textArea.innerText = codeModified;
 			});
 
@@ -682,9 +682,9 @@
 			Object.entries(mapValue).forEach((v, id) =>
 			{
 				let elemlist_input = document.getElementById('input-dialogvar' + nomeSnippet + '_' + v[1].name);
-				console.log(elemlist_input);
+				//console.log(elemlist_input);
 				let elemlist = elemlist_input.parentElement;
-				console.log(v[1]);
+				//console.log(v[1]);
 				if ((v[1].value != null || v[1].value != undefined) &&
 					(
 						!v[1].value.includes('@STR') &&
@@ -706,7 +706,7 @@
 
 			if (allValue)
 			{
-				console.log(codeModified);
+				//console.log(codeModified);
 				chrome.runtime.sendMessage({
 					type: 'WO_CODESNIPPET_run',
 					payload: codeModified.replaceAll('\n', ''),
@@ -725,9 +725,9 @@
 			Object.entries(mapValue).forEach((v, id) =>
 			{
 				let elemlist_input = document.getElementById('input-dialogvar' + nomeSnippet + '_' + v[1].name);
-				console.log(elemlist_input);
+				//console.log(elemlist_input);
 				let elemlist = elemlist_input.parentElement;
-				console.log(v[1]);
+				//console.log(v[1]);
 				if ((v[1].value != null || v[1].value != undefined) &&
 					(
 						!v[1].value.includes('@STR') &&
@@ -749,7 +749,7 @@
 
 			if (allValue)
 			{
-				console.log(codeModified);
+				//console.log(codeModified);
 				chrome.runtime.sendMessage({
 					type: 'WO_CODESNIPPET_run',
 					payload: codeModified.replaceAll('\n', ''),
