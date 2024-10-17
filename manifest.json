@@ -22,8 +22,7 @@
 		{
 			"resources": [
 				"dock.html",
-				"snippet.html",
-				"snippet.css"
+				"snippet.html"
 			],
 			"matches":  [
 				"https://*.force.com/*",

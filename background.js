@@ -188,6 +188,78 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			console.log('WO_TOOL_requestFields ARRIVED');
 			chrome.tabs.sendMessage(sender.tab.id, {
 				response: 'getPageFields',
+			}).then(async (HTMLFieldFound) =>
+			{
+				if (!HTMLFieldFound)
+				{
+					return;
+				}
+				const sidApiField = await chrome.cookies.getAll({
+					name: "sid",
+					domain: getCurrentUrl(sender.tab).customDomain,
+				});
+				const idObjSplitted = String(sender.tab.url).split('/');
+				const ObjectType = idObjSplitted[idObjSplitted.length - 3];
+
+				let recordTypeFounded = null;
+				let recordTypeDeveloperName = null;
+				await fetch(
+					getCurrentUrl(sender.tab).customDomainHttps +
+					`/services/data/v57.0/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`,
+					{
+						method: "GET",
+						headers: {
+							Authorization: "Bearer " + sidApiField[0].value,
+							"Content-Type": "application/json",
+						}
+					}).then(async responseRecordType =>
+					{
+						recordTypeFounded = await responseRecordType.json();
+
+						recordTypeDeveloperName = recordTypeFounded.records[0]['RecordType']['DeveloperName'];
+						recordTypeFounded = recordTypeFounded.records[0].RecordTypeId;
+
+					}).catch(noRecordTypeFound =>
+					{
+						recordTypeFounded = null;
+					});
+
+				var resApiName = null;
+				const query = !recordTypeFounded ?
+					`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' :
+					`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
+				await fetch(getCurrentUrl(sender.tab).customDomainHttps + query,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json; charset=UTF-8',
+							Accept: 'application/json',
+							Authorization: 'Bearer ' + sidApiField[0].value,
+						},
+					}).then(async responseFetchDescribe =>
+					{
+						resApiName = await responseFetchDescribe.json();
+						console.log(' API FIELD RESP', await resApiName);
+						if (resApiName)
+						{
+							chrome.tabs.sendMessage(sender.tab.id, {
+								response: 'setApiToField',
+								payload: {
+									recordTypeFound: !recordTypeFounded ? false : true,
+									apiField: resApiName,
+									objectInfo: ObjectType,
+									recordTypeName: recordTypeDeveloperName
+								}
+							});
+						}
+					}).catch(err =>
+					{
+						console.error(err);
+					});
+
+			})
+			/* chrome.tabs.sendMessage(sender.tab.id, {
+				response: 'getPageFields',
 			}).then(async (responseField) =>
 			{
 				console.log('BG RESPONSE', responseField);
@@ -202,9 +274,11 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					const ObjectType = idObjSplitted[idObjSplitted.length - 3];
 
 					let recordTypeFounded = null;
+					let recordTypeDeveloperName = null;
+
 					await fetch(
 						getCurrentUrl(sender.tab).customDomainHttps +
-						`/services/data/v57.0/query/?q=SELECT+RecordTypeId+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
+						`/services/data/v57.0/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
 						method: "GET",
 						headers: {
 							Authorization: "Bearer " + sidApiField[0].value,
@@ -213,7 +287,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					}).then(async respRecordType =>
 					{
 						recordTypeFounded = await respRecordType.json();
-						console.log(recordTypeFounded)
+						console.log(recordTypeFounded.records[0])
 						try
 						{
 							if (recordTypeFounded[0].errorCode)
@@ -222,12 +296,13 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 							}
 						} catch (err)
 						{
+							recordTypeDeveloperName = recordTypeFounded.records[0]['RecordType']['DeveloperName'];
 							recordTypeFounded = recordTypeFounded.records[0].RecordTypeId;
 						}
 						console.log('RECORD TYPE ID ', recordTypeFounded)
 					}).catch(err =>
 					{
-						console.log(err);
+						recordTypeFounded = null;
 					});
 
 					var resApiName = null;
@@ -251,12 +326,17 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 							{
 								chrome.tabs.sendMessage(sender.tab.id, {
 									response: 'setApiToField',
-									payload: { recordTypeFound: !recordTypeFounded ? false : true, apiField: resApiName }
+									payload: {
+										recordTypeFound: !recordTypeFounded ? false : true,
+										apiField: resApiName,
+										objectInfo: ObjectType,
+										recordTypeName: recordTypeDeveloperName
+									}
 								});
 							}
 						});
 				}
-			});
+			}); */
 			break;
 
 		case 'WO_TOOL_goToApexLog':

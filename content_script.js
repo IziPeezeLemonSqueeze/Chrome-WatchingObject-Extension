@@ -19,6 +19,7 @@
 	let toolOpen = false;
 
 	let pageFields = null;
+	const sectionFields = [];
 	var apiFieldExist = [];
 
 	chrome.runtime.onMessage.addListener((obj, sender, response) =>
@@ -66,26 +67,51 @@
 						removeApiNameToFields();
 						return;
 					}
-					pageFields = document.getElementsByClassName('test-id__field-label').length > 0 ? document.getElementsByClassName('test-id__field-label') : null;
-					if (!pageFields)
+
+					const sections = document.getElementsByTagName('records-record-layout-section');
+					console.log(sections, sections.length)
+					console.log(sections[0].firstChild.firstChild.innerText);
+					console.log(sections[0].getElementsByTagName('records-record-layout-row'))
+					console.log(sections[0].getElementsByTagName('records-record-layout-row')[0].getElementsByClassName('test-id__field-label'))
+
+					for (const sectionHTML of sections)
 					{
-						return;
+						sectionFields.push({
+							heading: !sectionHTML.firstChild.firstChild.innerText.includes('\n') ?
+								sectionHTML.firstChild.firstChild.innerText : null,
+							layoutRowsHTML: sectionHTML.getElementsByTagName('records-record-layout-row'),
+							layoutRowsAPI: []
+						});
 					}
-					const fields = [];
-					for (let elem of pageFields)
-					{
-						fields.push(elem.innerText);
-					};
-					response(fields);
+
+					response(sectionFields.size > 0);
+
 					break;
 
 				case 'setApiToField':
 					if (apiFieldExist.length === 0)
 					{
+						console.log('PAYLOAD', obj.payload);
+						let sections;
 						try
 						{
-							setApiNameToFields(obj.payload);
-						} catch (err) { }
+							sections = obj.payload.apiField.layouts[0].detailLayoutSections;
+
+							for (let i = 0; i < sectionFields.length; i++)
+							{
+								sectionFields[i].layoutRowsAPI.push(...sections[i].layoutRows);
+							}
+						} catch (noLayoutErr)
+						{
+							console.log(noLayoutErr)
+							sections = obj.payload.apiField.detailLayoutSections;
+							for (let i = 0; i < sectionFields.length; i++)
+							{
+								sectionFields[i].layoutRowsAPI.push(...sections[i].layoutRows);
+							}
+						}
+						setApiToField(obj.payload.objectInfo, obj.payload.recordTypeFound, sectionFields);
+						//setApiNameToFields(obj.payload);
 					}
 					break;
 
@@ -114,9 +140,6 @@
 				{
 					console.log(e);
 				}
-			} else
-			{
-				removeFromWatchingList();
 			}
 		}
 		newDock();
@@ -137,8 +160,29 @@
 		apiFieldExist = [];
 	}
 
+	const setApiToField = (objectName, objectRecordTypeName, sectionsMap) =>
+	{
+		let newElementObjectInfoOnHTML = document.createElement('span');
+		newElementObjectInfoOnHTML.id = 'showapi-objectInfo';
+		newElementObjectInfoOnHTML.style = 'background-color: rgb(1, 118, 211);margin-left: 5px;display: inline-block;padding: 5px;border-radius: 3px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;';
+		newElementObjectInfoOnHTML.innerText = `${objectName}  :  ${(objectRecordTypeName ? objectRecordTypeName : "NO RECORDTYPE")}`;
+		const headerObject = document.getElementsByClassName('entityNameTitle')[0];
+		headerObject.appendChild(newElementObjectInfoOnHTML);
+		apiFieldExist.push('showapi-objectInfo');
+
+		console.log('SET API TO FIELD MAP', sectionsMap);
+		sectionsMap.forEach(function (v, k)
+		{
+			console.log('SECTION MAP ', v);
+		});
+
+
+
+	}
+
 	const setApiNameToFields = (api) =>
 	{
+		console.log(api)
 		if (!api.recordTypeFound)
 		{
 			api.apiField.layouts[0].detailLayoutSections.forEach(section =>
@@ -153,11 +197,11 @@
 							{
 								if (elem.innerText == item.label)
 								{
-									let newElemementOnHTML = document.createElement('span');
+									const newElemementOnHTML = document.createElement('span');
 									newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
-									newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;';
+									newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;cursor: pointer;';
 									newElemementOnHTML.innerText = item.layoutComponents[0].value;
-									newElemementOnHTML.title = 'click to copy on clipboard';
+									newElemementOnHTML.title = 'Click to copy on clipboard';
 									newElemementOnHTML.addEventListener('click', (e) =>
 									{
 										copyToClipboard(newElemementOnHTML.innerText);
@@ -173,36 +217,107 @@
 			});
 		} else
 		{
+			let newElementObjectInfoOnHTML = document.createElement('span');
+			newElementObjectInfoOnHTML.id = 'showapi-objectInfo';
+			newElementObjectInfoOnHTML.style = 'background-color: rgb(1, 118, 211);margin-left: 5px;display: inline-block;padding: 5px;border-radius: 3px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;';
+			newElementObjectInfoOnHTML.innerText = `${api.objectInfo}  :  ${api.recordTypeName}`;
+
+			apiFieldExist.push('showapi-objectInfo');
+
+			const headerObject = document.getElementsByClassName('entityNameTitle')[0];
+			headerObject.appendChild(newElementObjectInfoOnHTML);
+
+			const diffSection = [];
+			api.apiField.detailLayoutSections.forEach(s =>
+			{
+				if (!sectionFields.has(s.heading))
+				{
+					diffSection.push(s.heading);
+				}
+			});
+
 			api.apiField.detailLayoutSections.forEach(section =>
 			{
-				section.layoutRows.forEach(row =>
+				for (const [sect, elem] of sectionFields)  
 				{
-					row.layoutItems.forEach(item =>
+					console.log(sect)
+					if (section.heading === sect)
 					{
-						if (item.layoutComponents.length > 0)
+						section.layoutRows.forEach(row =>
 						{
-							for (let elem of pageFields)
+							row.layoutItems.forEach(item =>
 							{
-								if (elem.innerText == item.label)
+								if (item.layoutComponents.length > 0)
 								{
-									let newElemementOnHTML = document.createElement('span');
-									newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
-									newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;';
-									newElemementOnHTML.innerText = item.layoutComponents[0].value;
-									newElemementOnHTML.title = 'click to copy on clipboard';
-									newElemementOnHTML.addEventListener('click', (e) =>
+									for (let e of elem)
 									{
-										copyToClipboard(newElemementOnHTML.innerText);
-									});
-									elem.parentNode.appendChild(newElemementOnHTML);
+										if (e.innerText === item.label)
+										{
+											let newElemementOnHTML = document.createElement('span');
+											newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
+											newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;cursor: pointer;';
+											newElemementOnHTML.innerText = item.layoutComponents[0].value;
+											newElemementOnHTML.title = 'Click to copy on clipboard';
+											newElemementOnHTML.addEventListener('click', (e) =>
+											{
+												copyToClipboard(newElemementOnHTML.innerText);
+											});
+											e.parentNode.appendChild(newElemementOnHTML);
 
-									apiFieldExist.push(newElemementOnHTML.id);
+											apiFieldExist.push(newElemementOnHTML.id);
+										}
+									}
 								}
-							};
+							});
+						});
+					}
+				}
+			});
+
+			if (diffSection.length > 0)
+			{
+				let pageFieldCloned = [...pageFields];
+				for (let sectionToPop of diffSection)
+				{
+					api.apiField.detailLayoutSections.forEach(section =>
+					{
+						if (section.heading == sectionToPop)
+						{
+							section.layoutRows.forEach(row =>
+							{
+								let inserted = false;
+								row.layoutItems.forEach(item =>
+								{
+									inserted = false;
+									for (let elem of pageFieldCloned)
+									{
+										if (!inserted)
+										{
+											if (elem.innerText === item.label)
+											{
+												let newElemementOnHTML = document.createElement('span');
+												newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
+												newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;cursor: pointer;';
+												newElemementOnHTML.innerText = item.layoutComponents[0].value;
+												newElemementOnHTML.title = 'Click to copy on clipboard';
+												newElemementOnHTML.addEventListener('click', (e) =>
+												{
+													copyToClipboard(newElemementOnHTML.innerText);
+												});
+												elem.parentNode.appendChild(newElemementOnHTML);
+												inserted = true;
+												pageFieldCloned = pageFieldCloned.filter(pf => pf.innerText !== item.label)
+
+												apiFieldExist.push(newElemementOnHTML.id);
+											}
+										}
+									}
+								});
+							});
 						}
 					});
-				});
-			});
+				}
+			}
 		}
 	}
 
@@ -905,15 +1020,4 @@
 	}
 
 
-	const addCSS = (css) =>
-	{
-		let link = document.createElement("link");
-		link.setAttribute('type', 'text/css');
-		link.setAttribute('rel', 'stylesheet');
-
-		link.href = css
-
-		document.head.appendChild(link);
-	}
-	addCSS(chrome.runtime.getURL('./snippet.css'));
 })();
