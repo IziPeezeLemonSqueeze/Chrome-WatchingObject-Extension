@@ -10,7 +10,8 @@
 			src="snippet.js"></script>
 	</head>
 
-	<body id="snippet_body">
+	<body id="snippet_body"
+		style="overflow-x: clip;">
 		<dialog id="dialog"
 			style="
         border-radius: 30px;
@@ -21,36 +22,49 @@
         background-color: rgba(0, 0, 0, 0.2);
         z-index: 1;
       "></dialog>
-		<div style="padding: 1%">
-			<div class="slds-form-element">
-				<div class="slds-form-element__control"
-					style="background-color: slategray;
-						display: flex;
-						flex-direction: row;
-						flex-wrap: nowrap;
-						justify-content: center;
-						align-items: center;">
-					<div class="slds-checkbox"
-						style="background-color: slategrey; -webkit-text-fill-color: white; text-align: center;">
-						<label class="slds-checkbox__label"><b>[CODE SNIPPET]</b>
-						</label>
-					</div>
-					<button title="BACKUP SNIPPETS"
-						class="slds-button slds-button_brand"
-						style="max-block-size: -webkit-fill-available;position: absolute;right: 104px;width: 103px;"
-						id="btnBackupSnippets">
-					</button>
-					<button title="BACKUP SNIPPETS"
-						class="slds-button slds-button_brand"
-						style="max-block-size: -webkit-fill-available;position: absolute;right: 1px;width: 108px;"
-						id="btnRestoreSnippets">
-					</button>
-				</div>
-			</div>
-			<ul id="list"
-				style="max-height: 130px; overflow-y: scroll"
-				class="slds-has-block-links_space"></ul>
+		<div style="text-align-last: center;background-color: #60bdff;padding: .5%">
+			<label class="slds-checkbox__label"><b>[CODE SNIPPET]</b>
+			</label>
+			<button title="BACKUP SNIPPETS"
+				class="slds-button slds-button_brand"
+				style="max-block-size: -webkit-fill-available;position: absolute;right: 104px;width: 103px;height:20px"
+				id="btnBackupSnippets">
+			</button>
+			<label class="label slds-button slds-button_brand">
+				<input type="file"
+					id="btnRestoreSnippets"
+					required
+					accept=".json" />
+				<span id="btnRestoreSnippetsSpan">RESTORE</span>
+			</label>
+		</div>
+		<ul id="list"
+			style="max-height: 130px; overflow-y: scroll"
+			class="slds-has-block-links_space"></ul>
 		</div>
 	</body>
 
 </html>
+<style>
+	label.label input[type="file"] {
+		position: absolute;
+		top: -1000px;
+	}
+
+	.label {
+		height: 20px;
+		cursor: pointer;
+		display: -webkit-inline-box;
+		position: absolute;
+		right: 6px;
+	}
+
+
+	.label:invalid+span {
+		color: #000000;
+	}
+
+	.label:valid+span {
+		color: #ffffff;
+	}
+</style>

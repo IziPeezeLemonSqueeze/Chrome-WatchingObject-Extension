@@ -62,6 +62,7 @@ chrome.storage.onChanged.addListener((changes, namespace) =>
 chrome.runtime.onInstalled.addListener(() =>
 {
 	chrome.storage.session.clear();
+
 });
 
 
@@ -106,7 +107,7 @@ function clearWatchingProcess()
 let timeoutFORCEResetDialog;
 chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 {
-	//console.log('ARRIVED BE', obj);
+	console.log('ARRIVED BE', obj);
 
 	switch (obj.type)
 	{
@@ -399,7 +400,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					{
 						type: 'basic',
 						title: 'DELETING APEX LOGS',
-						message: await res.totalSize + ' ApexLog eliminati!',
+						message: await res.totalSize + ' ApexLog deleted!',
 						iconUrl: 'images/icon.png'
 					});
 
