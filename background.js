@@ -191,6 +191,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 				response: 'getPageFields',
 			}).then(async (HTMLFieldFound) =>
 			{
+				console.log('HTMLFieldFound', HTMLFieldFound)
 				if (!HTMLFieldFound)
 				{
 					return;
@@ -216,19 +217,18 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					}).then(async responseRecordType =>
 					{
 						recordTypeFounded = await responseRecordType.json();
-
+						console.log('RECORDTYPE BY QUERY', recordTypeFounded)
 						recordTypeDeveloperName = recordTypeFounded.records[0]['RecordType']['DeveloperName'];
 						recordTypeFounded = recordTypeFounded.records[0].RecordTypeId;
 
 					}).catch(noRecordTypeFound =>
 					{
-						recordTypeFounded = null;
+						recordTypeFounded = '012000000000000AAA';
 					});
 
 				var resApiName = null;
-				const query = !recordTypeFounded ?
-					`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' :
-					`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
+				const query = `/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
+				console.log(query);
 				await fetch(getCurrentUrl(sender.tab).customDomainHttps + query,
 					{
 						method: 'GET',
