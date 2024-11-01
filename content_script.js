@@ -121,6 +121,11 @@
 
 	const removeApiNameToFields = () =>
 	{
+		if (!apiFieldExist || apiFieldExist.length === 0)
+		{
+			return;
+		}
+
 		apiFieldExist.forEach(id =>
 		{
 			try
@@ -132,36 +137,40 @@
 		});
 
 		apiFieldExist = [];
+
+		location.reload();
 	}
 
 	const setApiNameToFields = (api) =>
 	{
+		const pageFieldsCopy = [...pageFields];
+		let newElementObjectInfoOnHTML = document.createElement('span');
+		newElementObjectInfoOnHTML.id = 'showapi-objectInfo';
+		newElementObjectInfoOnHTML.style = 'background-color: rgb(1, 118, 211);margin-left: 5px;display: inline-block;padding: 5px;border-radius: 3px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;';
+		newElementObjectInfoOnHTML.innerText = `${api.objectInfo}  :  ${(api.recordTypeFound ? api.recordTypeName : "NO RECORDTYPE")}`;
+		const headerObject = document.getElementsByClassName('entityNameTitle')[0];
+		headerObject.appendChild(newElementObjectInfoOnHTML);
+		apiFieldExist.push('showapi-objectInfo');
+		//console.log('ENTITY NAME TITLE', headerObject)
 		if (!api.recordTypeFound)
 		{
-			api.apiField.layouts[0].detailLayoutSections.forEach(section =>
+			api.apiField.layouts[0].detailLayoutSections.forEach((section, sectionIndex) =>
 			{
-				section.layoutRows.forEach(row =>
+				section.layoutRows.forEach((row, rowIndex) =>
 				{
 					row.layoutItems.forEach(item =>
 					{
 						if (item.layoutComponents.length > 0)
 						{
-							for (let elem of pageFields)
+							let inserted = false;
+							for (let elem of pageFieldsCopy)
 							{
-								if (elem.innerText == item.label)
+								if (elem.innerText == item.label && !inserted)
 								{
-									let newElemementOnHTML = document.createElement('span');
-									newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
-									newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;';
-									newElemementOnHTML.innerText = item.layoutComponents[0].value;
-									newElemementOnHTML.title = 'click to copy on clipboard';
-									newElemementOnHTML.addEventListener('click', (e) =>
-									{
-										copyToClipboard(newElemementOnHTML.innerText);
-									});
-									elem.parentNode.appendChild(newElemementOnHTML);
-
-									apiFieldExist.push(newElemementOnHTML.id);
+									inserted = true;
+									api.apiField.detailLayoutSections[sectionIndex].layoutRows[rowIndex].layoutItems = api.apiField.detailLayoutSections[sectionIndex].layoutRows[rowIndex].layoutItems.filter(li => li.label != elem.innerText);
+									pageFieldsCopy.splice(pageFieldsCopy.indexOf(elem), 1);
+									createElementHTMLForApiFields(elem, item);
 								}
 							};
 						}
@@ -170,30 +179,23 @@
 			});
 		} else
 		{
-			api.apiField.detailLayoutSections.forEach(section =>
+			api.apiField.detailLayoutSections.forEach((section, sectionIndex) =>
 			{
-				section.layoutRows.forEach(row =>
+				section.layoutRows.forEach((row, rowIndex) =>
 				{
 					row.layoutItems.forEach(item =>
 					{
 						if (item.layoutComponents.length > 0)
 						{
-							for (let elem of pageFields)
+							let inserted = false;
+							for (let elem of pageFieldsCopy)
 							{
-								if (elem.innerText == item.label)
+								if (elem.innerText == item.label && !inserted)
 								{
-									let newElemementOnHTML = document.createElement('span');
-									newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
-									newElemementOnHTML.style = 'background-color: #0176d3;margin-top: 2px;margin-bottom: 5px;display: table;padding: 5px;border-radius: 3px;color: rgb(255 255 255);-webkit-text-stroke-width: thin;-webkit-text-stroke-color: rgb(0 0 0);font-weight: bold;';
-									newElemementOnHTML.innerText = item.layoutComponents[0].value;
-									newElemementOnHTML.title = 'click to copy on clipboard';
-									newElemementOnHTML.addEventListener('click', (e) =>
-									{
-										copyToClipboard(newElemementOnHTML.innerText);
-									});
-									elem.parentNode.appendChild(newElemementOnHTML);
-
-									apiFieldExist.push(newElemementOnHTML.id);
+									inserted = true;
+									api.apiField.detailLayoutSections[sectionIndex].layoutRows[rowIndex].layoutItems = api.apiField.detailLayoutSections[sectionIndex].layoutRows[rowIndex].layoutItems.filter(li => li.label != elem.innerText);
+									pageFieldsCopy.splice(pageFieldsCopy.indexOf(elem), 1);
+									createElementHTMLForApiFields(elem, item);
 								}
 							};
 						}
@@ -201,6 +203,38 @@
 				});
 			});
 		}
+
+		//console.log('API FIELD INSERTED', apiFieldExist, apiFieldExist.length)
+	}
+
+	const createElementHTMLForApiFields = (elem, item) =>
+	{
+		const newElemementOnHTML = document.createElement('span');
+		newElemementOnHTML.id = `showapi-${item.layoutComponents[0].value}`;
+		newElemementOnHTML.style = 'background-color: rgb(1, 118, 211);margin-top: 2px;margin-bottom: 5px;display: block;padding: 5px;border-radius: 3px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;cursor: pointer;';
+		newElemementOnHTML.innerText = item.layoutComponents[0].value;
+		newElemementOnHTML.title = 'click to copy on clipboard';
+		newElemementOnHTML.addEventListener('click', (e) =>
+		{
+			copyToClipboard(item.layoutComponents[0].value);
+		});
+		elem.parentNode.appendChild(newElemementOnHTML);
+
+		newElemementOnHTML.style.width = '100%';
+		if (item.layoutComponents[0].details.calculatedFormula)
+		{
+			newElemementOnHTML.style.width = '110%';
+			const newElementOnHTMLFormula = document.createElement('span');
+			newElementOnHTMLFormula.id = `showapiformula-${item.layoutComponents[0].value}`
+			newElementOnHTMLFormula.title = item.layoutComponents[0].details.calculatedFormula;
+			newElementOnHTMLFormula.innerText = '{√x}²';
+			newElementOnHTMLFormula.style = 'background-color: rgb(1, 118, 211);padding: 6px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;cursor: help;border-left: dashed;margin-left: 9%;';
+
+			newElemementOnHTML.appendChild(newElementOnHTMLFormula);
+
+			//apiFieldExist.push(newElementOnHTMLFormula.id);
+		}
+		apiFieldExist.push(newElemementOnHTML.id);
 	}
 
 	const devConsoleTool = () => 

@@ -34,6 +34,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 			}
 
 
+		} else if (changeInfo.status == 'complete')
+		{
+			chrome.tabs.sendMessage(tabId, {
+				response: 'resetApiFieldArray'
+			})
 		} else
 		{
 			chrome.tabs.sendMessage(tabId, {
@@ -201,42 +206,31 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 
 					const idObjSplitted = String(sender.tab.url).split('/');
 					const ObjectType = idObjSplitted[idObjSplitted.length - 3];
-
 					let recordTypeFounded = null;
+					let recordTypeDeveloperName = null;
 					await fetch(
 						getCurrentUrl(sender.tab).customDomainHttps +
-						`/services/data/v57.0/query/?q=SELECT+RecordTypeId+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
+						`/services/data/v57.0/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
 						method: "GET",
 						headers: {
 							Authorization: "Bearer " + sidApiField[0].value,
 							"Content-Type": "application/json",
 						}
-					}).then(async respRecordType =>
+					}).then(async responseRecordType =>
 					{
-						recordTypeFounded = await respRecordType.json();
-						console.log(recordTypeFounded)
-						try
-						{
-							if (recordTypeFounded[0].errorCode)
-							{
-								recordTypeFounded = null;
-							}
-						} catch (err)
-						{
-							recordTypeFounded = recordTypeFounded.records[0].RecordTypeId;
-						}
-						console.log('RECORD TYPE ID ', recordTypeFounded)
-					}).catch(err =>
+						recordTypeFounded = await responseRecordType.json();
+						console.log('RECORDTYPE BY QUERY', recordTypeFounded)
+						recordTypeDeveloperName = recordTypeFounded.records[0]['RecordType']['DeveloperName'];
+						recordTypeFounded = recordTypeFounded.records[0].RecordTypeId;
+
+					}).catch(noRecordTypeFound =>
 					{
-						console.log(err);
+						recordTypeFounded = '012000000000000AAA';
 					});
 
 					var resApiName = null;
-					const query = !recordTypeFounded ?
-						`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' :
-						`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
-					await fetch(
-						getCurrentUrl(sender.tab).customDomainHttps + query,
+					const query = `/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
+					await fetch(getCurrentUrl(sender.tab).customDomainHttps + query,
 						{
 							method: 'GET',
 							headers: {
@@ -252,9 +246,17 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 							{
 								chrome.tabs.sendMessage(sender.tab.id, {
 									response: 'setApiToField',
-									payload: { recordTypeFound: !recordTypeFounded ? false : true, apiField: resApiName }
+									payload: {
+										recordTypeFound: !recordTypeFounded ? false : true,
+										apiField: resApiName,
+										objectInfo: ObjectType,
+										recordTypeName: recordTypeDeveloperName
+									}
 								});
 							}
+						}).catch(err =>
+						{
+							console.error(err);
 						});
 				}
 			});
