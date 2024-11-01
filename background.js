@@ -34,6 +34,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 			}
 
 
+		} else if (changeInfo.status == 'complete')
+		{
+			chrome.tabs.sendMessage(tabId, {
+				response: 'resetApiFieldArray'
+			})
 		} else
 		{
 			chrome.tabs.sendMessage(tabId, {
@@ -189,26 +194,23 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			console.log('WO_TOOL_requestFields ARRIVED');
 			chrome.tabs.sendMessage(sender.tab.id, {
 				response: 'getPageFields',
-			}).then(async (HTMLFieldFound) =>
+			}).then(async (responseField) =>
 			{
-				console.log('HTMLFieldFound', HTMLFieldFound)
-				if (!HTMLFieldFound)
+				console.log('BG RESPONSE', responseField);
+				if (responseField)
 				{
-					return;
-				}
-				const sidApiField = await chrome.cookies.getAll({
-					name: "sid",
-					domain: getCurrentUrl(sender.tab).customDomain,
-				});
-				const idObjSplitted = String(sender.tab.url).split('/');
-				const ObjectType = idObjSplitted[idObjSplitted.length - 3];
+					const sidApiField = await chrome.cookies.getAll({
+						name: "sid",
+						domain: getCurrentUrl(sender.tab).customDomain,
+					});
 
-				let recordTypeFounded = null;
-				let recordTypeDeveloperName = null;
-				await fetch(
-					getCurrentUrl(sender.tab).customDomainHttps +
-					`/services/data/v57.0/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`,
-					{
+					const idObjSplitted = String(sender.tab.url).split('/');
+					const ObjectType = idObjSplitted[idObjSplitted.length - 3];
+					let recordTypeFounded = null;
+					let recordTypeDeveloperName = null;
+					await fetch(
+						getCurrentUrl(sender.tab).customDomainHttps +
+						`/services/data/v57.0/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
 						method: "GET",
 						headers: {
 							Authorization: "Bearer " + sidApiField[0].value,
@@ -226,92 +228,9 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 						recordTypeFounded = '012000000000000AAA';
 					});
 
-				var resApiName = null;
-				const query = `/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
-				console.log(query);
-				await fetch(getCurrentUrl(sender.tab).customDomainHttps + query,
-					{
-						method: 'GET',
-						headers: {
-							'Content-Type': 'application/json; charset=UTF-8',
-							Accept: 'application/json',
-							Authorization: 'Bearer ' + sidApiField[0].value,
-						},
-					}).then(async responseFetchDescribe =>
-					{
-						resApiName = await responseFetchDescribe.json();
-						console.log(' API FIELD RESP', await resApiName);
-						if (resApiName)
-						{
-							chrome.tabs.sendMessage(sender.tab.id, {
-								response: 'setApiToField',
-								payload: {
-									recordTypeFound: !recordTypeFounded ? false : true,
-									apiField: resApiName,
-									objectInfo: ObjectType,
-									recordTypeName: recordTypeDeveloperName
-								}
-							});
-						}
-					}).catch(err =>
-					{
-						console.error(err);
-					});
-
-			})
-			/* chrome.tabs.sendMessage(sender.tab.id, {
-				response: 'getPageFields',
-			}).then(async (responseField) =>
-			{
-				console.log('BG RESPONSE', responseField);
-				if (responseField)
-				{
-					const sidApiField = await chrome.cookies.getAll({
-						name: "sid",
-						domain: getCurrentUrl(sender.tab).customDomain,
-					});
-
-					const idObjSplitted = String(sender.tab.url).split('/');
-					const ObjectType = idObjSplitted[idObjSplitted.length - 3];
-
-					let recordTypeFounded = null;
-					let recordTypeDeveloperName = null;
-
-					await fetch(
-						getCurrentUrl(sender.tab).customDomainHttps +
-						`/services/data/v57.0/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
-						method: "GET",
-						headers: {
-							Authorization: "Bearer " + sidApiField[0].value,
-							"Content-Type": "application/json",
-						}
-					}).then(async respRecordType =>
-					{
-						recordTypeFounded = await respRecordType.json();
-						console.log(recordTypeFounded.records[0])
-						try
-						{
-							if (recordTypeFounded[0].errorCode)
-							{
-								recordTypeFounded = null;
-							}
-						} catch (err)
-						{
-							recordTypeDeveloperName = recordTypeFounded.records[0]['RecordType']['DeveloperName'];
-							recordTypeFounded = recordTypeFounded.records[0].RecordTypeId;
-						}
-						console.log('RECORD TYPE ID ', recordTypeFounded)
-					}).catch(err =>
-					{
-						recordTypeFounded = null;
-					});
-
 					var resApiName = null;
-					const query = !recordTypeFounded ?
-						`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' :
-						`/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
-					await fetch(
-						getCurrentUrl(sender.tab).customDomainHttps + query,
+					const query = `/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
+					await fetch(getCurrentUrl(sender.tab).customDomainHttps + query,
 						{
 							method: 'GET',
 							headers: {
@@ -335,9 +254,12 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 									}
 								});
 							}
+						}).catch(err =>
+						{
+							console.error(err);
 						});
 				}
-			}); */
+			});
 			break;
 
 		case 'WO_TOOL_goToApexLog':
@@ -593,5 +515,3 @@ async function login(domain, sid, SObject, ID)
 
 	return res;
 }
-
-
