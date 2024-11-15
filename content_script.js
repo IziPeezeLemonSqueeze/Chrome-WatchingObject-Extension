@@ -51,7 +51,7 @@
 				case 'openDialogVar':
 					if (!dialogVarOpen)
 					{
-						openDialogVar(obj.payload);
+						openDialogVar(divDCTOOL, divFastDCTOOL, obj.payload);
 					}
 					break;
 
@@ -418,8 +418,13 @@
 		}
 	}
 
-	const openDialogVar = ([mapValue, code, id]) =>
+	const openDialogVar = (divDCTOOL, divFastDCTOOL, [mapValue, code, id]) =>
 	{
+		console.log('DIVTOOL', divDCTOOL);
+		console.log('DIVFASTTOOL', divFastDCTOOL);
+
+		const divToolToAttach = divDCTOOL ? divDCTOOL : divFastDCTOOL ? divFastDCTOOL : null;
+
 		const nomeSnippet = id;
 		dialogVarOpen = true;
 		try
@@ -433,42 +438,39 @@
 
 		let dialog = document.createElement('dialog');
 		dialog.id = 'dialogvar';
-		let title = document.createElement('h4');
+		let title = document.createElement('div');
 		title.innerText = 'CODE SNIPPET - Value assignment!\nNAME SNIPPET: ' + id.replace('snippet_', '');
-
+		title.style = 'text-align: center;margin: -2.35%;padding: 1%;border-radius: 10px 10px 0px 0px;background-color: rgb(96, 189, 255);font-weight: bold;';
 		dialog.setAttribute('open', '');
-		dialog.style = "background-color: rgba(255, 255, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;margin: 5%;min-width: -webkit-fill-available;position: fixed;z-index: 1000000000;top: 1%;box-shadow: rgba(0, 0, 0, 0.11) 0px 0 7px 9px;height: 520px;"
+		/* dialog.style = "background-color: rgba(255, 255, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;margin: 5%;min-width: -webkit-fill-available;position: fixed;z-index: 1000000000;top: 1%;box-shadow: rgba(0, 0, 0, 0.11) 0px 0 7px 9px;height: 520px;" */
+		dialog.style = "width: 100%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: absolute;z-index: -1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 520px;bottom: 85%;"
 
 		let list = document.createElement('ul');
 		list.style = "min-height: 130px; overflow-y: scroll";
-		list.className = "slds-has-block-links_space";
+		//list.className = "slds-has-block-links_space";
 		list.id = 'list-dialogvar';
 
 		let div = document.createElement('div');
 		div.className = 'row';
-		div.style = "margin-top: 3%;min-height: 400px;height: 400px;display: flex;flex-flow: row nowrap;justify-content: space-evenly;align-items: flex-start;flex-wrap: nowrap;flex-direction: row;"
+		div.style = "margin-top: 5%;min-height: 415px;height: 400px;display: flex;flex-flow: row nowrap;justify-content: space-evenly;align-items: flex-start;flex-wrap: nowrap;flex-direction: row;"
 
+		/* 		RESULTING CODE DIV
 		let divRight = document.createElement('div');
 		divRight.style = "height: -webkit-fill-available;display: flex;flex-wrap: nowrap;align-items: center;flex-direction: column;";
-		divRight.className = 'col-4';
+		divRight.className = 'col-4'; */
 
 		let divCenter = document.createElement('div');
-		divCenter.style = "background-color: rgba(255,255,255);height: -webkit-fill-available;display: flex;flex-direction: column-reverse;place-content: center space-between;"
+		divCenter.style = "width: 100%;background-color: rgba(238, 244, 255, 0.0);height: -webkit-fill-available;display: flex;flex-direction: column-reverse;place-content: center space-between;"
 
 		divCenter.className = 'col-4';
 
-
-		let divCenterContent = document.createElement('div');
-		divCenterContent.className = 'col';
-
 		let divCenterActions = document.createElement('div');
 		divCenterActions.className = 'col-4';
-		divCenterActions.style = "margin-top: 5%;display: flex;align-items: flex-start;flex-direction: row;justify-content: space-around;"
+		divCenterActions.style = "display: flex;align-items: flex-start;flex-direction: row;justify-content: space-around;"
 
 		div.appendChild(divCenter);
 		divCenter.appendChild(divCenterActions);
-		divCenter.appendChild(divCenterContent);
-		div.appendChild(divRight);
+		//div.appendChild(divRight);
 		const mapType = new Map(
 			[
 				['ID', 'ID, here you can put only ID, there is the 18-character check!.\nNO SUPERSCRIPTS OR QUOTATION MARKS'],
@@ -491,6 +493,7 @@
 			spanTestoTipo.id = 'spantestotipo';
 			let nameVar = document.createElement('h2');
 			nameVar.innerText = el.name;
+			nameVar.style = 'font-weight: bold; text-align: center; text-transform: uppercase;'
 			spanTestoTipo.innerText =
 				'Enter the value for the variable: ';
 			spanTestoTipo.appendChild(nameVar);
@@ -687,28 +690,29 @@
 		});
 
 		divCenter.appendChild(list);
-		let spanTextArea = document.createElement('span');
-		spanTextArea.id = 'spantextarea-dialogvar';
-		spanTextArea.innerText = 'Resulting code';
-		let textArea = document.createElement('textarea');
-		textArea.id = 'textarea-dialogvar';
-		textArea.setAttribute('row', 50);
-		textArea.setAttribute('col', 100);
-		textArea.setAttribute('readonly', true);
-		textArea.innerText = code;
-		textArea.className = "textarea";
-		textArea.style = "resize: none;min-height: 400px;min-width: 550px;width: 585px;height: 413px;";
 
 
-		divRight.appendChild(spanTextArea);
-		divRight.appendChild(textArea);
-
-
+		// RESULTING CODE
+		/* 		let spanTextArea = document.createElement('span');
+				spanTextArea.id = 'spantextarea-dialogvar';
+				spanTextArea.innerText = 'Resulting code';
+				let textArea = document.createElement('textarea');
+				textArea.id = 'textarea-dialogvar';
+				textArea.setAttribute('row', 50);
+				textArea.setAttribute('col', 100);
+				textArea.setAttribute('readonly', true);
+				textArea.innerText = code;
+				textArea.className = "textarea";
+				textArea.style = "resize: none;min-height: 400px;min-width: 550px;width: 585px;height: 413px;";
+		
+		
+				divRight.appendChild(spanTextArea);
+				divRight.appendChild(textArea); */
 
 		let btnRun = document.createElement('button');
 		btnRun.id = 'btnRun-dialogvar';
 		btnRun.innerText = 'RUN 🚀';
-		btnRun.className = 'x-btn-inner';
+		btnRun.className = 'x-btn-inner slds-button slds-button_brand';
 
 		btnRun.addEventListener('click', (e) =>
 		{
@@ -752,7 +756,7 @@
 		let btnRunClose = document.createElement('button');
 		btnRunClose.innerText = 'RUN & CLOSE 🚀';
 		btnRunClose.id = 'btnRunClose-dialogvar';
-		btnRunClose.className = 'x-btn-inner';
+		btnRunClose.className = 'x-btn-inner slds-button slds-button_brand';
 		btnRunClose.addEventListener('click', (e) =>
 		{
 			let allValue = false;
@@ -810,20 +814,24 @@
 		let btnAnnulla = document.createElement('button');
 		btnAnnulla.innerText = 'CANCEL ❌';
 		btnAnnulla.id = 'btnAnnulla-dialogvar';
-		btnAnnulla.className = 'x-btn-inner';
+		btnAnnulla.className = 'x-btn-inner slds-button slds-button_brand';
 		btnAnnulla.addEventListener('click', (e) =>
 		{
 			Object.entries(mapValue).forEach((v, id) =>
 			{
 				delete v[1].value;
 			});
-			try
+			/* try
 			{
 				developerConsoleBody.removeChild(document.getElementById('dialogvar'));
 			} catch (err)
 			{
 				salesforceBody.removeChild(document.getElementById('dialogvar'));
-			}
+			} */
+			try
+			{
+				divToolToAttach.removeChild(document.getElementById('dialogvar'));
+			} catch (err) { console.log(err) }
 			dialogVarOpen = false;
 			chrome.runtime.sendMessage({
 				type: 'WO_CODESNIPPET_forceResetDialog'
@@ -836,12 +844,20 @@
 
 		dialog.appendChild(title);
 		dialog.appendChild(div);
+		/* 		try
+				{
+					developerConsoleBody.appendChild(dialog);
+				} catch (err)
+				{
+					salesforceBody.appendChild(dialog);
+				} */
+
 		try
 		{
-			developerConsoleBody.appendChild(dialog);
+			divToolToAttach.appendChild(dialog);
 		} catch (err)
 		{
-			salesforceBody.appendChild(dialog);
+			console.log(err);
 		}
 
 	}
