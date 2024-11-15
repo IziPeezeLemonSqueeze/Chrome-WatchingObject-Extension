@@ -696,7 +696,7 @@
 					}
 				}
 				//console.log(lastValueInserted)
-				textArea.innerText = codeModified;
+				//textArea.innerText = codeModified;
 			});
 
 			let li = document.createElement('li');
@@ -815,13 +815,17 @@
 				{
 					delete v[1].value;
 				});
-				try
+				/* try
 				{
 					developerConsoleBody.removeChild(document.getElementById('dialogvar'));
 				} catch (err)
 				{
 					salesforceBody.removeChild(document.getElementById('dialogvar'));
-				}
+				} */
+				try
+				{
+					divToolToAttach.removeChild(document.getElementById('dialogvar'));
+				} catch (err) { console.log(err) }
 				dialogVarOpen = false;
 				chrome.runtime.sendMessage({
 					type: 'WO_CODESNIPPET_forceResetDialog'
