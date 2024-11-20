@@ -11,6 +11,7 @@
 	let dialogVarOpen = false;
 	let frameSnippet = null;
 	let frameFastSnippet = null;
+	let textAreaNewSnippetOpen = false;
 	let windowApexCode;
 	let divDCTOOL;
 	let divFastDCTOOL;
@@ -41,7 +42,10 @@
 					break;
 
 				case 'openTextAreaNewSnippet':
-					openTextAreaNewSnippet();
+					if (!textAreaNewSnippetOpen)
+					{
+						openTextAreaNewSnippet();
+					}
 					break;
 
 				case 'copyApexSnippet':
@@ -367,6 +371,8 @@
 
 	const openTextAreaNewSnippet = () =>
 	{
+
+		textAreaNewSnippetOpen = true;
 		_initDeveloperConsoleBody();
 
 		const divNewSnippet = document.createElement('div');
@@ -408,6 +414,7 @@
 				textArea.value = null;
 				inputNewSnippetName.value = null;
 				divNewSnippet.remove();
+				textAreaNewSnippetOpen = false;
 			}
 		});
 
@@ -421,6 +428,7 @@
 			textArea.value = null;
 			inputNewSnippetName.value = null;
 			divNewSnippet.remove();
+			textAreaNewSnippetOpen = false;
 		});
 
 		divBottom.appendChild(inputNewSnippetName);
