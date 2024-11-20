@@ -2,6 +2,7 @@ const root = document.getElementById('snippet_body');
 const btnBackup = document.getElementById('btnBackupSnippets');
 const btnRestore = document.getElementById('btnRestoreSnippets');
 const btnRestoreSpan = document.getElementById('btnRestoreSnippetsSpan');
+const btnAddSnippet = document.getElementById('btnAddSnippet');
 let nButton = [];
 let dialog = document.getElementById('dialog');
 let mapValue = new Map();
@@ -9,6 +10,13 @@ var snippetsBackup = [];
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
+
+	btnAddSnippet.innerText = 'New ➕';
+	btnAddSnippet.addEventListener('click', (e) =>
+	{
+		handler_addNewSnippet();
+	});
+
 	btnBackup.innerText = 'BACKUP 💾';
 	btnBackup.addEventListener('click', async (e) =>
 	{
@@ -416,5 +424,11 @@ const handler_del = (args) =>
 	});
 }
 
+const handler_addNewSnippet = () =>
+{
+	chrome.runtime.sendMessage({
+		type: 'WO_CODESNIPPET_addNewSnippet'
+	})
+}
 
 createObjectList();

@@ -37,8 +37,13 @@
 					}, 2000);
 					break;
 				case 'popupNameSnippet':
-					makeSnippet(obj.payload);
+					//makeSnippet(obj.payload);
 					break;
+
+				case 'openTextAreaNewSnippet':
+					openTextAreaNewSnippet();
+					break;
+
 				case 'copyApexSnippet':
 					copyApexSnippet(obj.payload);
 					hideCS(windowApexCode);
@@ -347,17 +352,99 @@
 
 	// indentifierVariabileOnCode + ivc
 
+	const _initDeveloperConsoleBody = () =>
+	{
+		try
+		{
+			developerConsoleBody = document.getElementById('ext-gen1361');
+		} catch (e) { console.error('DEVELOPER_CONSOLE_BODY NOT FOUND >>>'); }
+
+		developerConsoleBody ?
+			null :
+			developerConsoleBody = document.getElementsByClassName('ApexCSIPage')[0];
+	}
+
+
+	const openTextAreaNewSnippet = () =>
+	{
+		_initDeveloperConsoleBody();
+
+		const divNewSnippet = document.createElement('div');
+		divNewSnippet.className = 'col';
+		divNewSnippet.id = 'newSnippet';
+		divNewSnippet.style = 'left: 5%;border-radius: 10px 10px 10px 10px;padding: 0.1%;background-color: rgb(96, 189, 255);position: absolute;top: 10%;'
+
+		const titleNewSnippet = document.createElement('div');
+		titleNewSnippet.innerText = 'CODE SNIPPET - New Snippet';
+		titleNewSnippet.style = 'text-align: center;padding: 1%;border-radius: 10px 10px 0px 0px;background-color: rgb(96, 189, 255);font-weight: bold;';
+
+		const textArea = document.createElement('textarea');
+		textArea.id = 'newSnippet-textarea';
+		textArea.spellcheck = false;
+		textArea.placeholder = 'Paste here your code...';
+		textArea.style = 'border-radius: 1%;padding: 5%;resize: none;width: 360px;height: 360px;'
+
+		const seperator = document.createElement('br');
+		seperator.style = 'margin-top: 1%; margin-bottom: 1%, padding: .5%';
+
+		const divBottom = document.createElement('div');
+		divBottom.className = 'row';
+		divBottom.style = 'display: flex;flex-direction: row;flex-wrap: nowrap;align-content: center;justify-content: space-between;align-items: center;'
+
+		const inputNewSnippetName = document.createElement('input');
+		inputNewSnippetName.style = 'margin: 1%;border-radius: 1%;';
+		inputNewSnippetName.placeholder = 'New Snippet NAME';
+
+		const buttonOkNewSnippet = document.createElement('button');
+		buttonOkNewSnippet.id = 'saveOkNewSnippet';
+		buttonOkNewSnippet.innerText = 'Save';
+		buttonOkNewSnippet.className = 'slds-button slds-button_success';
+		buttonOkNewSnippet.style = 'width: 90px;mix-blend-mode: multiply;margin-left: auto;margin-right: 5%;size: unset;max-height: 25px;';
+		buttonOkNewSnippet.addEventListener('click', (e) =>
+		{
+			if (inputNewSnippetName.value && textArea.value)
+			{
+				makeSnippet({ name: inputNewSnippetName.value, code: textArea.value });
+				textArea.value = null;
+				inputNewSnippetName.value = null;
+				divNewSnippet.remove();
+			}
+		});
+
+		const buttonKoNewSnippet = document.createElement('button');
+		buttonKoNewSnippet.innerText = 'Cancel';
+		buttonKoNewSnippet.id = 'saveKoNewSnippet';
+		buttonKoNewSnippet.className = 'slds-button slds-button_success';
+		buttonKoNewSnippet.style = 'mix-blend-mode: multiply;margin-left: auto;margin-right: 1%;size: unset;max-height: 25px;'
+		buttonKoNewSnippet.addEventListener('click', (e) =>
+		{
+			textArea.value = null;
+			inputNewSnippetName.value = null;
+			divNewSnippet.remove();
+		});
+
+		divBottom.appendChild(inputNewSnippetName);
+		divBottom.appendChild(buttonOkNewSnippet);
+		divBottom.appendChild(buttonKoNewSnippet);
+
+		divNewSnippet.appendChild(titleNewSnippet);
+		divNewSnippet.appendChild(textArea);
+		divNewSnippet.appendChild(seperator);
+		divNewSnippet.appendChild(divBottom);
+
+		developerConsoleBody.appendChild(divNewSnippet);
+	}
+
 	const makeSnippet = (payload) =>
 	{
-		const name = prompt('Nome Snippet?');
 		// TODO CONTORLLO SUI DUPLICATI
 		const regexIVC = /@\b[\@V\@ID\@INT\@BOL\@STR]\w+(?='*)/g;
 		const countIVC = String(payload).match(regexIVC);
 		//console.log(countIVC);
 
 		chrome.storage.local.set({
-			['snippet_' + name]: {
-				code: payload,
+			['snippet_' + payload.name]: {
+				code: payload.code,
 				ivcFound: countIVC
 			}
 		});
@@ -428,21 +515,15 @@
 	{
 		const nomeSnippet = id;
 		dialogVarOpen = true;
-		try
-		{
-			developerConsoleBody = document.getElementById('ext-gen1361');
-		} catch (e) { console.error('DEVELOPER_CONSOLE_BODY NOT FOUND >>>'); }
 
-		developerConsoleBody ?
-			null :
-			developerConsoleBody = document.getElementsByClassName('ApexCSIPage')[0];
+		_initDeveloperConsoleBody();
 
-		console.log('DEVCONSOLE', developerConsoleBody);
+		//console.log('DEVCONSOLE', developerConsoleBody);
 
 		let isFastToAttach = !developerConsoleBody;
 
 
-		console.log('isFastToAttach', isFastToAttach)
+		//console.log('isFastToAttach', isFastToAttach)
 
 		let dialog = document.createElement('div');
 		dialog.id = 'dialogvar';
@@ -973,6 +1054,7 @@
 	const copyToClipboard = (textToCopy) =>
 	{
 		const t = document.createElement('textarea');
+		console.log('textToCopy', textToCopy)
 		t.value = textToCopy;
 		t.setAttribute('readonly', '');
 		t.style.position = 'absolute';
