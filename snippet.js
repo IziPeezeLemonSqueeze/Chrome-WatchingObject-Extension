@@ -2,6 +2,7 @@ const root = document.getElementById('snippet_body');
 const btnBackup = document.getElementById('btnBackupSnippets');
 const btnRestore = document.getElementById('btnRestoreSnippets');
 const btnRestoreSpan = document.getElementById('btnRestoreSnippetsSpan');
+const btnAddSnippet = document.getElementById('btnAddSnippet');
 let nButton = [];
 let dialog = document.getElementById('dialog');
 let mapValue = new Map();
@@ -9,6 +10,13 @@ var snippetsBackup = [];
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
+
+	btnAddSnippet.innerText = 'New ➕';
+	btnAddSnippet.addEventListener('click', (e) =>
+	{
+		handler_addNewSnippet();
+	});
+
 	btnBackup.innerText = 'BACKUP 💾';
 	btnBackup.addEventListener('click', async (e) =>
 	{
@@ -137,6 +145,10 @@ const creatorElementList = async (items) =>
 				'Run the code now!'
 			btnRun.className = 'slds-button slds-button_success';
 
+			let loader = document.createElement('div');
+			loader.id = k + '-loader'
+			loader.className = 'loader';
+
 			let btnMod = document.createElement('button');
 			btnMod.innerText = '💾';
 			btnMod.id = k + '-mod';
@@ -158,6 +170,7 @@ const creatorElementList = async (items) =>
 			span.id = k + '-span';
 
 			div.appendChild(span);
+			div.appendChild(loader);
 			div.appendChild(btnRun);
 			div.appendChild(btnMod);
 			div.appendChild(btnRemove);
@@ -187,6 +200,7 @@ const creatorElementList = async (items) =>
 				//console.log(id[0], 'RUN');
 				btnIdx.doc.addEventListener('click', () =>
 				{
+					document.getElementById(btnIdx.id + '-loader').style.display = 'inline';
 					handler_run(btnIdx.doc, btnIdx.payload, btnIdx.id);
 				});
 				break;
@@ -246,7 +260,7 @@ const showHandlerDialogError = (textObj) =>
 	divErrorDialog.appendChild(document.createElement('br'));
 	divErrorDialog.appendChild(btn);
 
-	dialog.innerText = 'ERRORE: ';
+	dialog.innerText = 'ERROR: ';
 	dialog.appendChild(divErrorDialog);
 	dialog.setAttribute('open', '');
 }
@@ -410,5 +424,11 @@ const handler_del = (args) =>
 	});
 }
 
+const handler_addNewSnippet = () =>
+{
+	chrome.runtime.sendMessage({
+		type: 'WO_CODESNIPPET_addNewSnippet'
+	})
+}
 
 createObjectList();

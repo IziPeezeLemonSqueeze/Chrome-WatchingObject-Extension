@@ -73,7 +73,7 @@ chrome.runtime.onInstalled.addListener(() =>
 
 chrome.contextMenus.onClicked.addListener((info, tab) =>
 {
-	//console.log('CONTEXT_MENU_CLICKED', info, tab);
+	console.log('CONTEXT_MENU_CLICKED', info, tab);
 	if (info.selectionText.length == 18 && info.selectionText) 
 	{
 		let urlToGo = getCurrentUrl(tab).customDomainHttps;
@@ -82,8 +82,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
 			url: urlToGo + '/' + info.selectionText
 		});
 
-	} else
+	}/*  else
 	{
+
 		let formattedSnippet = info.selectionText.toString().replaceAll(';', ';\n');
 		let snippet = '';
 		let rows = formattedSnippet.split('\n');
@@ -98,16 +99,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
 			response: 'popupNameSnippet',
 			payload: snippet
 		});
-	}
+	} */
 });
-
-let watchingP;
-function clearWatchingProcess()
-{
-	console.log('STOP WATCHING JOB');
-	clearInterval(watchingP);
-	watchingP = null;
-}
 
 let timeoutFORCEResetDialog;
 chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
@@ -132,7 +125,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			});
 			break;
 
-		case 'createContextMenuDC':
+		/* case 'createContextMenuDC':
 			chrome.contextMenus.create({
 				title: "Salva selezione come CodeSnippet",
 				contexts: ["selection"],
@@ -143,6 +136,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 				]
 			});
 			break;
+			*/
 
 		case 'removeContextMenu':
 			chrome.contextMenus.removeAll();
@@ -339,6 +333,15 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			}
 			break;
 
+		//-------------------------CODE SNIPPET----------------------------------------------
+
+		case 'WO_CODESNIPPET_addNewSnippet':
+			chrome.tabs.sendMessage(sender.tab.id, {
+				response: 'openTextAreaNewSnippet',
+				payload: null
+			})
+			break
+
 		case 'WO_CODESNIPPET_edit':
 			chrome.tabs.sendMessage(sender.tab.id, {
 				response: 'copyApexSnippet',
@@ -442,9 +445,26 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			break;
 
 
+		case 'CREATE_NOTIFICATION':
+			createNotification(obj.payload);
+			break;
+
+
 	}
 
 });
+
+const createNotification = (data) =>
+{
+	chrome.notifications.create(
+		'',
+		{
+			type: 'basic',
+			title: data.title,
+			message: data.msg,
+			iconUrl: 'images/icon.png'
+		});
+}
 
 var notificationID = [];
 

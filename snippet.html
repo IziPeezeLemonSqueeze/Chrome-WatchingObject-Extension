@@ -23,6 +23,11 @@
         z-index: 1;
       "></dialog>
 		<div style="text-align-last: center;background-color: #60bdff;padding: .5%">
+			<button title="Add new Snippet"
+				class="slds-button slds-button_brand"
+				style="max-block-size: -webkit-fill-available;left: 1%;position: absolute;height:20px"
+				id="btnAddSnippet">
+			</button>
 			<label class="slds-checkbox__label"><b>[CODE SNIPPET]</b>
 			</label>
 			<button title="BACKUP SNIPPETS"
@@ -66,5 +71,44 @@
 
 	.label:valid+span {
 		color: #ffffff;
+	}
+
+	#list::-webkit-scrollbar {
+		width: 10px;
+		margin-left: 1%
+	}
+
+	#list::-webkit-scrollbar-track {
+		border-radius: 8px;
+		background-color: #e7e7e7;
+		border: 1px solid #cacaca;
+	}
+
+	#list::-webkit-scrollbar-thumb {
+		border-radius: 8px;
+		background-color: #60bdff;
+	}
+
+	.loader {
+		display: none;
+		border: 2px solid #f3f3f3;
+		border-top: 2px solid #3498db;
+		border-radius: 50%;
+		width: 15px;
+		height: 15px;
+		animation: spin 2s linear infinite;
+		padding: 1%;
+		margin-top: 0.5%;
+		margin-left: 2%;
+	}
+
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
 	}
 </style>
