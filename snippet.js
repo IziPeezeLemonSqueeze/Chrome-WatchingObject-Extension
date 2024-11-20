@@ -137,6 +137,10 @@ const creatorElementList = async (items) =>
 				'Run the code now!'
 			btnRun.className = 'slds-button slds-button_success';
 
+			let loader = document.createElement('div');
+			loader.id = k + '-loader'
+			loader.className = 'loader';
+
 			let btnMod = document.createElement('button');
 			btnMod.innerText = '💾';
 			btnMod.id = k + '-mod';
@@ -158,6 +162,7 @@ const creatorElementList = async (items) =>
 			span.id = k + '-span';
 
 			div.appendChild(span);
+			div.appendChild(loader);
 			div.appendChild(btnRun);
 			div.appendChild(btnMod);
 			div.appendChild(btnRemove);
@@ -187,6 +192,7 @@ const creatorElementList = async (items) =>
 				//console.log(id[0], 'RUN');
 				btnIdx.doc.addEventListener('click', () =>
 				{
+					document.getElementById(btnIdx.id + '-loader').style.display = 'inline';
 					handler_run(btnIdx.doc, btnIdx.payload, btnIdx.id);
 				});
 				break;
@@ -246,7 +252,7 @@ const showHandlerDialogError = (textObj) =>
 	divErrorDialog.appendChild(document.createElement('br'));
 	divErrorDialog.appendChild(btn);
 
-	dialog.innerText = 'ERRORE: ';
+	dialog.innerText = 'ERROR: ';
 	dialog.appendChild(divErrorDialog);
 	dialog.setAttribute('open', '');
 }

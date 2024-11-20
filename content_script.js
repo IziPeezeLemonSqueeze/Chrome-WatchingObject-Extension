@@ -51,7 +51,7 @@
 				case 'openDialogVar':
 					if (!dialogVarOpen)
 					{
-						openDialogVar(divDCTOOL, divFastDCTOOL, obj.payload);
+						openDialogVar(obj.payload);
 					}
 					break;
 
@@ -281,6 +281,12 @@
 
 	const showCS = (div, windowApexCode) =>
 	{
+		const loaders = document.querySelectorAll('[id*=-loader]');
+		loaders.forEach(loader =>
+		{
+			loader.style.display = 'none';
+		});
+
 		codeSnippetOpen = true;
 		try
 		{
@@ -418,11 +424,8 @@
 		}
 	}
 
-	const openDialogVar = (divDCTOOL, divFastDCTOOL, [mapValue, code, id]) =>
+	const openDialogVar = ([mapValue, code, id]) =>
 	{
-		console.log('DIVTOOL', divDCTOOL);
-		console.log('DIVFASTTOOL', divFastDCTOOL);
-
 		const nomeSnippet = id;
 		dialogVarOpen = true;
 		try
@@ -435,31 +438,27 @@
 			developerConsoleBody = document.getElementsByClassName('ApexCSIPage')[0];
 
 		console.log('DEVCONSOLE', developerConsoleBody);
-		let divToolToAttach = null;
-		let isFastToAttach = false;
-		if (divFastDCTOOL)
-		{
-			isFastToAttach = true;
-			divToolToAttach = divFastDCTOOL;
-		} else 
-		{
-			divToolToAttach = developerConsoleBody;
-		}
 
-		let dialog = document.createElement('dialog');
+		let isFastToAttach = !developerConsoleBody;
+
+
+		console.log('isFastToAttach', isFastToAttach)
+
+		let dialog = document.createElement('div');
 		dialog.id = 'dialogvar';
 		let title = document.createElement('div');
 		title.innerText = 'CODE SNIPPET - Value assignment!\nNAME SNIPPET: ' + id.replace('snippet_', '');
-		title.style = 'text-align: center;margin: -2.35%;padding: 1%;border-radius: 10px 10px 0px 0px;background-color: rgb(96, 189, 255);font-weight: bold;';
+		title.style = 'text-align: center;m;padding: 1%;border-radius: 10px 10px 0px 0px;background-color: rgb(96, 189, 255);font-weight: bold;';
 		dialog.setAttribute('open', '');
 		/* dialog.style = "background-color: rgba(255, 255, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;margin: 5%;min-width: -webkit-fill-available;position: fixed;z-index: 1000000000;top: 1%;box-shadow: rgba(0, 0, 0, 0.11) 0px 0 7px 9px;height: 520px;" */
 
 		if (isFastToAttach)
 		{
-			dialog.style = "width: 100%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: absolute;z-index: -1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 520px;bottom: 85%;"
+			/* dialog.style = "width: 100%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: absolute;z-index: -1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 520px;bottom: 85%;" */
+			dialog.style = "width: 600px;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 7px;position: fixed;z-index: 1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 9px 4px;height: 520px;bottom: 14%;right: 50%;"
 		} else
 		{
-			dialog.style = "width: 30%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: fixed;top:30%;z-index: 1000000;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 490px;bottom: 85%;";
+			dialog.style = "width: 30%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: fixed;top: 5%;right: 35%;z-index: 1000000;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 490px;";
 		}
 
 		let list = document.createElement('ul');
@@ -469,7 +468,7 @@
 
 		let div = document.createElement('div');
 		div.className = 'row';
-		div.style = "margin-top: 5%;min-height: 415px;height: 400px;display: flex;flex-flow: row nowrap;justify-content: space-evenly;align-items: flex-start;flex-wrap: nowrap;flex-direction: row;"
+		div.style = "padding: 1%;margin-top: 5%;min-height: 415px;height: 400px;display: flex;justify-content: space-evenly;align-items: flex-start;flex-flow: row;"
 
 		/* 		RESULTING CODE DIV
 		let divRight = document.createElement('div');
@@ -524,11 +523,15 @@
                 `;
 
 			let isInvalidField = false;
+
+			const divRowInput = document.createElement('div');
+			divRowInput.className = 'row';
+
 			let input = document.createElement('input');
 			input.id = 'input-dialogvar' + id + '_' + el.name;
 			input.setAttribute('type', 'text');
 			input.className = "dialogerror";
-			input.style = "width: -webkit-fill-available;"
+			input.style = "width: 90%"
 			input.placeholder = 'Enter the value you want to assign here!';
 
 			input.addEventListener('input', (e) =>
@@ -699,11 +702,25 @@
 				//textArea.innerText = codeModified;
 			});
 
+			const buttonPageId = document.createElement('button');
+			buttonPageId.id = 'btnVar-PageId';
+			buttonPageId.className = 'x-btn-inner slds-button slds-button_brand';
+			buttonPageId.addEventListener('click', (e) =>
+			{
+				const idOfPage = window.location.href.split('/');
+				input.value = idOfPage[idOfPage.length - 2];
+				input.focus();
+			});
+			buttonPageId.innerText = 'ID';
+			buttonPageId.style = 'height: 20px;width: 8%;';
+
 			let li = document.createElement('li');
 			li.id = 'elemlist';
 			li.appendChild(spanTestoTipo);
 			li.appendChild(spanTestoVarName);
-			li.appendChild(input);
+			divRowInput.appendChild(input)
+			divRowInput.appendChild(buttonPageId);
+			li.appendChild(divRowInput);
 			list.appendChild(li);
 		});
 
@@ -815,17 +832,13 @@
 				{
 					delete v[1].value;
 				});
-				/* try
+				try
 				{
 					developerConsoleBody.removeChild(document.getElementById('dialogvar'));
 				} catch (err)
 				{
 					salesforceBody.removeChild(document.getElementById('dialogvar'));
-				} */
-				try
-				{
-					divToolToAttach.removeChild(document.getElementById('dialogvar'));
-				} catch (err) { console.log(err) }
+				}
 				dialogVarOpen = false;
 				chrome.runtime.sendMessage({
 					type: 'WO_CODESNIPPET_forceResetDialog'
@@ -843,17 +856,13 @@
 			{
 				delete v[1].value;
 			});
-			/* try
+			try
 			{
 				developerConsoleBody.removeChild(document.getElementById('dialogvar'));
 			} catch (err)
 			{
 				salesforceBody.removeChild(document.getElementById('dialogvar'));
-			} */
-			try
-			{
-				divToolToAttach.removeChild(document.getElementById('dialogvar'));
-			} catch (err) { console.log(err) }
+			}
 			dialogVarOpen = false;
 			chrome.runtime.sendMessage({
 				type: 'WO_CODESNIPPET_forceResetDialog'
@@ -866,20 +875,12 @@
 
 		dialog.appendChild(title);
 		dialog.appendChild(div);
-		/* 		try
-				{
-					developerConsoleBody.appendChild(dialog);
-				} catch (err)
-				{
-					salesforceBody.appendChild(dialog);
-				} */
-
 		try
 		{
-			divToolToAttach.appendChild(dialog);
+			developerConsoleBody.appendChild(dialog);
 		} catch (err)
 		{
-			console.log(err);
+			salesforceBody.appendChild(dialog);
 		}
 
 	}
