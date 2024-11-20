@@ -440,7 +440,10 @@
 		divNewSnippet.appendChild(seperator);
 		divNewSnippet.appendChild(divBottom);
 
-		developerConsoleBody.appendChild(divNewSnippet);
+		try
+		{
+			developerConsoleBody.appendChild(divNewSnippet);
+		} catch (err) { }
 	}
 
 	const makeSnippet = (payload) =>
