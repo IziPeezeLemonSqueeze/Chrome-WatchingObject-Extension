@@ -705,11 +705,16 @@
 			const buttonPageId = document.createElement('button');
 			buttonPageId.id = 'btnVar-PageId';
 			buttonPageId.className = 'x-btn-inner slds-button slds-button_brand';
+			buttonPageId.title = 'Takes the id of the page you are currently on';
 			buttonPageId.addEventListener('click', (e) =>
 			{
 				const idOfPage = window.location.href.split('/');
-				input.value = idOfPage[idOfPage.length - 2];
-				input.focus();
+				const idFounded = idOfPage[idOfPage.length - 2];
+				if (idFounded.length === 18)
+				{
+					input.value = idFounded;
+					input.focus();
+				}
 			});
 			buttonPageId.innerText = 'ID';
 			buttonPageId.style = 'height: 20px;width: 8%;';
