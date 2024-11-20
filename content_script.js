@@ -411,6 +411,13 @@
 			if (inputNewSnippetName.value && textArea.value)
 			{
 				makeSnippet({ name: inputNewSnippetName.value, code: textArea.value });
+				chrome.runtime.sendMessage({
+					type: 'CREATE_NOTIFICATION',
+					payload: {
+						title: 'CODE SNIPPET',
+						msg: `New Snippet created: ${inputNewSnippetName.value}`
+					}
+				});
 				textArea.value = null;
 				inputNewSnippetName.value = null;
 				divNewSnippet.remove();

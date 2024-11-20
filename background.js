@@ -445,9 +445,26 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			break;
 
 
+		case 'CREATE_NOTIFICATION':
+			createNotification(obj.payload);
+			break;
+
+
 	}
 
 });
+
+const createNotification = (data) =>
+{
+	chrome.notifications.create(
+		'',
+		{
+			type: 'basic',
+			title: data.title,
+			message: data.msg,
+			iconUrl: 'images/icon.png'
+		});
+}
 
 var notificationID = [];
 
