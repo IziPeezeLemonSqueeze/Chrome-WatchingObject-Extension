@@ -1015,7 +1015,7 @@
 						'z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
 					let frame = document.createElement('iframe');
 					frame.src = chrome.runtime.getURL('dock.html');
-					frame.style = 'width: 248px; height: 385px; border: 0; border-bottom-right-radius: 0px; border-top-right-radius: 15px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;';
+					frame.style = 'width: 248px; height: 445px; border: 0; border-bottom-right-radius: 0px; border-top-right-radius: 15px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;';
 					div.appendChild(frame);
 
 					salesforceBody.appendChild(div);

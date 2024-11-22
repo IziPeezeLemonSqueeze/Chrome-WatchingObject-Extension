@@ -40,8 +40,9 @@
 				</div>
 			</div>
 		</div>
-		<div class="slds-align_absolute-center"
-			style="text-align: center; height: 21rem">
+		<div id="main"
+			class="slds-align_absolute-center"
+			style="text-align: center; height: 25rem">
 			<ul class="slds-has-block-links_space">
 				<li style="margin: 1px">
 					<button title="Show the api name of the object fields"
@@ -61,7 +62,7 @@
 				</li>
 				<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
 				<div
-					style="padding: 1px;background-clip: text;background-color: #eef4ff;-webkit-text-stroke-width: medium;z-index: 100;position: absolute;bottom: 64%;left: 39%;">
+					style="padding: 1px;background-clip: text;background-color: #eef4ff;-webkit-text-stroke-width: medium;z-index: 100;position: absolute;bottom: 68%;left: 39%;">
 					Shortcuts</div>
 				<li style="margin: 1px">
 					<button title="Open a new tab in the Object Manager settings"
@@ -118,8 +119,57 @@
 						Delete Apex Logs
 					</button>
 				</li>
+				<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+				<li style="margin: 1px">
+					<button title="Settings"
+						class="slds-button slds-button_outline-brand"
+						style="width: 150px"
+						id="btnSettings">
+						Settings
+					</button>
+				</li>
 			</ul>
 		</div>
+		<div id="settings"
+			class="slds-align_absolute-center"
+			style="display: flex;width: -webkit-fill-available;text-align: center;height: 25rem;position:fixed;justify-content: center;flex-direction: column;flex-wrap: nowrap;align-content: center;align-items: center;">
+			<ul class="slds-has-block-links_space">
+				<li
+					style="font-weight: bolder;font-family: monospace;border-width: thin;border-style: dashed;margin: 1px;border-radius: 20px;padding: 6%;">
+					<label class="slds-form-element__label"
+						id="combobox-label-id-131">Api Versions</label>
+					<br />
+					<select name="ApiVersions"
+						style="width: 150px;"
+						id="apiVersionCombobox">
+					</select>
+					<br />
+					<label class="slds-form-element__label">Current Api</label>
+					<br />
+					<label class="slds-form-element__label"
+						id="currentApiSelected">00.0</label>
+				</li>
+				<li style="margin: 15px">
+					<button title="Sync Metadata"
+						class="slds-button slds-button_outline-brand"
+						style="width: 150px"
+						id="btnSyncMetadata">
+						Sync Metadata
+					</button>
+				</li>
+				<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+				<li style="margin: 1px">
+					<button title="Settings"
+						class="slds-button slds-button_outline-brand"
+						style="width: 150px"
+						id="btnBackToMain">
+						Back
+					</button>
+				</li>
+			</ul>
+		</div>
+
+
 	</body>
 
 </html>
