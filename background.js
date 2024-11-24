@@ -102,6 +102,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
 	} */
 });
 
+let apiActive = null;
+
 let timeoutFORCEResetDialog;
 chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 {
@@ -204,7 +206,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					let recordTypeDeveloperName = null;
 					await fetch(
 						getCurrentUrl(sender.tab).customDomainHttps +
-						`/services/data/v57.0/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
+						`/services/data/v${apiActive}/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
 						method: "GET",
 						headers: {
 							Authorization: "Bearer " + sidApiField[0].value,
@@ -223,7 +225,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					});
 
 					var resApiName = null;
-					const query = `/services/data/v57.0/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
+					const query = `/services/data/v${apiActive}/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
 					await fetch(getCurrentUrl(sender.tab).customDomainHttps + query,
 						{
 							method: 'GET',
@@ -264,7 +266,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			var res = null;
 			await fetch(
 				getCurrentUrl(sender.tab).customDomainHttps +
-				"/services/data/v57.0/query/?q=SELECT+Id+FROM+ApexLog", {
+				"/services/data/v${apiActive}/query/?q=SELECT+Id+FROM+ApexLog", {
 				method: "GET",
 				headers: {
 					Authorization: "Bearer " + sid[0].value,
@@ -277,7 +279,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			if (await res.totalSize > 0)
 			{
 				console.log('APEX LOGS', await res.totalSize);
-				const urlToSendDelete = getCurrentUrl(sender.tab).customDomainHttps + '/services/data/v57.0/composite/sobjects?ids=';
+				const urlToSendDelete = getCurrentUrl(sender.tab).customDomainHttps + '/services/data/v${apiActive}/composite/sobjects?ids=';
 
 				let chunkComposite = [];
 				for (let c = 0; c < res.records.length; c += 200)
@@ -333,6 +335,11 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			}
 			break;
 
+		case 'WO_TOOL_apiVersion':
+			apiActive = obj.payload;
+			console.log('INIT API VERSION', apiActive)
+			break;
+
 		//-------------------------CODE SNIPPET----------------------------------------------
 
 		case 'WO_CODESNIPPET_addNewSnippet':
@@ -361,7 +368,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			newUrl = _URL_[0] + "salesforce.com";
 			console.log('----', newUrl.replace("https://", ""))
 
-			let urlToSendAnonymous = newUrl + '/services/data/v57.0/tooling/executeAnonymous/?anonymousBody=';
+			let urlToSendAnonymous = newUrl + '/services/data/v${apiActive}/tooling/executeAnonymous/?anonymousBody=';
 
 			let sid_ = await chrome.cookies.getAll({
 				name: "sid",
@@ -375,7 +382,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 					domain: getCurrentUrl(sender.tab).customDomain,
 				});
 				console.log('SID ON SNIPPET RUN SALESFORCE BODY', sid_)
-				urlToSendAnonymous = getCurrentUrl(sender.tab).customDomainHttps.split('/lightning')[0] + '/services/data/v57.0/tooling/executeAnonymous/?anonymousBody=';
+				urlToSendAnonymous = getCurrentUrl(sender.tab).customDomainHttps.split('/lightning')[0] + '/services/data/v${apiActive}/tooling/executeAnonymous/?anonymousBody=';
 				console.log('----', urlToSendAnonymous)
 			}
 
@@ -524,7 +531,7 @@ async function login(domain, sid, SObject, ID)
 
 	var res = null;
 
-	await fetch(domain + "/services/data/v57.0/sobjects/" + SObject + "/" + ID + "?fields=LastModifiedDate", requestOptions)
+	await fetch(domain + "/services/data/v${apiActive}/sobjects/" + SObject + "/" + ID + "?fields=LastModifiedDate", requestOptions)
 		.then(response => res = response.json())
 		.then(result => console.log(result))
 		.catch(error => console.log('error', error));

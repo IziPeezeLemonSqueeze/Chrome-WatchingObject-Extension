@@ -6,9 +6,11 @@ const btnDeploy = document.getElementById('btnDeploy');
 const btnApexLog = document.getElementById('btnApexLog');
 const btnFlow = document.getElementById('btnFlw');
 const btnSettings = document.getElementById('btnSettings');
+const labelSettings = document.getElementById('labelSettings');
 const btnBackToMain = document.getElementById('btnBackToMain');
 const apiVersionCombobox = document.getElementById('apiVersionCombobox');
 const currentApiSelected = document.getElementById('currentApiSelected');
+const btnSyncMetadata = document.getElementById('btnSyncMetadata');
 
 const btnApiFields = document.getElementById('btnApiFields');
 const btnCodeSnippet = document.getElementById('btnFastCodeSnippet');
@@ -22,6 +24,7 @@ const optionsApiVersion = [
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
+	labelSettings.innerText = '⚙️ Settings ';
 	chrome.storage.local.get('apiVersion', async (items) =>
 	{
 		if (!Object.keys(await items)[0])
@@ -57,13 +60,23 @@ document.addEventListener("DOMContentLoaded", async () =>
 		console.log('API VERSION SELECTED', await items);
 		if (Object.keys(await items))
 		{
-			currentApiSelected.innerText = await items.apiVersionSelected;
+			if (!await items.apiVersionSelected)
+			{
+				currentApiSelected.innerText = optionsApiVersion[0];
+				updateBackgroudWithApiVersion(optionsApiVersion[0])
+			} else
+			{
+				currentApiSelected.innerText = await items.apiVersionSelected;
+				updateBackgroudWithApiVersion(await items.apiVersionSelected);
+			}
 		}
 	});
 
 	apiVersionCombobox.addEventListener('change', (e) =>
 	{
 		chrome.storage.local.set({ ['apiVersionSelected']: e.target.value });
+		currentApiSelected.innerText = e.target.value;
+		updateBackgroudWithApiVersion(e.target.value);
 	});
 
 	btnSettings.addEventListener('click', () =>
@@ -180,5 +193,13 @@ const codeSnippetEvent = () =>
 {
 	chrome.runtime.sendMessage({
 		type: 'WO_TOOL_showCodeSnippet'
+	});
+}
+
+const updateBackgroudWithApiVersion = (apiActive) =>
+{
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_apiVersion',
+		payload: apiActive
 	});
 }
