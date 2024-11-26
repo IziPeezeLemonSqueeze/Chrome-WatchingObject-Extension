@@ -229,7 +229,7 @@
 		});
 		elem.parentNode.appendChild(newElemementOnHTML);
 
-		newElemementOnHTML.style.width = '100%';
+		newElemementOnHTML.style.width = 'fit-content';
 		if (item.layoutComponents[0].details.calculatedFormula)
 		{
 			newElemementOnHTML.style.width = '110%';
