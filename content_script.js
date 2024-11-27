@@ -852,6 +852,7 @@
 		btnRun.id = 'btnRun-dialogvar';
 		btnRun.innerText = 'RUN 🚀';
 		btnRun.className = 'x-btn-inner slds-button slds-button_brand';
+		btnRun.style.display = 'none';
 
 		btnRun.addEventListener('click', (e) =>
 		{
@@ -893,7 +894,8 @@
 		});
 
 		let btnRunClose = document.createElement('button');
-		btnRunClose.innerText = 'RUN & CLOSE 🚀';
+		//btnRunClose.innerText = 'RUN & CLOSE 🚀';
+		btnRunClose.innerText = 'RUN 🚀';
 		btnRunClose.id = 'btnRunClose-dialogvar';
 		btnRunClose.className = 'x-btn-inner slds-button slds-button_brand';
 		btnRunClose.addEventListener('click', (e) =>

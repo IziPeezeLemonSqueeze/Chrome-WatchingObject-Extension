@@ -228,7 +228,7 @@ let divErrorDialog = document.createElement('div');
 const showHandlerDialogError = (textObj) =>
 {
 	//initDialog();
-	//console.log('TESTO ERRORE DIALOG', textObj);
+	console.log('TESTO ERRORE DIALOG', textObj);
 	divErrorDialog.id = 'divErrorDialog';
 	divErrorDialog.className = 'column';
 	divErrorDialog.style = "-webkit-text-stroke-width: medium;text-align-last: center;"
