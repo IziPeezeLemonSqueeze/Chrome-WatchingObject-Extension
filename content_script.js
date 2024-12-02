@@ -114,7 +114,7 @@
 					break;
 
 				case 'showIdOnPage':
-					console.log('showIdOnPage', obj.payload)
+					//console.log('showIdOnPage', obj.payload)
 					if (obj.payload)
 					{
 						showIdOnPage();
@@ -150,7 +150,7 @@
 		spanShowIds.forEach(s =>
 		{
 			const spanId = document.getElementById(s);
-			console.log(spanId);
+			//console.log(spanId);
 			spanId.remove();
 		});
 		spanShowIds = [];
@@ -355,7 +355,7 @@
 		{
 			if (document.getElementById('DCTOOL'))
 			{
-				console.log('RETURN')
+				//console.log('RETURN')
 				return;
 			}
 
@@ -1128,7 +1128,7 @@
 	const copyToClipboard = (textToCopy) =>
 	{
 		const t = document.createElement('textarea');
-		console.log('textToCopy', textToCopy)
+		//console.log('textToCopy', textToCopy)
 		t.value = textToCopy;
 		t.setAttribute('readonly', '');
 		t.style.position = 'absolute';

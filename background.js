@@ -117,7 +117,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 
 		case 'createContextMenu':
 			chrome.contextMenus.create({
-				title: "Apri in una nuova tab \"%s\"",
+				title: "Open in a new TAB \"%s\"",
 				contexts: ["selection"],
 				id: "1",
 				documentUrlPatterns: [

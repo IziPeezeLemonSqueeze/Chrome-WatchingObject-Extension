@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () =>
 	alwaysShowId.addEventListener('change', (e) =>
 	{
 		const checked = e.currentTarget.checked;
-		console.log('CHANGE ALWAYS SHOW ID', checked);
+		//console.log('CHANGE ALWAYS SHOW ID', checked);
 		chrome.runtime.sendMessage({
 			type: 'WO_TOOL_alwaysShowId',
 			payload: checked
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () =>
 
 	chrome.storage.local.get('apiVersionSelected', async (items) =>
 	{
-		console.log('API VERSION SELECTED', await items);
+		//console.log('API VERSION SELECTED', await items);
 		if (Object.keys(await items))
 		{
 			if (!await items.apiVersionSelected)
