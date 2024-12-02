@@ -11,6 +11,7 @@ const btnBackToMain = document.getElementById('btnBackToMain');
 const apiVersionCombobox = document.getElementById('apiVersionCombobox');
 const currentApiSelected = document.getElementById('currentApiSelected');
 const btnSyncMetadata = document.getElementById('btnSyncMetadata');
+const alwaysShowId = document.getElementById('alwaysShowId');
 
 const btnApiFields = document.getElementById('btnApiFields');
 const btnCodeSnippet = document.getElementById('btnFastCodeSnippet');
@@ -25,6 +26,17 @@ const optionsApiVersion = [
 document.addEventListener("DOMContentLoaded", async () =>
 {
 	labelSettings.innerText = '⚙️ Settings ';
+
+	alwaysShowId.addEventListener('change', (e) =>
+	{
+		const checked = e.currentTarget.checked;
+		console.log('CHANGE ALWAYS SHOW ID', checked);
+		chrome.runtime.sendMessage({
+			type: 'WO_TOOL_alwaysShowId',
+			payload: checked
+		});
+	})
+
 	chrome.storage.local.get('apiVersion', async (items) =>
 	{
 		if (!Object.keys(await items)[0])

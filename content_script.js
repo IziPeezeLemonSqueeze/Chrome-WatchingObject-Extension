@@ -106,6 +106,14 @@
 				case 'openFastCodeSnippet':
 					showFastCS();
 					break;
+
+				case 'showIdOnPage':
+					console.log('showIdOnPage', obj.payload)
+					if (obj.payload)
+					{
+						showIdOnPage();
+					}
+					break;
 			}
 		} else
 		{
@@ -127,6 +135,29 @@
 			}
 		}
 	});
+
+	const showIdOnPage = () =>
+	{
+		const forceLookupElements = document.querySelectorAll('force-lookup');
+
+		Array.from(forceLookupElements)
+			.map(element =>
+			{
+				const aElements = element.querySelectorAll('a');
+				return Array.from(aElements).map(aElement =>
+				{
+					const href = aElement.href;
+					const match = href.match(/\/lightning\/r\/[^\/]+\/([a-zA-Z0-9]{15,18})\/view/);
+					if (match)
+					{
+						const span = document.createElement('span');
+						span.style = 'position: absolute; z-index: 1000;background-color: rgb(1, 118, 211); padding: 5px; border-radius: 3px; color: rgb(255, 255, 255); -webkit-text-stroke: thin rgb(0, 0, 0); font-weight: bold; cursor: pointer; width: fit-content;'
+						span.innerText = match[1];
+						element.appendChild(span);
+					}
+				});
+			});
+	}
 
 	const removeApiNameToFields = () =>
 	{

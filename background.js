@@ -254,6 +254,13 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			})
 			break;
 
+		case 'WO_TOOL_alwaysShowId':
+			chrome.tabs.sendMessage(sender.tab.id, {
+				response: 'showIdOnPage',
+				payload: obj.payload
+			});
+			break;
+
 		case 'CREATE_NOTIFICATION':
 			createNotification(obj.payload);
 			break;
