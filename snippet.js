@@ -3,6 +3,7 @@ const btnBackup = document.getElementById('btnBackupSnippets');
 const btnRestore = document.getElementById('btnRestoreSnippets');
 const btnRestoreSpan = document.getElementById('btnRestoreSnippetsSpan');
 const btnAddSnippet = document.getElementById('btnAddSnippet');
+const btnCloseCS = document.getElementById('btnCloseCS');
 let nButton = [];
 let dialog = document.getElementById('dialog');
 let mapValue = new Map();
@@ -10,6 +11,11 @@ var snippetsBackup = [];
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
+	btnCloseCS.innerText = '❌';
+	btnCloseCS.addEventListener('click', (e) =>
+	{
+		close();
+	})
 
 	btnAddSnippet.innerText = 'New ➕';
 	btnAddSnippet.addEventListener('click', (e) =>
@@ -117,6 +123,12 @@ const createObjectList = () =>
 	});
 }
 
+const close = () =>
+{
+	chrome.runtime.sendMessage({
+		type: 'WO_CODESNIPPET_close'
+	});
+}
 
 const creatorElementList = async (items) =>
 {
@@ -428,7 +440,7 @@ const handler_addNewSnippet = () =>
 {
 	chrome.runtime.sendMessage({
 		type: 'WO_CODESNIPPET_addNewSnippet'
-	})
+	});
 }
 
 createObjectList();

@@ -22,6 +22,8 @@
 	let pageFields = null;
 	var apiFieldExist = [];
 
+	let spanShowIds = [];
+
 	chrome.runtime.onMessage.addListener((obj, sender, response) =>
 	{
 		//console.log('ARRIVED CS ', obj);
@@ -50,6 +52,10 @@
 
 				case 'copyApexSnippet':
 					copyApexSnippet(obj.payload);
+					hideCS(windowApexCode);
+					break;
+
+				case 'closeCodeSnippetByBtn':
 					hideCS(windowApexCode);
 					break;
 
@@ -112,6 +118,9 @@
 					if (obj.payload)
 					{
 						showIdOnPage();
+					} else
+					{
+						deleteShowIdOnPage();
 					}
 					break;
 			}
@@ -136,6 +145,17 @@
 		}
 	});
 
+	const deleteShowIdOnPage = () =>
+	{
+		spanShowIds.forEach(s =>
+		{
+			const spanId = document.getElementById(s);
+			console.log(spanId);
+			spanId.remove();
+		});
+		spanShowIds = [];
+	}
+
 	const showIdOnPage = () =>
 	{
 		const forceLookupElements = document.querySelectorAll('force-lookup');
@@ -151,9 +171,12 @@
 					if (match)
 					{
 						const span = document.createElement('span');
-						span.style = 'position: absolute; z-index: 1000;background-color: rgb(1, 118, 211); padding: 5px; border-radius: 3px; color: rgb(255, 255, 255); -webkit-text-stroke: thin rgb(0, 0, 0); font-weight: bold; cursor: pointer; width: fit-content;'
+						span.id = `alwayshowid-${match[1]}`;
+						span.style = 'font-size: smaller;display: inline-table;background-color: rgb(1, 118, 211);padding: 5px;border-radius: 3px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;cursor: pointer;width: fit-content;'
 						span.innerText = match[1];
 						element.appendChild(span);
+
+						spanShowIds.push(span.id);
 					}
 				});
 			});

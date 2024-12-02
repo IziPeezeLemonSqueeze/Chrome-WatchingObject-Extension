@@ -248,6 +248,12 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			});
 			break;
 
+		case 'WO_CODESNIPPET_close':
+			chrome.tabs.sendMessage(sender.tab.id, {
+				response: 'closeCodeSnippetByBtn'
+			});
+			break;
+
 		case 'WO_TOOL_showCodeSnippet':
 			chrome.tabs.sendMessage(sender.tab.id, {
 				response: 'openFastCodeSnippet',
