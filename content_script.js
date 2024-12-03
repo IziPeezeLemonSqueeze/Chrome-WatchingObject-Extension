@@ -790,7 +790,7 @@
 						if (checkVirgolette(e.target.value))
 						{
 							returnInvalid();
-						} false
+						}
 						if (e.target.value != 'true' && e.target.value != 'false')
 						{
 							returnInvalid();
@@ -861,13 +861,20 @@
 			buttonPageId.title = 'Takes the id of the page you are currently on';
 			buttonPageId.addEventListener('click', (e) =>
 			{
-				const idOfPage = window.location.href.split('/');
+				const matchIdOfPage = window.location.href.match(/\/lightning\/r\/[^\/]+\/([a-zA-Z0-9]{15,18})\/view/);
+				if (matchIdOfPage)
+				{
+					input.value = matchIdOfPage[1];
+					input.focus();
+				}
+
+				/* const idOfPage = window.location.href.split('/');
 				const idFounded = idOfPage[idOfPage.length - 2];
 				if (idFounded.length === 18)
 				{
 					input.value = idFounded;
 					input.focus();
-				}
+				} */
 			});
 			buttonPageId.innerText = 'ID';
 			buttonPageId.style = 'height: 20px;width: 8%;';
