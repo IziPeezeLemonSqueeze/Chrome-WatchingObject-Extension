@@ -1,63 +1,64 @@
 {
-	"manifest_version": 3,
-	"name": "Salesforce Ehnancer",
-	"version": "1.6.3.1",
-	"description": "Developer tool for Salesforce, designed to help and speed up what the developer has to do!",
-	"background": {
-		"service_worker": "background.js",
-		"type": "module"
-	},
-	"permissions": [
-		"notifications",
-		"storage",
-		"activeTab",
-		"cookies",
-		"tabs",
-		"contextMenus"
-	],
-	"host_permissions": [
-		"https://*.force.com/*",
-		"https://*.salesforce.com/*"
-	],
-	"content_scripts": [
-		{
-			"run_at": "document_end",
-			"matches": [
-				"https://*.force.com/*",
-				"https://*.salesforce.com/*"
-			],
-			"js": [
-				"contentScript.js"
-			],
-			"css": [
-				"snippet.css"
-			],
-			"all_frames": true
-		}
-	],
-	"web_accessible_resources": [
-		{
-			"resources": [
-				"dock.html",
-				"snippet.html",
-				"snippet.css"
-			],
-			"matches": [
-				"https://*.force.com/*",
-				"https://*.salesforce.com/*"
-			]
-		}
-	],
-	"action": {
-		"default_icon": {
-			"48": "images/icon.png",
-			"128": "images/icon.png"
-		},
-		"default_title": "Salesforce Enhancer",
-		"default_popup": "popup.html"
-	},
-	"icons": {
-		"48": "images/icon.png",
-		"128": "images/icon.png"
-	}
+  "manifest_version": 3,
+  "name": "Salesforce Ehnancer",
+  "version": "1.6.3.1",
+  "description": "Developer tool for Salesforce, designed to help and speed up what the developer has to do!",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "notifications",
+    "storage",
+    "activeTab",
+    "cookies",
+    "tabs",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://*.force.com/*",
+    "https://*.salesforce.com/*"
+  ],
+  "content_scripts": [
+    {
+      "run_at": "document_end",
+      "matches": [
+        "https://*.force.com/*",
+        "https://*.salesforce.com/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "css": [
+        "snippet.css"
+      ],
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "dock.html",
+        "snippet.html",
+        "snippet.css",
+        "popup.css"
+      ],
+      "matches": [
+        "https://*.force.com/*",
+        "https://*.salesforce.com/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "48": "images/icon.png",
+      "128": "images/icon.png"
+    },
+    "default_title": "Salesforce Enhancer",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "48": "images/icon.png",
+    "128": "images/icon.png"
+  }
 }

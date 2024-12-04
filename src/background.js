@@ -278,7 +278,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 async function snippetRun(obj, sender, response)
 {
   const _URL_ = sender.tab.url.split('salesforce.com')
-  newUrl = _URL_[0] + "salesforce.com";
+  let newUrl = _URL_[0] + "salesforce.com";
   console.log('----', newUrl.replace("https://", ""))
 
   let urlToSendAnonymous = newUrl + `/services/data/v${apiActive}/tooling/executeAnonymous/?anonymousBody=`;

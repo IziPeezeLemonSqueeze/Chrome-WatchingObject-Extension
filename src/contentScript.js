@@ -133,7 +133,7 @@
       {
         try
         {
-          currentObject = {
+          let currentObject = {
             tab: tab,
             title: title,
             sObject: sObject,
