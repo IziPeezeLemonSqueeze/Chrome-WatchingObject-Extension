@@ -381,7 +381,7 @@ const handler_run = (doc, payload, id) =>
 			payload: [Object.fromEntries(mapValue), payload.code, id]
 
 		});
-		/* 
+		/*
 				console.log('CHECK 2', mapValue.values());
 				mapValue.forEach(k =>
 				{
@@ -389,7 +389,7 @@ const handler_run = (doc, payload, id) =>
 					while (payload.code.includes(k.ivc))
 					{
 						let splitted = [];
-	    
+
 						if (k.type == 'V')
 						{
 							splitted = payload.code.split(k.ivc);
@@ -403,7 +403,7 @@ const handler_run = (doc, payload, id) =>
 								("'" + k.value + "'") :
 								k.value)
 							+ splitted[1]);
-	    
+
 					}
 				});
 				console.log('FINAL ', payload.code);

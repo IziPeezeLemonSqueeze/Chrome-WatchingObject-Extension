@@ -21,6 +21,7 @@ const optionsApiVersion = [
 	'59.0',
 	'60.0',
 	'61.0',
+	'62.0',
 ];
 
 document.addEventListener("DOMContentLoaded", async () =>
