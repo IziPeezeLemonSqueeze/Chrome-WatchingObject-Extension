@@ -1,5 +1,7 @@
 'use strict';
 
+import { snippetRun, requestFields, goToApexLog, getCurrentUrl, retrieveApiVersions, apiActive as bckApiActive } from "./utils/bckutils";
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 {
 	if (tab.url && tab.url.includes("force.com"))
@@ -8,13 +10,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 
 		if (changeInfo.title && !changeInfo.title.includes('Lightning Experience'))
 		{
-			console.log(changeInfo.title, changeInfo.status);
+			//console.log(changeInfo.title, changeInfo.status);
 
 			if (changeInfo.status == undefined)
 			{
 
 				let matches = getCurrentSObjectNameAndID(tab);
-				console.log('MATCHES ', matches);
+				//console.log('MATCHES ', matches);
 				if (matches && matches[1] && matches[2])
 				{
 					chrome.tabs.sendMessage(tab.id, {
@@ -70,12 +72,53 @@ chrome.runtime.onInstalled.addListener(() =>
 {
 	chrome.storage.session.clear();
 
+	chrome.storage.sync.get(['appVersion'], async (version) =>
+	{
+		let totPrev = 0;
+		let totCurr = 0;
+		const resp = await version;
+		const manifest = await chrome.runtime.getManifest();
+		console.log('@@ VERSION', resp)
+		if (Object.keys(resp).length == 0)
+		{
+			chrome.storage.sync.set({
+				['appVersion']: {
+					previousVersion: '1.6.3.2',
+					currentVersion: manifest['version']
+				}
+			});
+			totPrev = 1632;
+			totCurr = parseInt(manifest['version'].replace('.', ''));
+		} else
+		{
+			totCurr = parseInt(resp.appVersion.currentVersion.replace('.', ''));
+		}
+
+		chrome.storage.sync.get(['firstGO'], async (isFirstGo) =>
+		{
+			console.log('@@ firstgo', await isFirstGo, Object.keys(await isFirstGo));
+			if (Object.keys(await isFirstGo).length == 0)
+			{
+				await chrome.storage.sync.set({
+					firstGO: true
+				});
+			} else
+			{
+				if (totPrev < totCurr && Object.keys(await isFirstGo).length == 0)
+				{
+					chrome.storage.sync.set({
+						firstGO: true
+					});
+				}
+			}
+		});
+	});
 });
 
 
 chrome.contextMenus.onClicked.addListener((info, tab) =>
 {
-	console.log('CONTEXT_MENU_CLICKED', info, tab);
+	//console.log('CONTEXT_MENU_CLICKED', info, tab);
 	if (info.selectionText.length == 18 && info.selectionText)
 	{
 		let urlToGo = getCurrentUrl(tab).customDomainHttps;
@@ -195,10 +238,15 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 		case 'WO_TOOL_goToApexLog':
 			goToApexLog(obj, sender, response);
 			break;
-
-		case 'WO_TOOL_apiVersion':
-			apiActive = obj.payload;
-			console.log('INIT API VERSION', apiActive)
+		/*
+				case 'WO_TOOL_apiVersion':
+					apiActive = obj.payload;
+					console.log('INIT API VERSION', apiActive);
+					break;
+		 */
+		case 'WO_TOOL_requestApiVersion':
+			await retrieveApiVersions(obj, sender, response);
+			apiActive = bckApiActive;
 			break;
 
 		//-------------------------CODE SNIPPET----------------------------------------------
@@ -207,7 +255,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			chrome.tabs.sendMessage(sender.tab.id, {
 				response: 'openTextAreaNewSnippet',
 				payload: null
-			})
+			});
 			break
 
 		case 'WO_CODESNIPPET_edit':
@@ -243,7 +291,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			break;
 
 		case 'WO_CODESNIPPET_okDeleteSnippet':
-			chrome.storage.local.remove([obj.payload])
+			chrome.storage.sync.remove([obj.payload])
 			clearTimeout(timeoutFORCEResetDialog);
 			chrome.tabs.sendMessage(sender.tab.id, {
 				response: 'resetCodeSnippet'
@@ -275,223 +323,6 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 	}
 });
 
-async function snippetRun(obj, sender, response)
-{
-	if (!apiActive)
-	{
-		apiActive = '58.0';
-		console.error('NO SELECTED API VERSION, AUTO SET TO 58.0 ⚠');
-	}
-
-	const _URL_ = sender.tab.url.split('salesforce.com')
-	let newUrl = _URL_[0] + "salesforce.com";
-	console.log('----', newUrl.replace("https://", ""))
-
-	let urlToSendAnonymous = newUrl + `/services/data/v${apiActive}/tooling/executeAnonymous/?anonymousBody=`;
-
-	let sid_ = await chrome.cookies.getAll({
-		name: "sid",
-		domain: newUrl.replace("https://", ""),
-	});
-	console.log('SID ON SNIPPET RUN', sid_)
-	if (sid_.length === 0)
-	{
-		sid_ = await chrome.cookies.getAll({
-			name: "sid",
-			domain: getCurrentUrl(sender.tab).customDomain,
-		});
-		console.log('SID ON SNIPPET RUN SALESFORCE BODY', sid_)
-		urlToSendAnonymous = getCurrentUrl(sender.tab).customDomainHttps.split('/lightning')[0] + `/services/data/v${apiActive}/tooling/executeAnonymous/?anonymousBody=`;
-		console.log('----', urlToSendAnonymous)
-	}
-
-	let toSend = urlToSendAnonymous + obj.payload;
-	console.log('APEX CALL: ', toSend);
-	await fetch(toSend, {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json; charset=UTF-8",
-			Accept: "application/json",
-			Authorization: "Bearer " + sid_[0].value
-		}
-	}).then(async response =>
-	{
-
-		const resp = await response.json();
-		console.log('APEX ANONYMOUS RESPONSE', resp);
-		if (!resp.success)
-		{
-			chrome.tabs.sendMessage(sender.tab.id, {
-				response: 'snippet_showErrorDialog',
-				payload: resp.compileProblem
-			});
-			timeoutFORCEResetDialog = setTimeout(() =>
-			{
-				chrome.tabs.sendMessage(sender.tab.id, {
-					response: 'resetCodeSnippet'
-				});
-			}, obj.resetTimeoutDialogTime * 1000);
-		} else
-		{
-			chrome.tabs.sendMessage(sender.tab.id, {
-				response: 'resetCodeSnippet'
-			});
-		}
-	})
-		.then(result => console.log(result))
-		.catch(error => console.log('error', error));
-}
-
-function requestFields(obj, sender, response)
-{
-	console.log('WO_TOOL_requestFields ARRIVED');
-	chrome.tabs.sendMessage(sender.tab.id, {
-		response: 'getPageFields',
-	}).then(async (responseField) =>
-	{
-		console.log('BG RESPONSE', responseField);
-		if (responseField)
-		{
-			const sidApiField = await chrome.cookies.getAll({
-				name: "sid",
-				domain: getCurrentUrl(sender.tab).customDomain,
-			});
-
-			const idObjSplitted = String(sender.tab.url).split('/');
-			const ObjectType = idObjSplitted[idObjSplitted.length - 3];
-			let recordTypeFounded = null;
-			let recordTypeDeveloperName = null;
-			await fetch(
-				getCurrentUrl(sender.tab).customDomainHttps +
-				`/services/data/v${apiActive}/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
-				method: "GET",
-				headers: {
-					Authorization: "Bearer " + sidApiField[0].value,
-					"Content-Type": "application/json",
-				}
-			}).then(async responseRecordType =>
-			{
-				recordTypeFounded = await responseRecordType.json();
-				console.log('RECORDTYPE BY QUERY', recordTypeFounded)
-				recordTypeDeveloperName = recordTypeFounded.records[0]['RecordType']['DeveloperName'];
-				recordTypeFounded = recordTypeFounded.records[0].RecordTypeId;
-
-			}).catch(noRecordTypeFound =>
-			{
-				recordTypeFounded = '012000000000000AAA';
-			});
-
-			var resApiName = null;
-			const query = `/services/data/v${apiActive}/sobjects/` + ObjectType + '/describe/layouts/' + recordTypeFounded;
-			await fetch(getCurrentUrl(sender.tab).customDomainHttps + query,
-				{
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json; charset=UTF-8',
-						Accept: 'application/json',
-						Authorization: 'Bearer ' + sidApiField[0].value,
-					},
-				}).then(async responseFetchDescribe =>
-				{
-					resApiName = await responseFetchDescribe.json();
-					console.log(' API FIELD RESP', await resApiName);
-					if (resApiName)
-					{
-						chrome.tabs.sendMessage(sender.tab.id, {
-							response: 'setApiToField',
-							payload: {
-								recordTypeFound: !recordTypeFounded ? false : true,
-								apiField: resApiName,
-								objectInfo: ObjectType,
-								recordTypeName: recordTypeDeveloperName
-							}
-						});
-					}
-				}).catch(err =>
-				{
-					console.error(err);
-				});
-		}
-	});
-}
-
-async function goToApexLog(obj, sender, response)
-{
-	const sid = await chrome.cookies.getAll({
-		name: "sid",
-		domain: getCurrentUrl(sender.tab).customDomain,
-	});
-	var res = null;
-	await fetch(
-		getCurrentUrl(sender.tab).customDomainHttps +
-		`/services/data/v${apiActive}/query/?q=SELECT+Id+FROM+ApexLog`, {
-		method: "GET",
-		headers: {
-			Authorization: "Bearer " + sid[0].value,
-			"Content-Type": "application/json",
-		}
-	})
-		.then(async response => res = await response.json())
-		.then(result => console.log(result))
-		.catch(error => console.log('error', error));
-	if (await res.totalSize > 0)
-	{
-		console.log('APEX LOGS', await res.totalSize);
-		const urlToSendDelete = getCurrentUrl(sender.tab).customDomainHttps + `/services/data/v${apiActive}/composite/sobjects?ids=`;
-
-		let chunkComposite = [];
-		for (let c = 0; c < res.records.length; c += 200)
-		{
-			chunkComposite.push(res.records.slice(c, c + 200));
-		}
-		chunkComposite.forEach(async (chunk) =>
-		{
-			let composite = urlToSendDelete;
-			chunk.forEach((cId) =>
-			{
-				composite += cId.Id + ',';
-			});
-			composite = composite.slice(0, composite.length - 1);
-			console.log('COMPOSITE', composite);
-			await fetch(composite, {
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json; charset=UTF-8",
-					Accept: "application/json",
-					Authorization: "Bearer " + sid[0].value
-				}
-			})
-				.then(async response =>
-				{
-					console.log('COMPOSITE RESPONSE', await response.json());
-				})
-				.then(result => console.log(result))
-				.catch(error => console.log('error', error));
-
-			setTimeout(() => { console.log(composite) }, 2500);
-			composite = '';
-		});
-		chrome.notifications.create(
-			'',
-			{
-				type: 'basic',
-				title: 'DELETING APEX LOGS',
-				message: await res.totalSize + ' ApexLog deleted!',
-				iconUrl: 'images/icon.png'
-			});
-
-	} else
-	{
-		chrome.notifications.create(
-			'',
-			{
-				type: 'basic',
-				title: 'DELETING APEX LOGS',
-				message: 'There are not enough logs to perform the operation. Found: ' + res.totalSize,
-				iconUrl: 'images/icon.png'
-			});
-	}
-}
 
 const createNotification = (data) =>
 {
@@ -533,24 +364,7 @@ function getCurrentSObjectNameAndID(tab)
 	return tab.url.match(/\/lightning\/r\/(\w+)\/(\w+)\W*/);
 }
 
-function getCurrentUrl(tab)
-{
-	console.log("CURRENT URL", tab.url);
-	let url = tab.url;
-	let domain = tab.url.substring(
-		0,
-		tab.url.indexOf(".lightning.force.com")
-	);
-	let customDomain = domain.replace("https://", "") + ".my.salesforce.com";
-	let customDomainHttps = domain + ".my.salesforce.com";
 
-	return {
-		url: url,
-		domain: domain,
-		customDomain: customDomain,
-		customDomainHttps: customDomainHttps,
-	};
-}
 
 async function login(domain, sid, SObject, ID)
 {

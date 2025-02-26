@@ -516,7 +516,7 @@
 		const countIVC = String(payload).match(regexIVC);
 		//console.log(countIVC);
 
-		chrome.storage.local.set({
+		chrome.storage.sync.set({
 			['snippet_' + payload.name]: {
 				code: payload.code,
 				ivcFound: countIVC
@@ -1064,8 +1064,27 @@
 				woToolBtn = document.createElement('button');
 				woToolBtn.className = 'WOtool-btn slds-button slds-button_brand';
 				woToolBtn.innerText = '🛠️';
-				woToolBtn.style = 'width: 10px;bottom: 11px;position: fixed;right: -5px;z-index: 9;height: 30px;';
+				woToolBtn.style = 'width: 10px;bottom: 11px;position: fixed;right: -5px;z-index: 9;height: 30px;background: linear-gradient(145deg, rgb(74 87 255) 0%, rgb(89 100 255) 70%, rgb(86 98 255) 0%, rgb(96, 189, 255) 90%, rgb(255, 255, 255) 96%, rgb(255, 255, 255) 96%);';
 				woToolBtn.addEventListener('click', showHideWOTools);
+
+				console.log('@')
+				chrome.storage.sync.get(['firstGO'], async (isFirstGo) =>
+				{
+					console.log('@@', await isFirstGo)
+					if (await isFirstGo.firstGO)
+					{
+						console.log('@@@')
+						const welcomeDiv = document.createElement('div');
+						welcomeDiv.id = 'WOtool-btn-welcome';
+						welcomeDiv.innerText = 'Here\'s Salesforce Enhancer!';
+						welcomeDiv.style = 'color: white;font-style: oblique;font-weight: bold;align-content: center;font-size: x-large;font-family: system-ui;width: 335px;bottom: 36px;position: fixed;right: 22px;z-index: 9;height: 60px;border: 2px solid #ffffff;border-radius: 5px;background: linear-gradient(145deg, rgb(74 87 255) 0%, rgb(89 100 255) 70%, rgb(86 98 255) 0%, rgb(96, 189, 255) 90%, rgb(255, 255, 255) 96%, rgb(255, 255, 255) 96%);text-align: center;';
+						woToolBtn.addEventListener('mouseenter', () =>
+						{
+							welcomeDiv.style.display = 'none';
+						});
+						salesforceBody.appendChild(welcomeDiv);
+					}
+				})
 
 				salesforceBody.appendChild(woToolBtn);
 			}
@@ -1076,8 +1095,7 @@
 				{
 					let div = document.createElement('div');
 					div.id = 'WOTOOL';
-					div.style =
-						'z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
+					div.style = 'z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
 					let frame = document.createElement('iframe');
 					frame.src = chrome.runtime.getURL('dock.html');
 					frame.style = 'width: 248px; height: 445px; border: 0; border-bottom-right-radius: 0px; border-top-right-radius: 15px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;';

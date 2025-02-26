@@ -58,11 +58,11 @@ document.addEventListener("DOMContentLoaded", async () =>
 
 				payloadRestore.forEach(p =>
 				{
-					chrome.storage.local.get(p.name, async (items) =>
+					chrome.storage.sync.get(p.name, async (items) =>
 					{
 						if (!Object.keys(await items)[0])
 						{
-							chrome.storage.local.set({
+							chrome.storage.sync.set({
 								[p.name]: {
 									code: p.code,
 									ivcFound: p.ivcFound
@@ -82,7 +82,7 @@ chrome.storage.onChanged.addListener(async (changes, namespace) =>
 {
 	//console.log(Object.entries(changes)[0])
 	const obj = Object.entries(changes)[0]
-	if (namespace == 'local' && obj[0].includes('snippet_'))
+	if (/* namespace == 'local' &&  */obj[0].includes('snippet_'))
 	{
 		let obj_item = {};
 		obj_item[obj[0]] = obj[1].newValue;
@@ -113,7 +113,7 @@ chrome.runtime.onMessage.addListener((obj, sender, response) =>
 
 const createObjectList = () =>
 {
-	chrome.storage.local.get(null, async (items) =>
+	chrome.storage.sync.get(null, async (items) =>
 	{
 		if (await items)
 		{

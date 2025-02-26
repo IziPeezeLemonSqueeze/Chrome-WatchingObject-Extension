@@ -16,16 +16,21 @@ const alwaysShowId = document.getElementById('alwaysShowId');
 const btnApiFields = document.getElementById('btnApiFields');
 const btnCodeSnippet = document.getElementById('btnFastCodeSnippet');
 
-const optionsApiVersion = [
-	'58.0',
-	'59.0',
-	'60.0',
-	'61.0',
-	'62.0',
-];
+const divTutorial = document.getElementById('tutorial');
+const divStepOne = document.getElementById('stepOneBlock');
+const divStepTwo = document.getElementById('stepTwoBlock');
+const divStepUpTwo = document.getElementById('stepTwoUpBlock');
+const divStepGreetings = document.getElementById('stepGreetings');
+const freccia = document.getElementById('freccia');
+
+const tutorialPhases = {
+	isOn: false,
+}
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
+	getTutorial(divTutorial);
+
 	labelSettings.innerText = '⚙️ Settings ';
 
 	alwaysShowId.addEventListener('change', (e) =>
@@ -38,56 +43,49 @@ document.addEventListener("DOMContentLoaded", async () =>
 		});
 	})
 
-	chrome.storage.local.get('apiVersion', async (items) =>
+	chrome.storage.sync.get('apiVersion', async (items) =>
 	{
+		console.log('apiVersion', items);
 		if (!Object.keys(await items)[0])
 		{
-			chrome.storage.local.set({
-				['apiVersion']: optionsApiVersion
-			});
-
-			optionsApiVersion.forEach(opt =>
-			{
-				const option = document.createElement('option');
-				option.value = opt;
-				option.innerText = opt;
-				option.id = `opt_${opt}`;
-				apiVersionCombobox.appendChild(option);
-			});
+			requestApiVersions();
 		}
-		try
-		{
-			await items['apiVersion'].forEach(opt =>
-			{
-				const option = document.createElement('option');
-				option.value = opt;
-				option.innerText = opt;
-				option.id = `opt_${opt}`;
-				apiVersionCombobox.appendChild(option);
-			});
-		} catch (err) { }
 	});
 
-	chrome.storage.local.get('apiVersionSelected', async (items) =>
+	setTimeout(async () =>
 	{
-		//console.log('API VERSION SELECTED', await items);
-		if (Object.keys(await items))
+		chrome.storage.sync.get('apiVersion', async (items) =>
 		{
-			if (!await items.apiVersionSelected)
+			if (Object.keys(await items)[0])
 			{
-				currentApiSelected.innerText = optionsApiVersion[0];
-				updateBackgroudWithApiVersion(optionsApiVersion[0])
-			} else
-			{
-				currentApiSelected.innerText = await items.apiVersionSelected;
-				updateBackgroudWithApiVersion(await items.apiVersionSelected);
+				//console.log('DOCK API VERIONS');
+				try
+				{
+					await items['apiVersion'].forEach(opt =>
+					{
+						const option = document.createElement('option');
+						option.value = opt;
+						option.innerText = opt;
+						option.id = `opt_${opt}`;
+						apiVersionCombobox.appendChild(option);
+					});
+				} catch (err) { }
 			}
-		}
-	});
+		});
+
+		chrome.storage.sync.get('apiVersionSelected', async (items) =>
+		{
+			if (Object.keys(await items)[0])
+			{
+				//console.log('ALREADY SELECTED API VERSION', await items);
+				currentApiSelected.innerText = await items.apiVersionSelected
+			}
+		});
+	}, 1000);
 
 	apiVersionCombobox.addEventListener('change', (e) =>
 	{
-		chrome.storage.local.set({ ['apiVersionSelected']: e.target.value });
+		chrome.storage.sync.set({ ['apiVersionSelected']: e.target.value });
 		currentApiSelected.innerText = e.target.value;
 		updateBackgroudWithApiVersion(e.target.value);
 	});
@@ -95,6 +93,10 @@ document.addEventListener("DOMContentLoaded", async () =>
 	btnSettings.addEventListener('click', () =>
 	{
 		document.getElementById('main').style.display = 'none';
+		if (tutorialPhases.isOn)
+		{
+			setupStepTwo();
+		}
 	});
 
 	btnBackToMain.addEventListener('click', () =>
@@ -147,6 +149,74 @@ document.addEventListener("DOMContentLoaded", async () =>
 		codeSnippetEvent();
 	});
 });
+
+const getTutorial = () =>
+{
+	divTutorial.style.opacity = 0;
+	divStepOne.style.opacity = 0;
+	divStepTwo.style.opacity = 0;
+	divStepTwo.style.display = 'none';
+	divStepUpTwo.style.opacity = 0;
+	divStepUpTwo.style.display = 'none';
+	divStepGreetings.style.opacity = 0;
+	divStepGreetings.style.display = 'none';
+	chrome.storage.sync.get(['firstGO'], async (isFirstGo) =>
+	{
+		const resp = await isFirstGo;
+		//console.log('TUT RESP', resp)
+		if (!resp.firstGO)
+		{
+			divTutorial.style.display = 'none';
+			return;
+		}
+		divTutorial.style.display = null;
+		setTimeout(() =>
+		{
+			tutorialPhases.isOn = true;
+			divTutorial.style.opacity = 1;
+			setupStepOne(divTutorial);
+		}, 200);
+
+	});
+}
+
+const setupStepOne = () =>
+{
+	freccia.innerText = '⬇';
+	divStepOne.style.opacity = 1;
+
+}
+
+const setupStepTwo = () =>
+{
+	divStepOne.style.opacity = 0;
+	divStepOne.style.display = 'none';
+	divStepTwo.style.opacity = 1;
+	divStepTwo.style.display = null;
+	divStepUpTwo.style.opacity = 1;
+	divStepUpTwo.style.display = null;
+}
+
+const setupStepGreetings = () =>
+{
+	divStepTwo.style.opacity = 0;
+	divStepTwo.style.display = 'none';
+	divStepUpTwo.style.opacity = 0;
+	divStepUpTwo.style.display = 'none';
+	divStepGreetings.style.opacity = 1;
+	divStepGreetings.style.display = null;
+	setTimeout(async () =>
+	{
+		await chrome.storage.sync.set({ firstGO: false });
+		tutorialPhases.isOn = false;
+		divStepGreetings.style.opacity = 0;
+		setTimeout(() =>
+		{
+			divStepGreetings.style.display = 'none';
+		}, 1000)
+	}, 1000);
+
+}
 
 const objectManagerEvent = () =>
 {
@@ -209,10 +279,21 @@ const codeSnippetEvent = () =>
 	});
 }
 
+const requestApiVersions = () =>
+{
+	chrome.runtime.sendMessage({
+		type: 'WO_TOOL_requestApiVersion'
+	});
+}
+
 const updateBackgroudWithApiVersion = (apiActive) =>
 {
 	chrome.runtime.sendMessage({
 		type: 'WO_TOOL_apiVersion',
 		payload: apiActive
 	});
+	if (tutorialPhases.isOn)
+	{
+		setupStepGreetings();
+	}
 }

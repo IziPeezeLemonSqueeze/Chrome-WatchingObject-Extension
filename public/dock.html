@@ -40,6 +40,23 @@
 				</div>
 			</div>
 		</div>
+		<div id="tutorial">
+			<div id="stepOneBlock">
+				<p>Welcome!</p>
+				<p>Let's start with Settings!</p>
+				<p id="freccia"></p>
+			</div>
+			<div id="stepTwoUpBlock">
+				<p>Select API</p>
+				<p>Version</p>
+			</div>
+			<div id="stepTwoBlock">
+
+			</div>
+			<div id="stepGreetings">
+				Thank You!
+			</div>
+		</div>
 		<div id="main"
 			class="slds-align_absolute-center"
 			style="text-align: center; height: 25rem">
@@ -139,6 +156,7 @@
 			<ul class="slds-has-block-links_space">
 				<li style="margin-bottom: 5%;">
 					<input type="checkbox"
+						title="(WIP)"
 						name="Always show ID"
 						id="alwaysShowId">
 					<label for="alwaysShowId">Always SHOW ID</label><br>
@@ -161,7 +179,7 @@
 				</li>
 				<hr style="margin: 5%;" />
 				<li style="margin: 15px">
-					<button title="Sync Metadata"
+					<button title="Sync Metadata (WIP)"
 						class="slds-button slds-button_outline-brand"
 						style="width: 150px"
 						id="btnSyncMetadata">
@@ -180,10 +198,154 @@
 						Back
 					</button>
 				</li>
+				<li style="margin: 1px">
+					<button title="FAQ/DOC"
+						class="slds-button slds-button_outline-brand"
+						style="left: 6%;width: 70px;position: absolute;bottom: 2%;"
+						id="btnFaqDoc">
+						FAQ/DOC
+					</button>
+					<a href="https://www.buymeacoffee.com/IziPeezeLemonSqueeze"
+						target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+							alt="Buy Me A Coffee"
+							style="bottom: 1%;scale: 0.75;right: 0%;position: absolute;height: 40px !important;width: 140px !important;"></a>
+				</li>
 			</ul>
 		</div>
 
 
 	</body>
+	<style>
+		#tutorial {
+			pointer-events: none;
+			left: 0;
+			top: 0;
+			height: -webkit-fill-available;
+			width: -webkit-fill-available;
+			position: absolute;
+			border: 2px solid #fff;
+			border-radius: 8px;
+			transition: opacity 1s ease-in-out;
+			z-index: 1000000000000000000000;
+		}
+
+		#stepGreetings {
+			transform: scale(1);
+			padding: 5%;
+			font-size: 43px;
+			align-content: center;
+			font-family: system-ui;
+			font-style: oblique;
+			font-weight: bolder;
+			text-align: center;
+			top: 9%;
+			position: sticky;
+			width: -webkit-fill-available;
+			height: 91%;
+			background: rgba(101, 255, 96, 0.46);
+			border: 2px solid white;
+			transition: opacity 1s ease-in-out;
+			pointer-events: auto;
+		}
+
+		#stepTwoUpBlock {
+			transform: scale(1);
+			font-size: 30px;
+			align-content: flex-start;
+			font-family: system-ui;
+			font-style: oblique;
+			font-weight: bolder;
+			text-align: center;
+			top: 9%;
+			position: sticky;
+			width: -webkit-fill-available;
+			height: 22%;
+			background: rgb(96 189 255 / 46%);
+			border: 2px solid white;
+			transition: opacity 1s ease-in-out;
+			pointer-events: auto;
+		}
+
+		#stepTwoBlock {
+			transform: scale(1);
+			padding: 5%;
+			font-size: 43px;
+			align-content: flex-end;
+			font-family: system-ui;
+			font-style: oblique;
+			font-weight: bolder;
+			text-align: center;
+			top: 55%;
+			position: sticky;
+			width: -webkit-fill-available;
+			height: 45%;
+			background: rgb(96 189 255 / 46%);
+			border: 2px solid white;
+			transition: opacity 1s ease-in-out;
+			pointer-events: auto;
+		}
+
+
+		#stepOneBlock {
+			padding: 5%;
+			font-size: 43px;
+			align-content: flex-end;
+			font-family: system-ui;
+			font-style: oblique;
+			font-weight: bolder;
+			text-align: center;
+			top: 9%;
+			position: sticky;
+			width: -webkit-fill-available;
+			height: 80%;
+			background: rgb(96 189 255 / 46%);
+			border: 2px solid white;
+			transition: opacity 1s ease-in-out;
+			pointer-events: auto;
+		}
+
+		@keyframes pulse {
+			0% {
+				color: #fcfcfc;
+				left: 0px;
+				top: 0px;
+			}
+
+			25% {
+				color: #60bdff;
+				left: 200px;
+				top: 0px;
+			}
+
+			50% {
+				color: #fcfcfc;
+				left: 200px;
+				top: 200px;
+			}
+
+			75% {
+				color: #60bdff;
+				left: 0px;
+				top: 200px;
+			}
+
+			100% {
+				color: #fcfcfc;
+				left: 0px;
+				top: 0px;
+			}
+		}
+
+		#freccia {
+			background: transparent;
+			align-items: anchor-center;
+			font-size: larger;
+			pointer-events: none;
+			margin-top: 20%;
+			animation-name: pulse;
+			animation-duration: 4s;
+			animation-iteration-count: infinite;
+		}
+	</style>
 
 </html>
