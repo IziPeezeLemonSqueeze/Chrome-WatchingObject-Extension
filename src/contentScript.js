@@ -385,7 +385,7 @@
 		divFastDCTOOL.style = 'z-index: 1000;display: flex;position: fixed;bottom: -18px;right: 50%;';
 		frameFastSnippet = document.createElement('iframe');
 		frameFastSnippet.src = chrome.runtime.getURL('snippet.html');
-		frameFastSnippet.style = 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 173px;border: 0px;';
+		frameFastSnippet.style = 'box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;border-radius: 5px;width: 600px;height: 173px;border: 1px #80808082 solid;;border-radius: 5px;width: 600px;height: 173px;border: 0px;';
 		divFastDCTOOL.appendChild(frameFastSnippet);
 		salesforceBody.appendChild(divFastDCTOOL);
 
