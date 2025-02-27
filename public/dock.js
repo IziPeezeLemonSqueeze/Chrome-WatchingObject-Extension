@@ -22,6 +22,7 @@ const divStepTwo = document.getElementById('stepTwoBlock');
 const divStepUpTwo = document.getElementById('stepTwoUpBlock');
 const divStepGreetings = document.getElementById('stepGreetings');
 const freccia = document.getElementById('freccia');
+const btnGoToDOC = document.getElementById('btnGoToDOC');
 
 const tutorialPhases = {
 	isOn: false,
@@ -148,7 +149,17 @@ document.addEventListener("DOMContentLoaded", async () =>
 	{
 		codeSnippetEvent();
 	});
+
+	btnGoToDOC.addEventListener('click', () =>
+	{
+		goToDOC();
+	})
 });
+
+const goToDOC = () =>
+{
+	chrome.tabs.create({ url: 'https://github.com/IziPeezeLemonSqueeze/Salesforce-Enhancer_Chrome-Extension_DOC/wiki' });
+}
 
 const getTutorial = () =>
 {
