@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () =>
 
 	chrome.storage.sync.get('apiVersion', async (items) =>
 	{
-		console.log('apiVersion', items);
+		//console.log('apiVersion', items);
 		if (!Object.keys(await items)[0])
 		{
 			requestApiVersions();
