@@ -50,7 +50,7 @@ export class SNIPPET
 
 	_initDeveloperConsoleBody()
 	{
-		this.windowApexCode = this.windowAnonymCode.parentElement.parentElement.parentElement.parentElement.parentElement;
+
 		try
 		{
 			this.developerConsoleBody = document.getElementById('ext-gen1361');
@@ -66,10 +66,10 @@ export class SNIPPET
 		try
 		{
 			this.setWindowAnonymCode(document.getElementById('executeHighlightedButton').parentElement);
-
+			this.windowApexCode = this.windowAnonymCode.parentElement.parentElement.parentElement.parentElement.parentElement;
 			if (this.windowAnonymCode)
 			{
-				clearInterval(consoleIntervalSearch);
+				clearInterval(this.consoleIntervalSearch);
 				if (!document.getElementsByClassName('DCSnippet')[0])
 				{
 					this.btnCodeSnippet = document.createElement('button');
@@ -82,29 +82,30 @@ export class SNIPPET
 					this.btnCodeSnippet.addEventListener('click', this.showHideCodeSnippet);
 				}
 			}
-		} catch (e) { console.log(e) }
+		} catch (e)
+		{
+			//console.log(e)
+		}
 	}
 
-	showHideCodeSnippet = (windowAnonymCode) =>
+	showHideCodeSnippet = async () =>
 	{
-		this.divDCTOOL = document.createElement('div');
-		this.divDCTOOL.id = 'DCTOOL';
-		this.divDCTOOL.style =
-			'z-index: 1000;display: flex;position: relative;bottom: 137px;left: 77px;';
-
 		if (!this.codeSnippetOpen)
 		{
-			showCS(this.divDCTOOL, this.windowApexCode);
+
+			this.showCS();
+			await this.showReloadCS();
+
 		} else
 		{
-			hideCS(this.windowApexCode);
+			this.hideCS();
 		}
 	}
 
 	openTextAreaNewSnippet()
 	{
 		this.textAreaNewSnippetOpen = true;
-		_initDeveloperConsoleBody();
+		this._initDeveloperConsoleBody();
 
 		const divNewSnippet = document.createElement('div');
 		divNewSnippet.className = 'col';
@@ -141,7 +142,7 @@ export class SNIPPET
 		{
 			if (inputNewSnippetName.value && textArea.value)
 			{
-				makeSnippet({ name: inputNewSnippetName.value, code: textArea.value });
+				this.makeSnippet({ name: inputNewSnippetName.value, code: textArea.value });
 				chrome.runtime.sendMessage({
 					type: 'CREATE_NOTIFICATION',
 					payload: {
@@ -244,15 +245,29 @@ export class SNIPPET
 		//console.log('dialogDeleteAlreadyExist', dialogDeleteAlreadyExist)
 		if (!dialogDeleteAlreadyExist)
 		{
-			try
+			if (this.divFastDCTOOL)
 			{
-				this.divFastDCTOOL.appendChild(dialogDelete);
-			} catch (err)
+				try
+				{
+					this.divFastDCTOOL.appendChild(dialogDelete);
+				} catch (err)
+				{
+					console.log(err);
+				}
+
+			}
+			if (this.divDCTOOL)
 			{
-				this.divDCTOOL.appendChild(dialogDelete);
-				console.log(err)
+				try
+				{
+					this.divDCTOOL.appendChild(dialogDelete);
+				} catch (err)
+				{
+					console.log(err);
+				}
 			}
 		}
+
 	}
 
 	copyApexSnippet(codeTxt)
@@ -733,8 +748,58 @@ export class SNIPPET
 
 	}
 
+	async showReloadCS()
+	{
+		console.log('SHOW RELOAD')
+		return new Promise(async (approve, reject) =>
+		{
+			if (this.divDCTOOL)
+			{
+				const divReload = document.createElement('div');
+				divReload.id = 'DCTOOL_reload';
+				divReload.style = 'overflow-x: clip;z-index: 500;position: relative;bottom: 422px;left: 77px;width: 600px;height: 285px;border-radius: 6px;box-shadow: white 0px 0px 20px inset;';
+
+				divReload.classList.add('progress-bar');
+
+				const text = document.createElement('span');
+				text.innerText = 'Reloading...';
+				text.style = 'text-shadow: 0 0 4px #ffffff;justify-self: anchor-center;position: absolute;font-size: -webkit-xxx-large;color: #ffffff;font-family: system-ui;font-style: oblique;font-weight: bold;'
+
+				divReload.appendChild(text);
+				await this.windowApexCode.appendChild(divReload);
+				console.log('SHOW RELOAD APPROVE')
+				approve();
+			} else if (this.divFastDCTOOL)
+			{
+
+			} else
+			{
+				reject();
+			}
+		});
+	}
+
+	removeReloadCS()
+	{
+		const divReload = document.getElementById('DCTOOL_reload');
+		divReload.style.display = 'none';
+	}
+
 	showCS()
 	{
+		this.divDCTOOL = document.createElement('div');
+		this.divDCTOOL.id = 'DCTOOL';
+		this.divDCTOOL.style = 'z-index: 1000;display: flex;position: relative;bottom: -50px;left: 77px;';
+		this.divDCTOOL.animate([
+			{ bottom: '-50px' },
+			{ bottom: '137px' },
+		], {
+			duration: 500,
+			easing: 'ease-in-out',
+			iterations: 1,
+			fill: 'forwards'
+		});
+
 		const loaders = document.querySelectorAll('[id*=-loader]');
 		loaders.forEach(loader =>
 		{
@@ -753,10 +818,12 @@ export class SNIPPET
 			this.frameSnippet = document.createElement('iframe');
 			this.frameSnippet.src = chrome.runtime.getURL('snippet.html');
 			this.frameSnippet.style = 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 285px;border: 0px;';
+
 			this.divDCTOOL.appendChild(this.frameSnippet);
-			this.windowApexCode.appendChild(div);
+			this.windowApexCode.appendChild(this.divDCTOOL);
 		} catch (err)
 		{
+			console.log(err)
 			this.showFastCS();
 		}
 	}
@@ -766,15 +833,41 @@ export class SNIPPET
 		const fastDCTOOL = document.getElementById('fastDCTOOL')
 		if (fastDCTOOL)
 		{
-			fastDCTOOL.remove();
+			if (fastDCTOOL)
+			{
+				fastDCTOOL.animate([
+					{ bottom: '-18px' },
+					{ bottom: '-180px' },
+				], {
+					duration: 500,
+					easing: 'ease-in-out',
+					iterations: 1,
+					fill: 'forwards'
+				});
+			}
+			setTimeout(() =>
+			{
+				fastDCTOOL.remove();
+			}, 500);
 			return;
 		}
 		this.divFastDCTOOL = document.createElement('div');
 		this.divFastDCTOOL.id = 'fastDCTOOL';
 		this.divFastDCTOOL.style = 'z-index: 1000;display: flex;position: fixed;bottom: -18px;right: 50%;';
+		this.divFastDCTOOL.animate([
+			{ bottom: '-180px' },
+			{ bottom: '-18px' },
+		], {
+			duration: 500,
+			easing: 'ease-in-out',
+			iterations: 1,
+			fill: 'forwards'
+		});
+
 		this.frameFastSnippet = document.createElement('iframe');
 		this.frameFastSnippet.src = chrome.runtime.getURL('snippet.html');
 		this.frameFastSnippet.style = 'box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;border-radius: 5px;width: 600px;height: 173px;border: 1px #80808082 solid;;border-radius: 5px;width: 600px;height: 173px;border: 0px;';
+
 		this.divFastDCTOOL.appendChild(this.frameFastSnippet);
 		this.salesforceBody.appendChild(this.divFastDCTOOL);
 
@@ -784,19 +877,59 @@ export class SNIPPET
 	hideCS()
 	{
 		this.codeSnippetOpen = false;
-		//console.log('WINDOW', windowApexCode)
-		this.divDCTOOL = document.createElement('div');
-		this.divDCTOOL.id = 'DCTOOL';
-		this.divDCTOOL.style =
-			'z-index: 1000;display: flex;position: relative;bottom: 137px;left: 77px;';
-		try
+
+
+		if (this.divDCTOOL)
 		{
-			this.windowApexCode.removeChild(document.getElementById('DCTOOL'));
-			//console.log('REMOVED DCTOOL')
-		} catch (err)
-		{
-			this.salesforceBody.removeChild(document.getElementById('fastDCTOOL'));
+			this.divDCTOOL.animate([
+				{ bottom: '137px' },
+				{ bottom: '-50px' },
+			], {
+				duration: 500,
+				easing: 'ease-in-out',
+				iterations: 1,
+				fill: 'forwards'
+			});
+			setTimeout(() =>
+			{
+				try
+				{
+					this.windowApexCode.removeChild(document.getElementById('DCTOOL'));
+					//console.log('REMOVED DCTOOL')
+				} catch (err)
+				{
+					//console.log(err)
+				}
+			}, 500);
 		}
+
+		if (this.divFastDCTOOL)
+		{
+			this.divFastDCTOOL.animate([
+				{ bottom: '-18px' },
+				{ bottom: '-180px' },
+			], {
+				duration: 500,
+				easing: 'ease-in-out',
+				iterations: 1,
+				fill: 'forwards'
+			});
+			setTimeout(() =>
+			{
+				try
+				{
+					this.salesforceBody.removeChild(document.getElementById('fastDCTOOL'));
+					//console.log('REMOVED DCTOOL')
+				} catch (err)
+				{
+					console.log(err)
+				}
+			}, 500);
+		}
+
+
+
+
 	}
 
 }

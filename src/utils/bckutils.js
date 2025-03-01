@@ -1,6 +1,6 @@
 
 export let apiActive = null;
-
+export let timeoutFORCEResetDialog;
 export function getCurrentUrl(tab)
 {
 	console.log("CURRENT URL", tab.url);
@@ -22,18 +22,26 @@ export function getCurrentUrl(tab)
 
 function getCurrentApiActive()
 {
-	if (!apiActive)
+	return new Promise((resolve, reject) =>
 	{
-		chrome.storage.sync.get('apiVersionSelected', async (items) =>
+		chrome.storage.sync.get(['apiVersionSelected'], async (items) =>
 		{
 			apiActive = await items.apiVersionSelected;
+			if (apiActive)
+			{
+				resolve();
+			} else
+			{
+				reject();
+			}
 		});
-	}
+	})
+
 }
 
 export async function snippetRun(obj, sender, response)
 {
-	getCurrentApiActive();
+	await getCurrentApiActive()
 	const _URL_ = sender.tab.url.split('salesforce.com')
 	let newUrl = _URL_[0] + "salesforce.com";
 	console.log('----', newUrl.replace("https://", ""))
@@ -93,9 +101,9 @@ export async function snippetRun(obj, sender, response)
 		.catch(error => console.log('error', error));
 }
 
-export function requestFields(obj, sender, response)
+export async function requestFields(obj, sender, response)
 {
-	getCurrentApiActive();
+	await getCurrentApiActive();
 	console.log('WO_TOOL_requestFields ARRIVED');
 	chrome.tabs.sendMessage(sender.tab.id, {
 		response: 'getPageFields',
@@ -169,7 +177,7 @@ export function requestFields(obj, sender, response)
 
 export async function goToApexLog(obj, sender, response)
 {
-	getCurrentApiActive();
+	await getCurrentApiActive();
 	const sid = await chrome.cookies.getAll({
 		name: "sid",
 		domain: getCurrentUrl(sender.tab).customDomain,

@@ -29,10 +29,13 @@ import { SNIPPET } from "./utils_content/snippet";
 
 	const Dock = new DOCK(salesforceBody);
 	Dock.newDock();
-	Dock.woToolBtn.addEventListener('click', () =>
+	try
 	{
-		Dock.showHideWOTools();
-	});
+		Dock.woToolBtn.addEventListener('click', () =>
+		{
+			Dock.showHideWOTools();
+		});
+	} catch (err) { }
 
 	const apiField = new APIFIELD(copyToClipboard);
 
@@ -45,16 +48,14 @@ import { SNIPPET } from "./utils_content/snippet";
 			switch (obj.response)
 			{
 				case 'devConsole':
-					consoleIntervalSearch = setInterval(() =>
+					snippet.consoleIntervalSearch = setInterval(() =>
 					{
 						snippet.devConsoleTool();
 					}, 2000);
 					break;
-				case 'popupNameSnippet':
-					break;// TODO DELETE
 
 				case 'openTextAreaNewSnippet':
-					if (!textAreaNewSnippetOpen)
+					if (!snippet.textAreaNewSnippetOpen)
 					{
 						snippet.openTextAreaNewSnippet();
 					}
@@ -83,7 +84,11 @@ import { SNIPPET } from "./utils_content/snippet";
 				case 'resetCodeSnippet':
 					//console.log('RESET')
 					snippet.hideCS();
-					snippet.showCS();
+					setTimeout(() =>
+					{
+						snippet.showCS();
+					}, 501);
+					//snippet.removeReloadCS();
 					break;
 
 				case 'getPageFields':

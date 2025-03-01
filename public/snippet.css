@@ -1,68 +1,95 @@
-#textarea-dialogvar, #elemlist, #spantextarea-dialogvar, #btnAnnulla-dialogvar, #btnRunClose-dialogvar, #btnRun-dialogvar {
-    font-size: 0.8rem;
-    letter-spacing: 1px;
+#textarea-dialogvar,
+#elemlist,
+#spantextarea-dialogvar,
+#btnAnnulla-dialogvar,
+#btnRunClose-dialogvar,
+#btnRun-dialogvar {
+	font-size: 0.8rem;
+	letter-spacing: 1px;
 }
-#textarea-dialogvar, #elemlist {
-    padding: 10px;
-    max-width: 100%;
-    line-height: 1.5;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-shadow: 1px 1px 1px #999;
-}
-
-#btnRunClose-dialogvar, #btnRun-dialogvar, #btnAnnulla-dialogvar
-{
-    height: 25px;
-    width: 200px;
-}
-
-#btnRunClose-dialogvar :hover
-{
-    background-color: green;
+#textarea-dialogvar,
+#elemlist {
+	padding: 10px;
+	max-width: 100%;
+	line-height: 1.5;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	box-shadow: 1px 1px 1px #999;
 }
 
-
-#btnRun-dialogvar :hover
-{
-    background-color: cornflowerblue;
-
+#btnRunClose-dialogvar,
+#btnRun-dialogvar,
+#btnAnnulla-dialogvar {
+	height: 25px;
+	width: 200px;
 }
 
-#btnAnnulla-dialogvar :hover
-{
-    background-color: red;
-
+#btnRunClose-dialogvar :hover {
+	background-color: green;
 }
 
-#spantestovarname 
-{
-    font-size: 0.6rem;
+#btnRun-dialogvar :hover {
+	background-color: cornflowerblue;
+}
+
+#btnAnnulla-dialogvar :hover {
+	background-color: red;
+}
+
+#spantestovarname {
+	font-size: 0.6rem;
 }
 
 .dialoggood {
-    border-width: 1px;
-    border-radius: 5px;
-    border-color: green;
+	border-width: 1px;
+	border-radius: 5px;
+	border-color: green;
 }
 .dialogerror {
-    border-width: 1px;
-    border-radius: 5px;
-    border-color: red;
+	border-width: 1px;
+	border-radius: 5px;
+	border-color: red;
 }
 
 #list-dialogvar::-webkit-scrollbar {
 	width: 10px;
 }
- 
+
 #list-dialogvar::-webkit-scrollbar-track {
 	border-radius: 8px;
 	background-color: #e7e7e7;
 	border: 1px solid #cacaca;
 }
- 
+
 #list-dialogvar::-webkit-scrollbar-thumb {
 	border-radius: 8px;
 	background-color: #60bdff;
 }
 
+.progress-bar {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.progress-bar {
+	content: '';
+	position: absolute;
+	top: 137;
+	left: -100%;
+	width: 200%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		rgba(0, 205, 255, 1) 0%,
+		rgba(1, 111, 255, 1) 50%,
+		rgba(0, 204, 255, 1) 100%
+	);
+	//animation: animate-stripes 5s linear infinite;
+}
+
+@keyframes animate-stripes {
+	100% {
+		background-position: -600px 0px;
+	}
+}

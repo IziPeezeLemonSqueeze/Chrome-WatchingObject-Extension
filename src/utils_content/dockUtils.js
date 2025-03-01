@@ -12,6 +12,10 @@ export class DOCK
 
 	newDock()
 	{
+		if (!this.salesforceBody)
+		{
+			return;
+		}
 		try
 		{
 			if (!document.getElementsByClassName('WOtool-btn slds-button slds-button_brand')[0])
@@ -42,6 +46,7 @@ export class DOCK
 
 				this.salesforceBody.appendChild(this.woToolBtn);
 			}
+
 			if (this.toolOpen)
 			{
 				//console.log('CHECK WOTOOL', document.getElementById('WOTOOL'));
@@ -50,9 +55,20 @@ export class DOCK
 					let div = document.createElement('div');
 					div.id = 'WOTOOL';
 					div.style = 'z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
+
 					let frame = document.createElement('iframe');
+					frame.id = 'WOOTOOLframe';
 					frame.src = chrome.runtime.getURL('dock.html');
-					frame.style = 'border-top-right-radius: 15px;border-bottom-left-radius: 15px;border-top-left-radius: 15px;width: 250px;height: 446px;border: 1px solid rgb(187, 187, 187);box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;z-index: 1000;display: flex;position: fixed;bottom: 42px;right: 0px;vertical-align: middle;';
+					frame.style = 'border-top-right-radius: 15px;border-bottom-left-radius: 15px;border-top-left-radius: 15px;width: 250px;height: 446px;border: 1px solid rgb(187, 187, 187);box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;z-index: 1000;display: flex;position: fixed;bottom: 42px;right: -265px;vertical-align: middle;';
+					frame.animate([
+						{ right: '-265px' },
+						{ right: '0px' },
+					], {
+						duration: 500,
+						easing: 'ease-in-out',
+						iterations: 1,
+						fill: 'forwards'
+					});
 					div.appendChild(frame);
 
 					this.salesforceBody.appendChild(div);
@@ -61,10 +77,23 @@ export class DOCK
 			{
 				try
 				{
-					this.salesforceBody.removeChild(document.getElementById('WOTOOL'));
+					let frame = document.getElementById('WOOTOOLframe');
+					frame.animate([
+						{ right: '0px' },
+						{ right: '-265px' },
+					], {
+						duration: 500,
+						easing: 'ease-in-out',
+						iterations: 1,
+						fill: 'forwards'
+					});
+					setTimeout(() =>
+					{
+						this.salesforceBody.removeChild(document.getElementById('WOTOOL'));
+					}, 500)
 				} catch (e)
 				{
-					//console.log(e);
+					console.log(e);
 				}
 			}
 		} catch (e)

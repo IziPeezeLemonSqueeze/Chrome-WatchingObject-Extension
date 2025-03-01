@@ -1,6 +1,6 @@
 'use strict';
 
-import { snippetRun, requestFields, goToApexLog, getCurrentUrl, retrieveApiVersions, apiActive as bckApiActive } from "./utils/bckutils";
+import { snippetRun, requestFields, goToApexLog, getCurrentUrl, retrieveApiVersions, apiActive as bckApiActive, timeoutFORCEResetDialog } from "./utils/bckutils";
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 {
@@ -149,7 +149,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
 
 let apiActive = null;
 
-let timeoutFORCEResetDialog;
 chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 {
 	console.log('ARRIVED BE', obj);
