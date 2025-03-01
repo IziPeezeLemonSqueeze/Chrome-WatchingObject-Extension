@@ -92,10 +92,7 @@ export class SNIPPET
 	{
 		if (!this.codeSnippetOpen)
 		{
-
 			this.showCS();
-			await this.showReloadCS();
-
 		} else
 		{
 			this.hideCS();
@@ -189,8 +186,8 @@ export class SNIPPET
 	{
 		// TODO CONTORLLO SUI DUPLICATI
 		const regexIVC = /@\b[\@V\@ID\@INT\@BOL\@STR]\w+(?='*)/g;
-		const countIVC = String(payload).match(regexIVC);
-		//console.log(countIVC);
+		const countIVC = String(payload.code).match(regexIVC);
+		console.log(payload, countIVC);
 
 		chrome.storage.sync.set({
 			['snippet_' + payload.name]: {
@@ -283,12 +280,12 @@ export class SNIPPET
 	openDialogVar([mapValue, code, id])
 	{
 		const nomeSnippet = id;
-		dialogVarOpen = true;
+		this.dialogVarOpen = true;
 
 		this._initDeveloperConsoleBody();
 		//console.log('DEVCONSOLE', developerConsoleBody);
 
-		let isFastToAttach = !developerConsoleBody;
+		let isFastToAttach = !this.developerConsoleBody;
 
 
 		//console.log('isFastToAttach', isFastToAttach)
@@ -304,7 +301,7 @@ export class SNIPPET
 		if (isFastToAttach)
 		{
 			/* dialog.style = "width: 100%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: absolute;z-index: -1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 520px;bottom: 85%;" */
-			dialog.style = "width: 600px;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 7px;position: fixed;z-index: 1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 9px 4px;height: 520px;bottom: 14%;right: 50%;"
+			dialog.style = "width: 600px;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 7px;position: fixed;z-index: 1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 9px 4px;height: 520px;bottom: -90%;right: 50%;"
 		} else
 		{
 			dialog.style = "width: 30%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: fixed;top: 5%;right: 35%;z-index: 1000000;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 490px;";
@@ -587,24 +584,6 @@ export class SNIPPET
 
 		divCenter.appendChild(list);
 
-
-		// RESULTING CODE
-		/* 		let spanTextArea = document.createElement('span');
-			spanTextArea.id = 'spantextarea-dialogvar';
-			spanTextArea.innerText = 'Resulting code';
-			let textArea = document.createElement('textarea');
-			textArea.id = 'textarea-dialogvar';
-			textArea.setAttribute('row', 50);
-			textArea.setAttribute('col', 100);
-			textArea.setAttribute('readonly', true);
-			textArea.innerText = code;
-			textArea.className = "textarea";
-			textArea.style = "resize: none;min-height: 400px;min-width: 550px;width: 585px;height: 413px;";
-
-
-			divRight.appendChild(spanTextArea);
-			divRight.appendChild(textArea); */
-
 		let btnRun = document.createElement('button');
 		btnRun.id = 'btnRun-dialogvar';
 		btnRun.innerText = 'RUN 🚀';
@@ -695,12 +674,28 @@ export class SNIPPET
 				{
 					delete v[1].value;
 				});
-				try
+				dialog.animate([
+					{ bottom: '14%' },
+					{ bottom: '-90%' },
+				], {
+					duration: 500,
+					easing: 'ease-in-out',
+					iterations: 1,
+					fill: 'forwards'
+				});
+
+				if (isFastToAttach)
 				{
-					developerConsoleBody.removeChild(document.getElementById('dialogvar'));
-				} catch (err)
+					setTimeout(() =>
+					{
+						this.salesforceBody.removeChild(document.getElementById('dialogvar'));
+					}, 501);
+				} else
 				{
-					salesforceBody.removeChild(document.getElementById('dialogvar'));
+					setTimeout(() =>
+					{
+						this.developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+					}, 501);
 				}
 				this.dialogVarOpen = false;
 				chrome.runtime.sendMessage({
@@ -721,11 +716,32 @@ export class SNIPPET
 			});
 			try
 			{
-				this.developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+				dialog.animate([
+					{ bottom: '14%' },
+					{ bottom: '-90%' },
+				], {
+					duration: 500,
+					easing: 'ease-in-out',
+					iterations: 1,
+					fill: 'forwards'
+				});
+
+				if (isFastToAttach)
+				{
+					setTimeout(() =>
+					{
+						this.salesforceBody.removeChild(document.getElementById('dialogvar'));
+					}, 501);
+				} else
+				{
+					setTimeout(() =>
+					{
+						this.developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+					}, 501);
+				}
 			} catch (err)
-			{
-				this.salesforceBody.removeChild(document.getElementById('dialogvar'));
-			}
+			{ }
+
 			this.dialogVarOpen = false;
 			chrome.runtime.sendMessage({
 				type: 'WO_CODESNIPPET_forceResetDialog'
@@ -738,6 +754,16 @@ export class SNIPPET
 
 		dialog.appendChild(title);
 		dialog.appendChild(div);
+
+		dialog.animate([
+			{ bottom: '-90%' },
+			{ bottom: '14%' },
+		], {
+			duration: 500,
+			easing: 'ease-in-out',
+			iterations: 1,
+			fill: 'forwards'
+		});
 		try
 		{
 			this.developerConsoleBody.appendChild(dialog);
@@ -746,43 +772,6 @@ export class SNIPPET
 			this.salesforceBody.appendChild(dialog);
 		}
 
-	}
-
-	async showReloadCS()
-	{
-		console.log('SHOW RELOAD')
-		return new Promise(async (approve, reject) =>
-		{
-			if (this.divDCTOOL)
-			{
-				const divReload = document.createElement('div');
-				divReload.id = 'DCTOOL_reload';
-				divReload.style = 'overflow-x: clip;z-index: 500;position: relative;bottom: 422px;left: 77px;width: 600px;height: 285px;border-radius: 6px;box-shadow: white 0px 0px 20px inset;';
-
-				divReload.classList.add('progress-bar');
-
-				const text = document.createElement('span');
-				text.innerText = 'Reloading...';
-				text.style = 'text-shadow: 0 0 4px #ffffff;justify-self: anchor-center;position: absolute;font-size: -webkit-xxx-large;color: #ffffff;font-family: system-ui;font-style: oblique;font-weight: bold;'
-
-				divReload.appendChild(text);
-				await this.windowApexCode.appendChild(divReload);
-				console.log('SHOW RELOAD APPROVE')
-				approve();
-			} else if (this.divFastDCTOOL)
-			{
-
-			} else
-			{
-				reject();
-			}
-		});
-	}
-
-	removeReloadCS()
-	{
-		const divReload = document.getElementById('DCTOOL_reload');
-		divReload.style.display = 'none';
 	}
 
 	showCS()
@@ -820,10 +809,11 @@ export class SNIPPET
 			this.frameSnippet.style = 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 285px;border: 0px;';
 
 			this.divDCTOOL.appendChild(this.frameSnippet);
+
 			this.windowApexCode.appendChild(this.divDCTOOL);
 		} catch (err)
 		{
-			console.log(err)
+			//console.log(err)
 			this.showFastCS();
 		}
 	}
@@ -926,12 +916,7 @@ export class SNIPPET
 				}
 			}, 500);
 		}
-
-
-
-
 	}
-
 }
 
 

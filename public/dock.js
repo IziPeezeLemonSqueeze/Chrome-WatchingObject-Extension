@@ -167,8 +167,6 @@ const getTutorial = () =>
 	divStepOne.style.opacity = 0;
 	divStepTwo.style.opacity = 0;
 	divStepTwo.style.display = 'none';
-	divStepUpTwo.style.opacity = 0;
-	divStepUpTwo.style.display = 'none';
 	divStepGreetings.style.opacity = 0;
 	divStepGreetings.style.display = 'none';
 	chrome.storage.sync.get(['firstGO'], async (isFirstGo) =>
@@ -204,16 +202,12 @@ const setupStepTwo = () =>
 	divStepOne.style.display = 'none';
 	divStepTwo.style.opacity = 1;
 	divStepTwo.style.display = null;
-	divStepUpTwo.style.opacity = 1;
-	divStepUpTwo.style.display = null;
 }
 
 const setupStepGreetings = () =>
 {
 	divStepTwo.style.opacity = 0;
 	divStepTwo.style.display = 'none';
-	divStepUpTwo.style.opacity = 0;
-	divStepUpTwo.style.display = 'none';
 	divStepGreetings.style.opacity = 1;
 	divStepGreetings.style.display = null;
 	setTimeout(async () =>

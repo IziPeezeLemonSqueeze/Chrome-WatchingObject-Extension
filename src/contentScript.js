@@ -82,13 +82,11 @@ import { SNIPPET } from "./utils_content/snippet";
 					break;
 
 				case 'resetCodeSnippet':
-					//console.log('RESET')
 					snippet.hideCS();
 					setTimeout(() =>
 					{
 						snippet.showCS();
-					}, 501);
-					//snippet.removeReloadCS();
+					}, 505);
 					break;
 
 				case 'getPageFields':
