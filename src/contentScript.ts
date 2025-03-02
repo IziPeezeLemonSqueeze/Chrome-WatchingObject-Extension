@@ -1,44 +1,41 @@
+import { DOCK } from './utils_content/dockUtils';
+import { APIFIELD } from './utils_content/apiFields';
+import { SNIPPET } from './utils_content/snippet';
 'use strict';
+let spanShowIds: string[] = [];
 
-import APIFIELD from "./utils_content/apiFields.js";
-import DOCK from "./utils_content/dockUtils.js";
-import SNIPPET from "./utils_content/snippet.js";
+const copyToClipboard = (textToCopy: string) =>
+{
+	const t = document.createElement('textarea');
+	//console.log('textToCopy', textToCopy)
+	t.value = textToCopy;
+	t.setAttribute('readonly', '');
+	t.style.position = 'absolute';
+	t.style.left = '-9999px';
+	document.body.appendChild(t);
+	t.select();
+	document.execCommand('copy');
+	document.body.removeChild(t);
+}
 
+const snippet = new SNIPPET(copyToClipboard);
+let salesforceBody = snippet.getSalesforceBody();
+let windowAnonymCode = snippet.getWindowAnonymCode();
+
+const Dock = new DOCK(salesforceBody);
+Dock.newDock();
+try
+{
+	Dock.woToolBtn.addEventListener('click', () =>
+	{
+		Dock.showHideWOTools();
+	});
+} catch (err) { }
+
+const apiField = new APIFIELD(copyToClipboard);
 
 (() =>
 {
-	let spanShowIds: string[] = [];
-
-	const copyToClipboard = (textToCopy: string) =>
-	{
-		const t = document.createElement('textarea');
-		//console.log('textToCopy', textToCopy)
-		t.value = textToCopy;
-		t.setAttribute('readonly', '');
-		t.style.position = 'absolute';
-		t.style.left = '-9999px';
-		document.body.appendChild(t);
-		t.select();
-		document.execCommand('copy');
-		document.body.removeChild(t);
-	}
-
-	const snippet = new SNIPPET(copyToClipboard);
-	let salesforceBody = snippet.getSalesforceBody();
-	let windowAnonymCode = snippet.getWindowAnonymCode();
-
-	const Dock = new DOCK(salesforceBody);
-	Dock.newDock();
-	try
-	{
-		Dock.woToolBtn.addEventListener('click', () =>
-		{
-			Dock.showHideWOTools();
-		});
-	} catch (err) { }
-
-	const apiField = new APIFIELD(copyToClipboard);
-
 	chrome.runtime.onMessage.addListener((obj, sender, response) =>
 	{
 		//console.log('ARRIVED CS ', obj);
@@ -83,10 +80,19 @@ import SNIPPET from "./utils_content/snippet.js";
 
 				case 'resetCodeSnippet':
 					snippet.hideCS();
-					setTimeout(() =>
+					if (snippet.divFastDCTOOL)
 					{
-						snippet.showCS();
-					}, 505);
+						setTimeout(() =>
+						{
+							snippet.showFastCS();
+						}, 505);
+					} else
+					{
+						setTimeout(() =>
+						{
+							snippet.showCS();
+						}, 505);
+					}
 					break;
 
 				case 'getPageFields':

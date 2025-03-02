@@ -119,7 +119,7 @@ export async function requestFields(obj: any, sender: chrome.runtime.MessageSend
 
 			const idObjSplitted = String(sender.tab.url).split('/');
 			const ObjectType = idObjSplitted[idObjSplitted.length - 3];
-			let recordTypeFounded: string = null;
+			let recordTypeFounded: any = null;
 			let recordTypeDeveloperName: null = null;
 			await fetch(
 				getCurrentUrl(sender.tab).customDomainHttps +
@@ -182,7 +182,7 @@ export async function goToApexLog(obj: any, sender: chrome.runtime.MessageSender
 		name: "sid",
 		domain: getCurrentUrl(sender.tab).customDomain,
 	});
-	var res = null;
+	let res: resApexLog = null;
 	await fetch(
 		getCurrentUrl(sender.tab).customDomainHttps +
 		`/services/data/v${apiActive}/query/?q=SELECT+Id+FROM+ApexLog`, {
@@ -195,12 +195,13 @@ export async function goToApexLog(obj: any, sender: chrome.runtime.MessageSender
 		.then(async response => res = await response.json())
 		.then(result => console.log(result))
 		.catch(error => console.log('error', error));
-	if (await res.totalSize > 0)
+
+	if (res.totalSize > 0)
 	{
-		console.log('APEX LOGS', await res.totalSize);
+		console.log('APEX LOGS', res.totalSize);
 		const urlToSendDelete = getCurrentUrl(sender.tab).customDomainHttps + `/services/data/v${apiActive}/composite/sobjects?ids=`;
 
-		let chunkComposite = [];
+		let chunkComposite: chunkCompositeApexLog[][] = [];
 		for (let c = 0; c < res.records.length; c += 200)
 		{
 			chunkComposite.push(res.records.slice(c, c + 200));
@@ -208,9 +209,9 @@ export async function goToApexLog(obj: any, sender: chrome.runtime.MessageSender
 		chunkComposite.forEach(async (chunk) =>
 		{
 			let composite = urlToSendDelete;
-			chunk.forEach((cId: { Id: string; }) =>
+			chunk.forEach((cId) =>
 			{
-				composite += cId.Id + ',';
+				composite += cId.id + ',';
 			});
 			composite = composite.slice(0, composite.length - 1);
 			console.log('COMPOSITE', composite);

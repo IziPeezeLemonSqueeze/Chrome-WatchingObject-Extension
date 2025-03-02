@@ -7,3 +7,17 @@ interface MAPVALUE
 	value: string | null,
 
 }
+
+interface resApexLog
+{
+	done: boolean,
+	records: chunkCompositeApexLog[],
+	totalSize: number
+}
+
+interface chunkCompositeApexLog
+{
+	errors: [],
+	id: string,
+	success: boolean
+}

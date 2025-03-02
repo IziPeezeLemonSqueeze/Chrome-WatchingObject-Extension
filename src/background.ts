@@ -323,7 +323,7 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 });
 
 
-const createNotification = (data) =>
+const createNotification = (data: { title: any; msg: any; }) =>
 {
 	chrome.notifications.create(
 		'',
@@ -335,7 +335,7 @@ const createNotification = (data) =>
 		});
 }
 
-var notificationID = [];
+var notificationID: any[] = [];
 chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) =>
 {
 	notificationID.forEach((not, idx) =>
@@ -358,14 +358,14 @@ chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) =>
  * @param {*} tab  URL
  * @returns 0 URL | 1 SObject | 2 ID
  */
-function getCurrentSObjectNameAndID(tab)
+function getCurrentSObjectNameAndID(tab: chrome.tabs.Tab)
 {
 	return tab.url.match(/\/lightning\/r\/(\w+)\/(\w+)\W*/);
 }
 
 
-
-async function login(domain, sid, SObject, ID)
+/*
+async function login(domain: string, sid: string, SObject: string, ID: string)
 {
 	console.log(SObject, ID);
 
@@ -385,4 +385,4 @@ async function login(domain, sid, SObject, ID)
 		.catch(error => console.log('error', error));
 
 	return res;
-}
+} */

@@ -9,7 +9,7 @@ export class SNIPPET
 	codeSnippetOpen = false;
 	textAreaNewSnippetOpen = false;
 	consoleIntervalSearch: NodeJS.Timeout | undefined;
-	frameSnippet: HTMLIFrameElement | undefined;
+
 	frameFastSnippet: HTMLIFrameElement | undefined;
 	dialogVarOpen = false;
 
@@ -65,23 +65,95 @@ export class SNIPPET
 	{
 		try
 		{
-			this.setWindowAnonymCode(document.getElementById('executeHighlightedButton')!.parentElement);
-			this.windowApexCode = this.windowAnonymCode!.parentElement!.parentElement!.parentElement!.parentElement!.parentElement;
-			if (this.windowAnonymCode)
+			/* 			this.setWindowAnonymCode(document.getElementById('executeHighlightedButton')!.parentElement);
+						this.windowApexCode = this.windowAnonymCode!.parentElement!.parentElement!.parentElement!.parentElement!.parentElement;
+						if (this.windowAnonymCode)
+						{
+							clearInterval(this.consoleIntervalSearch);
+							if (!document.getElementsByClassName('DCSnippet')[0])
+							{
+								this.btnCodeSnippet = document.createElement('button');
+								this.btnCodeSnippet.className = 'DCSnippet x-btn x-box-item x-toolbar-item x-btn-default-toolbar-small x-noicon x-btn-noicon x-btn-default-toolbar-small-noicon';
+								this.btnCodeSnippet.innerText = 'Code Snippet';
+								this.btnCodeSnippet.setAttribute('style', 'height: 22px');
+
+								this.windowAnonymCode.appendChild(this.btnCodeSnippet);
+
+								this.btnCodeSnippet.addEventListener('click', this.showHideCodeSnippet);
+							}
+						} */
+
+			//--------------------------------------
+
+
+			/*
+			const rowDiv = document.querySelector('.row');
+await setElementStyles(rowDiv, { height: '500px', display: 'flex' });
+const controlDiv = document.getElementById('resize-control');
+const codeSnippetDiv = document.getElementById('CodeSnippet');
+const editorsBodyDiv = document.getElementById('editors-body');
+let isDragging = false;
+let startX = 0;
+let initialEditorsBodyWidth = 0;
+let initialCodeSnippetWidth = 0;
+controlDiv.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  startX = e.clientX;
+  initialEditorsBodyWidth = editorsBodyDiv.offsetWidth;
+  initialCodeSnippetWidth = codeSnippetDiv.offsetWidth;
+  document.body.style.userSelect = 'none';
+});
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - startX;
+  const newEditorsBodyWidth = initialEditorsBodyWidth + dx;
+  const newCodeSnippetWidth = initialCodeSnippetWidth - dx;
+  editorsBodyDiv.style.width = `${newEditorsBodyWidth}px`;
+  codeSnippetDiv.style.width = `${newCodeSnippetWidth}px`;
+});
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+  document.body.style.userSelect = 'auto';
+});
+			*/
+
+			//----------------------------------------------
+
+			console.log('DEV CONSOLE TOOL')
+			const editorBody = document.getElementById('editors-body');
+			if (!editorBody)
 			{
-				clearInterval(this.consoleIntervalSearch);
-				if (!document.getElementsByClassName('DCSnippet')[0])
-				{
-					this.btnCodeSnippet = document.createElement('button');
-					this.btnCodeSnippet.className = 'DCSnippet x-btn x-box-item x-toolbar-item x-btn-default-toolbar-small x-noicon x-btn-noicon x-btn-default-toolbar-small-noicon';
-					this.btnCodeSnippet.innerText = 'Code Snippet';
-					this.btnCodeSnippet.setAttribute('style', 'height: 22px');
-
-					this.windowAnonymCode.appendChild(this.btnCodeSnippet);
-
-					this.btnCodeSnippet.addEventListener('click', this.showHideCodeSnippet);
-				}
+				console.log('editorBody NOT FOUND');
+				return;
 			}
+
+			const alreadyShow = document.getElementById('CodeSnippetCol');
+			console.log('alreadyShow', alreadyShow)
+			if (alreadyShow)
+			{
+				return;
+			}
+
+			const divColumn = document.createElement('div');
+			divColumn.id = 'CodeSnippetCol';
+			divColumn.setAttribute('style', 'display: flex;flex-direction: column; height: -webkit-fill-available;');
+
+			const parentElement = editorBody.parentElement;
+			parentElement.insertBefore(divColumn, editorBody);
+
+			const divCodeSnippet = document.createElement('div');
+			divCodeSnippet.setAttribute('style', 'height: 20%; width: -webkit-fill-available;');
+
+			const frameSnippet = document.createElement('iframe');
+			frameSnippet.src = chrome.runtime.getURL('snippet.html');
+			frameSnippet.setAttribute('style', '');
+
+			divCodeSnippet.appendChild(frameSnippet);
+
+			divColumn.appendChild(editorBody);
+			divColumn.appendChild(divCodeSnippet);
+
+			clearInterval(this.consoleIntervalSearch);
 		} catch (e)
 		{
 			//console.log(e)
@@ -240,6 +312,7 @@ export class SNIPPET
 
 		const dialogDeleteAlreadyExist = document.getElementById('deleteSnippet') ? true : false;
 		//console.log('dialogDeleteAlreadyExist', dialogDeleteAlreadyExist)
+
 		if (!dialogDeleteAlreadyExist)
 		{
 			if (this.divFastDCTOOL)
@@ -251,7 +324,7 @@ export class SNIPPET
 				{
 					console.log(err);
 				}
-
+				return;
 			}
 			if (this.divDCTOOL)
 			{
@@ -376,7 +449,7 @@ export class SNIPPET
 			let input = document.createElement('input') as HTMLInputElement;
 			input.id = 'input-dialogvar' + id + '_' + el.name;
 			input.setAttribute('type', 'text');
-			input.className = "dialogerror";
+			input.className = "dialogerror input";
 			input.setAttribute('style', "width: 90%");
 			input.placeholder = 'Enter the value you want to assign here!';
 
@@ -399,7 +472,7 @@ export class SNIPPET
 					{
 						input.className = 'dialoggood';
 					}
-					input.className.replace('dialogerror', 'dialoggood');
+					input.className.replace('dialogerror input', 'dialoggood');
 					isInvalidField = false;
 				} catch (e) { }
 				switch (el.type)
@@ -541,9 +614,10 @@ export class SNIPPET
 				function returnInvalid()
 				{
 					isInvalidField = true;
-					if (input.className.includes('dialoggood') && !input.className.includes('dialogerror'))
+					if (input.className.includes('dialoggood') && !input.className.includes('dialogerror input'))
 					{
-						input.className = 'dialogerror';
+						void input.offsetWidth;
+						input.className = 'dialogerror input';
 					}
 				}
 				//console.log(lastValueInserted)
@@ -572,7 +646,7 @@ export class SNIPPET
 				} */
 			});
 			buttonPageId.innerText = 'ID';
-			buttonPageId.setAttribute('style', 'height: 20px;width: 8%;');
+			buttonPageId.setAttribute('style', 'height: 22px;width: 8%;');
 
 			let li = document.createElement('li');
 			li.id = 'elemlist';
@@ -612,11 +686,13 @@ export class SNIPPET
 					allValue = true;
 					elemlist.setAttribute('style', '');
 					elemlist.title = '';
+					//elemlist.classList.remove('input');
 				} else
 				{
 					allValue = false;
 					elemlist.setAttribute('style', 'border-color: red;');
 					elemlist.title = 'Here is a problem... ';
+					//elemlist.classList.add('input');
 				}
 			});
 
@@ -798,7 +874,8 @@ export class SNIPPET
 		});
 
 		this.codeSnippetOpen = true;
-		try
+
+		if (this.windowApexCode)
 		{
 			if (document.getElementById('DCTOOL'))
 			{
@@ -806,43 +883,20 @@ export class SNIPPET
 				return;
 			}
 
-			this.frameSnippet = document.createElement('iframe');
-			this.frameSnippet.src = chrome.runtime.getURL('snippet.html');
-			this.frameSnippet.setAttribute('style', 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 285px;border: 0px;');
+			const frameSnippet = document.createElement('iframe');
+			frameSnippet.src = chrome.runtime.getURL('snippet.html');
+			frameSnippet.setAttribute('style', 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 285px;border: 0px;');
 
-			this.divDCTOOL.appendChild(this.frameSnippet);
-
-			this.windowApexCode!.appendChild(this.divDCTOOL);
-		} catch (err)
+			this.divDCTOOL.appendChild(frameSnippet);
+			this.windowApexCode.appendChild(this.divDCTOOL);
+		} else
 		{
-			//console.log(err)
 			this.showFastCS();
 		}
 	}
 
 	showFastCS()
 	{
-		const fastDCTOOL = document.getElementById('fastDCTOOL')
-		if (fastDCTOOL)
-		{
-			if (fastDCTOOL)
-			{
-				fastDCTOOL.animate([
-					{ bottom: '-18px' },
-					{ bottom: '-180px' },
-				], {
-					duration: 500,
-					easing: 'ease-in-out',
-					iterations: 1,
-					fill: 'forwards'
-				});
-			}
-			setTimeout(() =>
-			{
-				fastDCTOOL.remove();
-			}, 500);
-			return;
-		}
 		this.divFastDCTOOL = document.createElement('div');
 		this.divFastDCTOOL.id = 'fastDCTOOL';
 		this.divFastDCTOOL.setAttribute('style', 'z-index: 1000;display: flex;position: fixed;bottom: -18px;right: 50%;');
@@ -861,9 +915,7 @@ export class SNIPPET
 		this.frameFastSnippet.setAttribute('style', 'box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;border-radius: 5px;width: 600px;height: 173px;border: 1px #80808082 solid;;border-radius: 5px;width: 600px;height: 173px;border: 0px;');
 
 		this.divFastDCTOOL.appendChild(this.frameFastSnippet!);
-		this.salesforceBody!.appendChild(this.divFastDCTOOL);
-
-
+		this.salesforceBody.appendChild(this.divFastDCTOOL);
 	}
 
 	hideCS()

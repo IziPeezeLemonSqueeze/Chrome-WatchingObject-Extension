@@ -65,3 +65,26 @@
 	border-radius: 8px;
 	background-color: #60bdff;
 }
+
+@keyframes lampeggio {
+	0% {
+		transform: scale(1);
+		box-shadow: 0 0 0px rgba(255, 0, 0, 0.7);
+	}
+	50% {
+		transform: scale(1.1);
+		box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+	}
+	100% {
+		transform: scale(1);
+		box-shadow: 0 0 0px rgba(255, 0, 0, 0.7);
+	}
+}
+
+input {
+	border: 2px solid #ff0000;
+	padding: 2px;
+	outline: none;
+	animation: lampeggio 1.5s ease-in-out;
+	animation-iteration-count: 1;
+}
