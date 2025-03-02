@@ -277,7 +277,7 @@ export class SNIPPET
 		return this.dialogVarOpen;
 	}
 
-	openDialogVar([mapValue, code, id]: [string[], string, string])
+	openDialogVar([mapValue, code, id]: [MAPVALUE[], string, string])
 	{
 		const nomeSnippet = id;
 		this.dialogVarOpen = true;
@@ -347,7 +347,7 @@ export class SNIPPET
 		let lastValueInserted = new Map();
 		let codeModified = code;
 
-		Object.entries(mapValue).forEach((elem, idx) =>
+		Object.entries(mapValue).forEach((elem: [string, MAPVALUE]) =>
 		{
 			let el = elem[1];
 			//console.log(el, idx);
@@ -373,7 +373,7 @@ export class SNIPPET
 			const divRowInput = document.createElement('div');
 			divRowInput.className = 'row';
 
-			let input = document.createElement('input');
+			let input = document.createElement('input') as HTMLInputElement;
 			input.id = 'input-dialogvar' + id + '_' + el.name;
 			input.setAttribute('type', 'text');
 			input.className = "dialogerror";
@@ -382,14 +382,16 @@ export class SNIPPET
 
 			input.addEventListener('input', (e) =>
 			{
-				if (e.target.value == '' || !e.target.value)
+				const ee = e.target as HTMLInputElement;
+				if (ee.value == '' || !ee.value)
 				{
 					delete elem[1].value;
 				}
 			});
 
-			input.addEventListener('focusout', (e) =>
+			input.addEventListener('focusout', (s) =>
 			{
+				const e = s.target as HTMLInputElement;
 				//console.log(e.target.value);
 				try
 				{
@@ -403,13 +405,13 @@ export class SNIPPET
 				switch (el.type)
 				{
 					case 'V':
-						if (e.target.value.length < 1)
+						if (e.value.length < 1)
 						{
 							returnInvalid();
 						}
 						if (!isInvalidField)
 						{
-							lastValueInserted.set(el.ivc, e.target.value);
+							lastValueInserted.set(el.ivc, e.value);
 							if (!codeModified.includes(el.ivc) &&
 								!lastValueInserted.get(el.ivc).includes("'"))
 							{
@@ -424,19 +426,19 @@ export class SNIPPET
 
 							if (codeModified.includes("'" + el.ivc + "'"))
 							{
-								codeModified = codeModified.replace("'" + el.ivc + "'", e.target.value);
+								codeModified = codeModified.replace("'" + el.ivc + "'", e.value);
 							} else if (codeModified.includes(el.ivc))
 							{
-								codeModified = codeModified.replace(el.ivc, e.target.value);
+								codeModified = codeModified.replace(el.ivc, e.value);
 							}
-							elem[1].value = e.target.value;
+							elem[1].value = e.value;
 						} else
 						{
 							codeModified = codeModified.replace(lastValueInserted.get(el.ivc), "'" + el.ivc + "'");
 						}
 						break;
 					case 'ID':
-						if (checkVirgolette(e.target.value))
+						if (checkVirgolette(e.value))
 						{
 							returnInvalid();
 						}
@@ -451,16 +453,16 @@ export class SNIPPET
 								codeModified = codeModified.replace(lastValueInserted.get(el.ivc), el.ivc);
 								elem[1].value = '';
 							}
-							lastValueInserted.set(el.ivc, e.target.value);
-							codeModified = codeModified.replace(el.ivc, e.target.value);
-							elem[1].value = e.target.value;
+							lastValueInserted.set(el.ivc, e.value);
+							codeModified = codeModified.replace(el.ivc, e.value);
+							elem[1].value = e.value;
 						} else
 						{
 							codeModified = codeModified.replace(lastValueInserted.get(el.ivc), el.ivc);
 						}
 						break;
 					case 'STR':
-						if (checkVirgolette(e.target.value) || e.target.value.length < 1)
+						if (checkVirgolette(e.value) || e.value.length < 1)
 						{
 							returnInvalid();
 						}
@@ -471,20 +473,20 @@ export class SNIPPET
 								codeModified = codeModified.replace(lastValueInserted.get(el.ivc), el.ivc);
 								elem[1].value = '';
 							}
-							lastValueInserted.set(el.ivc, e.target.value);
-							codeModified = codeModified.replace(el.ivc, e.target.value);
-							elem[1].value = e.target.value;
+							lastValueInserted.set(el.ivc, e.value);
+							codeModified = codeModified.replace(el.ivc, e.value);
+							elem[1].value = e.value;
 						} else
 						{
 							codeModified = codeModified.replace(lastValueInserted.get(el.ivc), el.ivc);
 						}
 						break;
 					case 'BOL':
-						if (checkVirgolette(e.target.value))
+						if (checkVirgolette(e.value))
 						{
 							returnInvalid();
 						}
-						if (e.target.value != 'true' && e.target.value != 'false')
+						if (e.value != 'true' && e.value != 'false')
 						{
 							returnInvalid();
 						}
@@ -495,20 +497,20 @@ export class SNIPPET
 								codeModified = codeModified.replace(lastValueInserted.get(el.ivc), "'" + el.ivc + "'");
 								elem[1].value = '';
 							}
-							lastValueInserted.set(el.ivc, e.target.value);
-							codeModified = codeModified.replace("'" + el.ivc + "'", e.target.value);
-							elem[1].value = e.target.value;
+							lastValueInserted.set(el.ivc, e.value);
+							codeModified = codeModified.replace("'" + el.ivc + "'", e.value);
+							elem[1].value = e.value;
 						} else
 						{
 							codeModified = codeModified.replace(lastValueInserted.get(el.ivc), "'" + el.ivc + "'");
 						}
 						break;
 					case 'NMB':
-						if (checkVirgolette(e.target.value))
+						if (checkVirgolette(e.value))
 						{
 							returnInvalid();
 						}
-						if (!(/^\d+$/.test(e.target.value)))
+						if (!(/^\d+$/.test(e.value)))
 						{
 							returnInvalid();
 						}
@@ -518,9 +520,9 @@ export class SNIPPET
 							{
 								codeModified = codeModified.replace(lastValueInserted.get(el.ivc), "'" + el.ivc + "'");
 							}
-							lastValueInserted.set(el.ivc, e.target.value);
-							codeModified = codeModified.replace("'" + el.ivc + "'", e.target.value);
-							elem[1].value = e.target.value;
+							lastValueInserted.set(el.ivc, e.value);
+							codeModified = codeModified.replace("'" + el.ivc + "'", e.value);
+							elem[1].value = e.value;
 						} else
 						{
 							codeModified = codeModified.replace(lastValueInserted.get(el.ivc), "'" + el.ivc + "'");
@@ -570,7 +572,7 @@ export class SNIPPET
 				} */
 			});
 			buttonPageId.innerText = 'ID';
-			buttonPageId.setAttribute('style', 'height: 20px;width: 8%;';
+			buttonPageId.setAttribute('style', 'height: 20px;width: 8%;');
 
 			let li = document.createElement('li');
 			li.id = 'elemlist';
@@ -608,12 +610,12 @@ export class SNIPPET
 						!v[1].value.includes('@BOL')))
 				{
 					allValue = true;
-					elemlist.setAttribute('style', '';
+					elemlist.setAttribute('style', '');
 					elemlist.title = '';
 				} else
 				{
 					allValue = false;
-					elemlist.setAttribute('style', 'border-color: red;';
+					elemlist.setAttribute('style', 'border-color: red;');
 					elemlist.title = 'Here is a problem... ';
 				}
 			});

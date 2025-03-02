@@ -1,7 +1,7 @@
 
-export let apiActive = null;
-export let timeoutFORCEResetDialog;
-export function getCurrentUrl(tab)
+export let apiActive: null = null;
+export let timeoutFORCEResetDialog: NodeJS.Timeout;
+export function getCurrentUrl(tab: chrome.tabs.Tab)
 {
 	console.log("CURRENT URL", tab.url);
 	let url = tab.url;
@@ -22,7 +22,7 @@ export function getCurrentUrl(tab)
 
 function getCurrentApiActive()
 {
-	return new Promise((resolve, reject) =>
+	return new Promise<void>((resolve, reject) =>
 	{
 		chrome.storage.sync.get(['apiVersionSelected'], async (items) =>
 		{
@@ -39,7 +39,7 @@ function getCurrentApiActive()
 
 }
 
-export async function snippetRun(obj, sender, response)
+export async function snippetRun(obj: { payload: string; resetTimeoutDialogTime: number; }, sender: chrome.runtime.MessageSender, response: (response?: any) => void)
 {
 	await getCurrentApiActive()
 	const _URL_ = sender.tab.url.split('salesforce.com')
@@ -101,7 +101,7 @@ export async function snippetRun(obj, sender, response)
 		.catch(error => console.log('error', error));
 }
 
-export async function requestFields(obj, sender, response)
+export async function requestFields(obj: any, sender: chrome.runtime.MessageSender, response: (response?: any) => void)
 {
 	await getCurrentApiActive();
 	console.log('WO_TOOL_requestFields ARRIVED');
@@ -119,8 +119,8 @@ export async function requestFields(obj, sender, response)
 
 			const idObjSplitted = String(sender.tab.url).split('/');
 			const ObjectType = idObjSplitted[idObjSplitted.length - 3];
-			let recordTypeFounded = null;
-			let recordTypeDeveloperName = null;
+			let recordTypeFounded: string = null;
+			let recordTypeDeveloperName: null = null;
 			await fetch(
 				getCurrentUrl(sender.tab).customDomainHttps +
 				`/services/data/v${apiActive}/query/?q=SELECT+RecordTypeId+,+RecordType.DeveloperName+FROM+${ObjectType}+WHERE+Id='${idObjSplitted[idObjSplitted.length - 2]}'`, {
@@ -175,7 +175,7 @@ export async function requestFields(obj, sender, response)
 	});
 }
 
-export async function goToApexLog(obj, sender, response)
+export async function goToApexLog(obj: any, sender: chrome.runtime.MessageSender, response: (response?: any) => void)
 {
 	await getCurrentApiActive();
 	const sid = await chrome.cookies.getAll({
@@ -208,7 +208,7 @@ export async function goToApexLog(obj, sender, response)
 		chunkComposite.forEach(async (chunk) =>
 		{
 			let composite = urlToSendDelete;
-			chunk.forEach((cId) =>
+			chunk.forEach((cId: { Id: string; }) =>
 			{
 				composite += cId.Id + ',';
 			});
@@ -254,7 +254,7 @@ export async function goToApexLog(obj, sender, response)
 	}
 }
 
-export async function retrieveApiVersions(obj, sender, response)
+export async function retrieveApiVersions(obj: any, sender: chrome.runtime.MessageSender, response: (response?: any) => void)
 {
 	const sidApiVersion = await chrome.cookies.getAll({
 		name: "sid",
@@ -272,7 +272,7 @@ export async function retrieveApiVersions(obj, sender, response)
 	}).then(async responseApiVersion =>
 	{
 		const resp = await responseApiVersion.json();
-		const av = resp.reduce((p, c) =>
+		const av = resp.reduce((p: any[], c: { version: any; }) =>
 		{
 			p.push(c.version);
 			return p;
