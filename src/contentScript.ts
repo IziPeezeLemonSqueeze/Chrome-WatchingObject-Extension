@@ -1,15 +1,15 @@
 'use strict';
 
-import { APIFIELD } from "./utils_content/apiFields.js";
-import { DOCK } from "./utils_content/dockUtils";
-import { SNIPPET } from "./utils_content/snippet";
+import APIFIELD from "./utils_content/apiFields.js";
+import DOCK from "./utils_content/dockUtils.js";
+import SNIPPET from "./utils_content/snippet.js";
 
 
 (() =>
 {
-	let spanShowIds = [];
+	let spanShowIds: string[] = [];
 
-	const copyToClipboard = (textToCopy) =>
+	const copyToClipboard = (textToCopy: string) =>
 	{
 		const t = document.createElement('textarea');
 		//console.log('textToCopy', textToCopy)
@@ -165,7 +165,10 @@ import { SNIPPET } from "./utils_content/snippet";
 		{
 			const spanId = document.getElementById(s);
 			//console.log(spanId);
-			spanId.remove();
+			if (spanId)
+			{
+				spanId.remove();
+			}
 		});
 		spanShowIds = [];
 	}
@@ -186,7 +189,7 @@ import { SNIPPET } from "./utils_content/snippet";
 					{
 						const span = document.createElement('span');
 						span.id = `alwayshowid-${match[1]}`;
-						span.style = 'font-size: smaller;display: inline-table;background-color: rgb(1, 118, 211);padding: 5px;border-radius: 3px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;cursor: pointer;width: fit-content;'
+						span.setAttribute('style', 'font-size: smaller;display: inline-table;background-color: rgb(1, 118, 211);padding: 5px;border-radius: 3px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;cursor: pointer;width: fit-content;');
 						span.innerText = match[1];
 						element.appendChild(span);
 
@@ -202,12 +205,12 @@ import { SNIPPET } from "./utils_content/snippet";
 		let selectedText = window.getSelection()
 		//console.log('SELECTED_TEXT', selectedText);
 
-		if (selectedText.toString().length == 18)
+		if (selectedText && selectedText.toString().length == 18)
 		{
 			chrome.runtime.sendMessage({
 				type: 'createContextMenu'
 			});
-		} else if (windowAnonymCode && selectedText.toString().length > 0)
+		} else if (selectedText && windowAnonymCode && selectedText.toString().length > 0)
 		{
 
 			chrome.runtime.sendMessage({
@@ -226,7 +229,7 @@ import { SNIPPET } from "./utils_content/snippet";
 
 
 
-	const addCSS = (css) =>
+	const addCSS = (css: string) =>
 	{
 		let link = document.createElement("link");
 		link.setAttribute('type', 'text/css');

@@ -4,19 +4,28 @@
 	"description": "Developer tool for Salesforce, designed to help and speed up what the developer has to do!",
 	"private": true,
 	"scripts": {
-		"watch": "webpack --mode=development --watch --config config/webpack.config.js",
-		"build": "webpack --mode=production --config config/webpack.config.js",
-		"pack": "node pack.js",
-		"repack": "npm run build && npm run pack",
-		"format": "prettier --write --ignore-unknown \"{config,public,src}/**/*.{html,css,js,ts,json}\""
+		"build:tsc": "tsc -p tsconfig.json",
+		"pre:watch": "webpack --mode=development --watch --config config/webpack.config.js",
+		"pre:build": "webpack --mode=production --config config/webpack.config.js",
+		"pre:pack": "node pack.js",
+		"pre:repack": "npm run build && npm run pack",
+		"pre:format": "prettier --write --ignore-unknown \"{config,public,src}/**/*.{html,css,js,ts,json}\"",
+		"watch": "npm run build:tsc && npm run pre:watch",
+		"build": "npm run build:tsc && npm run pre:build",
+		"pack": "npm run build:tsc && npm run pre:pack",
+		"repack": "npm run build:tsc && npm run pre:repack",
+		"format": "npm run build:tsc && npm run pre:format"
 	},
 	"devDependencies": {
+		"@types/chrome": "^0.0.307",
+		"@types/node": "^22.13.8",
 		"adm-zip": "^0.5.16",
 		"copy-webpack-plugin": "^10.2.4",
 		"css-loader": "^6.11.0",
 		"file-loader": "^6.2.0",
 		"mini-css-extract-plugin": "^2.9.2",
 		"prettier": "^2.8.8",
+		"typescript": "^5.8.2",
 		"webpack": "^5.97.0",
 		"webpack-cli": "^4.10.0",
 		"webpack-merge": "^5.10.0"

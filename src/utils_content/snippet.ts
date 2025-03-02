@@ -1,24 +1,24 @@
 export class SNIPPET
 {
 
-	copyToClipboard;
+	copyToClipboard: Function;
 
-	btnCodeSnippet;
-	divDCTOOL;
-	divFastDCTOOL;
+	btnCodeSnippet: HTMLButtonElement | null | undefined;
+	divDCTOOL: HTMLDivElement | null | undefined;
+	divFastDCTOOL: HTMLDivElement | null | undefined;
 	codeSnippetOpen = false;
 	textAreaNewSnippetOpen = false;
-	consoleIntervalSearch;
-	frameSnippet = null;
-	frameFastSnippet = null;
+	consoleIntervalSearch: NodeJS.Timeout | undefined;
+	frameSnippet: HTMLIFrameElement | undefined;
+	frameFastSnippet: HTMLIFrameElement | undefined;
 	dialogVarOpen = false;
 
-	salesforceBody;
-	windowAnonymCode;
-	developerConsoleBody;
-	windowApexCode;
+	salesforceBody: Element | null | undefined;
+	windowAnonymCode: Element | null | undefined;
+	developerConsoleBody: Element | null | undefined;
+	windowApexCode: Element | null | undefined;
 
-	constructor(copyToClipboard)
+	constructor(copyToClipboard: Function)
 	{
 		this.copyToClipboard = copyToClipboard;
 		this.salesforceBody = document.getElementsByClassName('desktop')[0];
@@ -29,7 +29,7 @@ export class SNIPPET
 		return this.salesforceBody;
 	}
 
-	setWindowAnonymCode(window)
+	setWindowAnonymCode(window: Element | null | undefined)
 	{
 		this.windowAnonymCode = window;
 	}
@@ -65,8 +65,8 @@ export class SNIPPET
 	{
 		try
 		{
-			this.setWindowAnonymCode(document.getElementById('executeHighlightedButton').parentElement);
-			this.windowApexCode = this.windowAnonymCode.parentElement.parentElement.parentElement.parentElement.parentElement;
+			this.setWindowAnonymCode(document.getElementById('executeHighlightedButton')!.parentElement);
+			this.windowApexCode = this.windowAnonymCode!.parentElement!.parentElement!.parentElement!.parentElement!.parentElement;
 			if (this.windowAnonymCode)
 			{
 				clearInterval(this.consoleIntervalSearch);
@@ -75,7 +75,7 @@ export class SNIPPET
 					this.btnCodeSnippet = document.createElement('button');
 					this.btnCodeSnippet.className = 'DCSnippet x-btn x-box-item x-toolbar-item x-btn-default-toolbar-small x-noicon x-btn-noicon x-btn-default-toolbar-small-noicon';
 					this.btnCodeSnippet.innerText = 'Code Snippet';
-					this.btnCodeSnippet.style = 'height: 22px';
+					this.btnCodeSnippet.setAttribute('style', 'height: 22px');
 
 					this.windowAnonymCode.appendChild(this.btnCodeSnippet);
 
@@ -107,34 +107,34 @@ export class SNIPPET
 		const divNewSnippet = document.createElement('div');
 		divNewSnippet.className = 'col';
 		divNewSnippet.id = 'newSnippet';
-		divNewSnippet.style = 'z-index:1000;left: 5%;border-radius: 10px 10px 10px 10px;padding: 0.1%;background-color: rgb(96, 189, 255);position: absolute;top: 10%;'
+		divNewSnippet.setAttribute('style', 'z-index:1000;left: 5%;border-radius: 10px 10px 10px 10px;padding: 0.1%;background-color: rgb(96, 189, 255);position: absolute;top: 10%;');
 
 		const titleNewSnippet = document.createElement('div');
 		titleNewSnippet.innerText = 'CODE SNIPPET - New Snippet';
-		titleNewSnippet.style = 'text-align: center;padding: 1%;border-radius: 10px 10px 0px 0px;background-color: rgb(96, 189, 255);font-weight: bold;';
+		titleNewSnippet.setAttribute('style', 'text-align: center;padding: 1%;border-radius: 10px 10px 0px 0px;background-color: rgb(96, 189, 255);font-weight: bold;');;
 
 		const textArea = document.createElement('textarea');
 		textArea.id = 'newSnippet-textarea';
 		textArea.spellcheck = false;
 		textArea.placeholder = 'Paste here your code...';
-		textArea.style = 'border-radius: 1%;padding: 5%;resize: none;width: 360px;height: 360px;'
+		textArea.setAttribute('style', 'border-radius: 1%;padding: 5%;resize: none;width: 360px;height: 360px;');
 
 		const seperator = document.createElement('br');
-		seperator.style = 'margin-top: 1%; margin-bottom: 1%, padding: .5%';
+		seperator.setAttribute('style', 'margin-top: 1%; margin-bottom: 1%, padding: .5%');
 
 		const divBottom = document.createElement('div');
 		divBottom.className = 'row';
-		divBottom.style = 'display: flex;flex-direction: row;flex-wrap: nowrap;align-content: center;justify-content: space-between;align-items: center;'
+		divBottom.setAttribute('style', 'display: flex;flex-direction: row;flex-wrap: nowrap;align-content: center;justify-content: space-between;align-items: center;');
 
 		const inputNewSnippetName = document.createElement('input');
-		inputNewSnippetName.style = 'margin: 1%;border-radius: 1%;';
+		inputNewSnippetName.setAttribute('style', 'margin: 1%;border-radius: 1%;');
 		inputNewSnippetName.placeholder = 'New Snippet NAME';
 
 		const buttonOkNewSnippet = document.createElement('button');
 		buttonOkNewSnippet.id = 'saveOkNewSnippet';
 		buttonOkNewSnippet.innerText = 'Save';
 		buttonOkNewSnippet.className = 'slds-button slds-button_success';
-		buttonOkNewSnippet.style = 'width: 90px;mix-blend-mode: multiply;margin-left: auto;margin-right: 5%;size: unset;max-height: 25px;';
+		buttonOkNewSnippet.setAttribute('style', 'width: 90px;mix-blend-mode: multiply;margin-left: auto;margin-right: 5%;size: unset;max-height: 25px;');
 		buttonOkNewSnippet.addEventListener('click', (e) =>
 		{
 			if (inputNewSnippetName.value && textArea.value)
@@ -147,8 +147,8 @@ export class SNIPPET
 						msg: `New Snippet created: ${inputNewSnippetName.value}`
 					}
 				});
-				textArea.value = null;
-				inputNewSnippetName.value = null;
+				textArea.value = '';
+				inputNewSnippetName.value = '';
 				divNewSnippet.remove();
 				this.textAreaNewSnippetOpen = false;
 			}
@@ -158,11 +158,11 @@ export class SNIPPET
 		buttonKoNewSnippet.innerText = 'Cancel';
 		buttonKoNewSnippet.id = 'saveKoNewSnippet';
 		buttonKoNewSnippet.className = 'slds-button slds-button_success';
-		buttonKoNewSnippet.style = 'mix-blend-mode: multiply;margin-left: auto;margin-right: 1%;size: unset;max-height: 25px;'
+		buttonKoNewSnippet.setAttribute('style', 'mix-blend-mode: multiply;margin-left: auto;margin-right: 1%;size: unset;max-height: 25px;');
 		buttonKoNewSnippet.addEventListener('click', (e) =>
 		{
-			textArea.value = null;
-			inputNewSnippetName.value = null;
+			textArea.value = '';
+			inputNewSnippetName.value = '';
 			divNewSnippet.remove();
 			this.textAreaNewSnippetOpen = false;
 		});
@@ -178,11 +178,11 @@ export class SNIPPET
 
 		try
 		{
-			this.developerConsoleBody.appendChild(divNewSnippet);
+			this.developerConsoleBody!.appendChild(divNewSnippet);
 		} catch (err) { }
 	}
 
-	makeSnippet(payload)
+	makeSnippet(payload: { name: any; code: any; })
 	{
 		// TODO CONTORLLO SUI DUPLICATI
 		const regexIVC = /@\b[\@V\@ID\@INT\@BOL\@STR]\w+(?='*)/g;
@@ -197,7 +197,7 @@ export class SNIPPET
 		});
 	}
 
-	confirmDeleteSnippet(payload)
+	confirmDeleteSnippet(payload: string)
 	{
 		//console.log('divFastDCTOOL', divFastDCTOOL)
 		//console.log('divDCTOOL', divDCTOOL)
@@ -207,12 +207,12 @@ export class SNIPPET
 		titleDelete.innerText = `Confirm delete snippet: [${payload.split('_')[1]}]`;
 
 		dialogDelete.setAttribute('open', '');
-		dialogDelete.style = "border: 2px solid black;border-radius: 5px;background-color: rgba(155, 142, 142, 0.79);display: flex;flex-flow: column;justify-content: center;align-items: baseline;flex-direction: column;flex-wrap: wrap;align-content: stretch;";
+		dialogDelete.setAttribute('style', "border: 2px solid black;border-radius: 5px;background-color: rgba(155, 142, 142, 0.79);display: flex;flex-flow: column;justify-content: center;align-items: baseline;flex-direction: column;flex-wrap: wrap;align-content: stretch;");
 
 		let okDeleteBtn = document.createElement('buttonOkDelete');
 		okDeleteBtn.id = 'okDeleteButton';
 		okDeleteBtn.innerText = 'OK 👌';
-		okDeleteBtn.style = 'margin-top: 5px;background-color: green;cursor: pointer;size: unset;max-height: 25px; border: 2px solid black; border-radius: 5px;padding:3px';
+		okDeleteBtn.setAttribute('style', 'margin-top: 5px;background-color: green;cursor: pointer;size: unset;max-height: 25px; border: 2px solid black; border-radius: 5px;padding:3px');
 		okDeleteBtn.className = 'slds-button slds-button_success';
 		okDeleteBtn.addEventListener('click', (e) =>
 		{
@@ -223,7 +223,7 @@ export class SNIPPET
 		});
 		let denyDeleteBtn = document.createElement('buttonDenyDelete');
 		denyDeleteBtn.id = 'denyDeleteButton';
-		denyDeleteBtn.style = 'margin-top: 5px;background-color: #bd0000;cursor: pointer;size: unset;max-height: 25px; border: 2px solid black; border-radius: 5px;padding:3px';
+		denyDeleteBtn.setAttribute('style', 'margin-top: 5px;background-color: #bd0000;cursor: pointer;size: unset;max-height: 25px; border: 2px solid black; border-radius: 5px;padding:3px');
 		denyDeleteBtn.innerText = 'No 🙂‍';
 		denyDeleteBtn.className = 'slds-button slds-button_destructive';
 		denyDeleteBtn.addEventListener('click', (e) =>
@@ -267,7 +267,7 @@ export class SNIPPET
 
 	}
 
-	copyApexSnippet(codeTxt)
+	copyApexSnippet(codeTxt: string)
 	{
 		this.copyToClipboard(codeTxt);
 	}
@@ -277,7 +277,7 @@ export class SNIPPET
 		return this.dialogVarOpen;
 	}
 
-	openDialogVar([mapValue, code, id])
+	openDialogVar([mapValue, code, id]: [string[], string, string])
 	{
 		const nomeSnippet = id;
 		this.dialogVarOpen = true;
@@ -294,41 +294,41 @@ export class SNIPPET
 		dialog.id = 'dialogvar';
 		let title = document.createElement('div');
 		title.innerText = 'CODE SNIPPET - Value assignment!\nNAME SNIPPET: ' + id.replace('snippet_', '');
-		title.style = 'text-align: center;m;padding: 1%;border-radius: 10px 10px 0px 0px;background-color: rgb(96, 189, 255);font-weight: bold;';
+		title.setAttribute('style', 'text-align: center;m;padding: 1%;border-radius: 10px 10px 0px 0px;background-color: rgb(96, 189, 255);font-weight: bold;');
 		dialog.setAttribute('open', '');
-		/* dialog.style = "background-color: rgba(255, 255, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;margin: 5%;min-width: -webkit-fill-available;position: fixed;z-index: 1000000000;top: 1%;box-shadow: rgba(0, 0, 0, 0.11) 0px 0 7px 9px;height: 520px;" */
+		/* dialog.setAttribute('style',"background-color: rgba(255, 255, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;margin: 5%;min-width: -webkit-fill-available;position: fixed;z-index: 1000000000;top: 1%;box-shadow: rgba(0, 0, 0, 0.11) 0px 0 7px 9px;height: 520px;" */
 
 		if (isFastToAttach)
 		{
-			/* dialog.style = "width: 100%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: absolute;z-index: -1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 520px;bottom: 85%;" */
-			dialog.style = "width: 600px;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 7px;position: fixed;z-index: 1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 9px 4px;height: 520px;bottom: -90%;right: 50%;"
+			/* dialog.setAttribute('style',"width: 100%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: absolute;z-index: -1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 520px;bottom: 85%;" */
+			dialog.setAttribute('style', "width: 600px;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 7px;position: fixed;z-index: 1;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 9px 4px;height: 520px;bottom: -90%;right: 50%;");
 		} else
 		{
-			dialog.style = "width: 30%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: fixed;top: 5%;right: 35%;z-index: 1000000;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 490px;";
+			dialog.setAttribute('style', "width: 30%;background-color: rgba(238, 244, 255, 0.8);border-color: grey;border-radius: 10px;border-width: 1px;position: fixed;top: 5%;right: 35%;z-index: 1000000;box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 7px 9px;height: 490px;");
 		}
 
 		let list = document.createElement('ul');
-		list.style = "min-height: 130px; overflow-y: scroll";
+		list.setAttribute('style', "min-height: 130px; overflow-y: scroll");
 		//list.className = "slds-has-block-links_space";
 		list.id = 'list-dialogvar';
 
 		let div = document.createElement('div');
 		div.className = 'row';
-		div.style = "padding: 1%;margin-top: 5%;min-height: 415px;height: 400px;display: flex;justify-content: space-evenly;align-items: flex-start;flex-flow: row;"
+		div.setAttribute('style', "padding: 1%;margin-top: 5%;min-height: 415px;height: 400px;display: flex;justify-content: space-evenly;align-items: flex-start;flex-flow: row;");
 
 		/* 		RESULTING CODE DIV
 		let divRight = document.createElement('div');
-		divRight.style = "height: -webkit-fill-available;display: flex;flex-wrap: nowrap;align-items: center;flex-direction: column;";
+		divRight.setAttribute('style',"height: -webkit-fill-available;display: flex;flex-wrap: nowrap;align-items: center;flex-direction: column;";
 		divRight.className = 'col-4'; */
 
 		let divCenter = document.createElement('div');
-		divCenter.style = "width: 100%;background-color: rgba(238, 244, 255, 0.0);height: -webkit-fill-available;display: flex;flex-direction: column-reverse;place-content: center space-between;"
+		divCenter.setAttribute('style', "width: 100%;background-color: rgba(238, 244, 255, 0.0);height: -webkit-fill-available;display: flex;flex-direction: column-reverse;place-content: center space-between;");
 
 		divCenter.className = 'col-4';
 
 		let divCenterActions = document.createElement('div');
 		divCenterActions.className = 'col-4';
-		divCenterActions.style = "margin-top: 2%;display: flex;align-items: flex-start;flex-direction: row;justify-content: space-around;"
+		divCenterActions.setAttribute('style', "margin-top: 2%;display: flex;align-items: flex-start;flex-direction: row;justify-content: space-around;");
 
 		div.appendChild(divCenter);
 		divCenter.appendChild(divCenterActions);
@@ -355,7 +355,7 @@ export class SNIPPET
 			spanTestoTipo.id = 'spantestotipo';
 			let nameVar = document.createElement('h2');
 			nameVar.innerText = el.name;
-			nameVar.style = 'font-weight: bold; text-align: center; text-transform: uppercase;'
+			nameVar.setAttribute('style', 'font-weight: bold; text-align: center; text-transform: uppercase;');
 			nameVar.title = el.name;
 			spanTestoTipo.innerText =
 				'Enter the value for the variable: ';
@@ -377,7 +377,7 @@ export class SNIPPET
 			input.id = 'input-dialogvar' + id + '_' + el.name;
 			input.setAttribute('type', 'text');
 			input.className = "dialogerror";
-			input.style = "width: 90%"
+			input.setAttribute('style', "width: 90%");
 			input.placeholder = 'Enter the value you want to assign here!';
 
 			input.addEventListener('input', (e) =>
@@ -528,7 +528,7 @@ export class SNIPPET
 						break;
 				}
 
-				function checkVirgolette(value)
+				function checkVirgolette(value: string | string[])
 				{
 					if (value.includes("'") || value.includes('"'))
 					{
@@ -570,7 +570,7 @@ export class SNIPPET
 				} */
 			});
 			buttonPageId.innerText = 'ID';
-			buttonPageId.style = 'height: 20px;width: 8%;';
+			buttonPageId.setAttribute('style', 'height: 20px;width: 8%;';
 
 			let li = document.createElement('li');
 			li.id = 'elemlist';
@@ -608,12 +608,12 @@ export class SNIPPET
 						!v[1].value.includes('@BOL')))
 				{
 					allValue = true;
-					elemlist.style = '';
+					elemlist.setAttribute('style', '';
 					elemlist.title = '';
 				} else
 				{
 					allValue = false;
-					elemlist.style = 'border-color: red;';
+					elemlist.setAttribute('style', 'border-color: red;';
 					elemlist.title = 'Here is a problem... ';
 				}
 			});
@@ -637,11 +637,11 @@ export class SNIPPET
 		btnRunClose.addEventListener('click', (e) =>
 		{
 			let allValue = false;
-			Object.entries(mapValue).forEach((v, id) =>
+			Object.entries(mapValue).forEach((v: [string, any], id) =>
 			{
 				let elemlist_input = document.getElementById('input-dialogvar' + nomeSnippet + '_' + v[1].name);
 				//console.log(elemlist_input);
-				let elemlist = elemlist_input.parentElement;
+				let elemlist = elemlist_input!.parentElement;
 				//console.log(v[1]);
 				if ((v[1].value != null || v[1].value != undefined) &&
 					(
@@ -652,13 +652,13 @@ export class SNIPPET
 						!v[1].value.includes('@BOL')))
 				{
 					allValue = true;
-					elemlist.style = '';
-					elemlist.title = '';
+					elemlist!.removeAttribute('style');
+					elemlist!.title = '';
 				} else
 				{
 					allValue = false;
-					elemlist.style = 'border-color: red;';
-					elemlist.title = 'Here is a problem... ';
+					elemlist!.style.setProperty('border-color', 'red');
+					elemlist!.title = 'Here is a problem... ';
 				}
 			});
 
@@ -688,13 +688,13 @@ export class SNIPPET
 				{
 					setTimeout(() =>
 					{
-						this.salesforceBody.removeChild(document.getElementById('dialogvar'));
+						this.salesforceBody!.removeChild(document.getElementById('dialogvar') as Node);
 					}, 501);
 				} else
 				{
 					setTimeout(() =>
 					{
-						this.developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+						this.developerConsoleBody!.removeChild(document.getElementById('dialogvar') as Node);
 					}, 501);
 				}
 				this.dialogVarOpen = false;
@@ -730,13 +730,13 @@ export class SNIPPET
 				{
 					setTimeout(() =>
 					{
-						this.salesforceBody.removeChild(document.getElementById('dialogvar'));
+						this.salesforceBody!.removeChild(document.getElementById('dialogvar') as Node);
 					}, 501);
 				} else
 				{
 					setTimeout(() =>
 					{
-						this.developerConsoleBody.removeChild(document.getElementById('dialogvar'));
+						this.developerConsoleBody!.removeChild(document.getElementById('dialogvar') as Node);
 					}, 501);
 				}
 			} catch (err)
@@ -766,10 +766,10 @@ export class SNIPPET
 		});
 		try
 		{
-			this.developerConsoleBody.appendChild(dialog);
+			this.developerConsoleBody!.appendChild(dialog);
 		} catch (err)
 		{
-			this.salesforceBody.appendChild(dialog);
+			this.salesforceBody!.appendChild(dialog);
 		}
 
 	}
@@ -778,7 +778,7 @@ export class SNIPPET
 	{
 		this.divDCTOOL = document.createElement('div');
 		this.divDCTOOL.id = 'DCTOOL';
-		this.divDCTOOL.style = 'z-index: 1000;display: flex;position: relative;bottom: -50px;left: 77px;';
+		this.divDCTOOL.setAttribute('style', 'z-index: 1000;display: flex;position: relative;bottom: -50px;left: 77px;');
 		this.divDCTOOL.animate([
 			{ bottom: '-50px' },
 			{ bottom: '137px' },
@@ -792,7 +792,7 @@ export class SNIPPET
 		const loaders = document.querySelectorAll('[id*=-loader]');
 		loaders.forEach(loader =>
 		{
-			loader.style.display = 'none';
+			loader.setAttribute('style', 'display:none;');
 		});
 
 		this.codeSnippetOpen = true;
@@ -806,11 +806,11 @@ export class SNIPPET
 
 			this.frameSnippet = document.createElement('iframe');
 			this.frameSnippet.src = chrome.runtime.getURL('snippet.html');
-			this.frameSnippet.style = 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 285px;border: 0px;';
+			this.frameSnippet.setAttribute('style', 'box-shadow: 1px 1px #ffffff;border-radius: 5px;width: 600px;height: 285px;border: 0px;');
 
 			this.divDCTOOL.appendChild(this.frameSnippet);
 
-			this.windowApexCode.appendChild(this.divDCTOOL);
+			this.windowApexCode!.appendChild(this.divDCTOOL);
 		} catch (err)
 		{
 			//console.log(err)
@@ -843,7 +843,7 @@ export class SNIPPET
 		}
 		this.divFastDCTOOL = document.createElement('div');
 		this.divFastDCTOOL.id = 'fastDCTOOL';
-		this.divFastDCTOOL.style = 'z-index: 1000;display: flex;position: fixed;bottom: -18px;right: 50%;';
+		this.divFastDCTOOL.setAttribute('style', 'z-index: 1000;display: flex;position: fixed;bottom: -18px;right: 50%;');
 		this.divFastDCTOOL.animate([
 			{ bottom: '-180px' },
 			{ bottom: '-18px' },
@@ -856,10 +856,10 @@ export class SNIPPET
 
 		this.frameFastSnippet = document.createElement('iframe');
 		this.frameFastSnippet.src = chrome.runtime.getURL('snippet.html');
-		this.frameFastSnippet.style = 'box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;border-radius: 5px;width: 600px;height: 173px;border: 1px #80808082 solid;;border-radius: 5px;width: 600px;height: 173px;border: 0px;';
+		this.frameFastSnippet.setAttribute('style', 'box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;border-radius: 5px;width: 600px;height: 173px;border: 1px #80808082 solid;;border-radius: 5px;width: 600px;height: 173px;border: 0px;');
 
-		this.divFastDCTOOL.appendChild(this.frameFastSnippet);
-		this.salesforceBody.appendChild(this.divFastDCTOOL);
+		this.divFastDCTOOL.appendChild(this.frameFastSnippet!);
+		this.salesforceBody!.appendChild(this.divFastDCTOOL);
 
 
 	}
@@ -884,7 +884,7 @@ export class SNIPPET
 			{
 				try
 				{
-					this.windowApexCode.removeChild(document.getElementById('DCTOOL'));
+					this.windowApexCode!.removeChild(document.getElementById('DCTOOL') as Node);
 					//console.log('REMOVED DCTOOL')
 				} catch (err)
 				{
@@ -908,7 +908,7 @@ export class SNIPPET
 			{
 				try
 				{
-					this.salesforceBody.removeChild(document.getElementById('fastDCTOOL'));
+					this.salesforceBody!.removeChild(document.getElementById('fastDCTOOL') as Node);
 					//console.log('REMOVED DCTOOL')
 				} catch (err)
 				{
