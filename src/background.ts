@@ -319,6 +319,14 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 		case 'CREATE_NOTIFICATION':
 			createNotification(obj.payload);
 			break;
+
+		//---------------------------------
+
+		case 'DCS_changeHeight':
+			chrome.tabs.sendMessage(sender.tab.id, {
+				response: 'changeHeightDCS',
+			})
+			break;
 	}
 });
 

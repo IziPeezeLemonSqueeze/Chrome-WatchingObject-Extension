@@ -8,7 +8,6 @@ export class SNIPPET
 	divFastDCTOOL: HTMLDivElement | null | undefined;
 	codeSnippetOpen = false;
 	textAreaNewSnippetOpen = false;
-	consoleIntervalSearch: NodeJS.Timeout | undefined;
 
 	frameFastSnippet: HTMLIFrameElement | undefined;
 	dialogVarOpen = false;
@@ -61,7 +60,7 @@ export class SNIPPET
 			this.developerConsoleBody = document.getElementsByClassName('ApexCSIPage')[0];
 	}
 
-	devConsoleTool()
+	devConsoleTool_OLD()
 	{
 		try
 		{
@@ -119,41 +118,7 @@ document.addEventListener('mouseup', () => {
 
 			//----------------------------------------------
 
-			console.log('DEV CONSOLE TOOL')
-			const editorBody = document.getElementById('editors-body');
-			if (!editorBody)
-			{
-				console.log('editorBody NOT FOUND');
-				return;
-			}
 
-			const alreadyShow = document.getElementById('CodeSnippetCol');
-			console.log('alreadyShow', alreadyShow)
-			if (alreadyShow)
-			{
-				return;
-			}
-
-			const divColumn = document.createElement('div');
-			divColumn.id = 'CodeSnippetCol';
-			divColumn.setAttribute('style', 'display: flex;flex-direction: column; height: -webkit-fill-available;');
-
-			const parentElement = editorBody.parentElement;
-			parentElement.insertBefore(divColumn, editorBody);
-
-			const divCodeSnippet = document.createElement('div');
-			divCodeSnippet.setAttribute('style', 'height: 20%; width: -webkit-fill-available;');
-
-			const frameSnippet = document.createElement('iframe');
-			frameSnippet.src = chrome.runtime.getURL('snippet.html');
-			frameSnippet.setAttribute('style', '');
-
-			divCodeSnippet.appendChild(frameSnippet);
-
-			divColumn.appendChild(editorBody);
-			divColumn.appendChild(divCodeSnippet);
-
-			clearInterval(this.consoleIntervalSearch);
 		} catch (e)
 		{
 			//console.log(e)

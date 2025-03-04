@@ -41,7 +41,8 @@
 				"dock.html",
 				"snippet.html",
 				"snippet.css",
-				"popup.css"
+				"popup.css",
+				"developerConsoleSnippet.html"
 			],
 			"matches": [
 				"https://*.force.com/*",

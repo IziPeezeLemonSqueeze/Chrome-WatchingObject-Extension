@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="it">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="width=device-width, initial-scale=1">
+		<title>Snippet Box</title>
+		<script type="module"
+			src="developerConsoleSnippet.js"></script>
+		<style>
+			.snippetnew {
+				box-shadow: inset 0px 0px 10px #b5b5b5;
+				border: 1px #8d8d8d solid;
+				padding-left: 2%;
+				font-size: 0.6rem;
+				font-weight: 800;
+				border-radius: 30px;
+				margin-right: auto;
+				color: #2d2d2d;
+				background: #d5d5d5;
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+			}
+
+			.snippetnew:active {
+				transform: scale(0.95);
+				/* Riduce leggermente la dimensione per simulare l'effetto di pressione */
+				box-shadow: inset 0px 0px 15px #9a9a9a;
+				/* Aumenta l'ombra per un effetto più intenso quando premuto */
+			}
+
+			.snippet-container {
+				background: #f9f9f900;
+				display: flex;
+				align-items: center;
+				padding: 10px;
+				overflow-x: auto;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-content: center;
+				justify-content: flex-start;
+				margin-top: 2%;
+			}
+
+			/* Oggetto snippet come "pulsante" */
+			.snippet {
+				box-shadow: 0px 0px 3px black;
+				display: flex;
+				align-items: center;
+				background: radial-gradient(circle, rgb(174 216 238) 0%, rgb(45 137 245) 100%);
+				border: 1px solid #ddd;
+				border-radius: 5px;
+				padding: 8px 12px;
+				margin: 0.5%;
+				cursor: pointer;
+				color: white;
+				transition: transform 0.3s, box-shadow 0.3s;
+
+			}
+
+			/* Effetto hover per l'intera card dello snippet */
+			.snippet:hover {
+				transform: scale(1.05);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			}
+
+			/* Stile per il nome dello snippet */
+			.snippet-name {
+				font-weight: bold;
+				margin-right: 15px;
+			}
+
+			/* Stile base per tutti i pulsanti */
+			.snippet button {
+				border: none;
+				padding: 5px 10px;
+				margin-left: 5px;
+				border-radius: 3px;
+				color: #fff;
+				cursor: pointer;
+				transition: background-color 0.3s, transform 0.1s;
+			}
+
+			.snippet-header {
+				box-shadow: 0px 2px 10px black;
+				z-index: 1000;
+				width: -webkit-fill-available;
+				left: 0%;
+				top: 0%;
+				position: fixed;
+				display: flex;
+				justify-content: center;
+				background-color: #d0d0d0;
+				color: #5f5f5f;
+				padding: 10px 15px;
+				flex-direction: row;
+				flex-wrap: nowrap;
+				align-content: center;
+				align-items: stretch;
+			}
+
+			.snippet-header span {
+				font-size: 1.2em;
+				font-weight: bold;
+			}
+
+			.minimize-btn {
+				background: transparent;
+				border: none;
+				color: #fff;
+				font-size: 1.2em;
+				cursor: pointer;
+				transition: transform 0.1s;
+				margin-right: auto;
+			}
+
+			.minimize-btn:active {
+				transform: scale(0.95);
+			}
+
+			/* Pulsante RUN */
+			.run-btn {
+				background-color: #28a745;
+			}
+
+			.run-btn:hover {
+				background-color: #218838;
+			}
+
+			/* Pulsante COPY */
+			.copy-btn {
+				background-color: #007bff;
+			}
+
+			.copy-btn:hover {
+				background-color: #0069d9;
+			}
+
+			/* Pulsante REMOVE */
+			.remove-btn {
+				background-color: #dc3545;
+			}
+
+			.remove-btn:hover {
+				background-color: #c82333;
+			}
+
+			/* Animazione di click: riduzione scala al click */
+			.snippet button:active {
+				transform: scale(0.95);
+			}
+
+			::-webkit-scrollbar {
+				width: 10px;
+			}
+
+			::-webkit-scrollbar-track {
+				border-radius: 8px;
+				background-color: #e7e7e7;
+				border: 1px solid #cacaca;
+			}
+
+			::-webkit-scrollbar-thumb {
+				border-radius: 8px;
+				background-color: #60bdff;
+			}
+
+			/*composition*/
+
+			.lista-oggetti {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 20px;
+				padding: 0;
+				list-style: none;
+				justify-content: center;
+			}
+
+			.oggetto {
+				background-color: #fff;
+				border-radius: 12px;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+				width: 250px;
+				padding: 20px;
+				text-align: center;
+				transition: transform 0.2s;
+			}
+
+			.oggetto:hover {
+				transform: translateY(-5px);
+			}
+
+			.oggetto img {
+				max-width: 100%;
+				border-radius: 8px;
+			}
+
+			.oggetto h3 {
+				margin: 15px 0 10px;
+				font-size: 1.2rem;
+				color: #333;
+			}
+
+			.oggetto p {
+				font-size: 0.9rem;
+				color: #666;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div>
+			<div id="snippetheader"
+				class="snippet-header">
+				<button id="btnsnippetnew"
+					class="snippetnew">NEW +</button>
+				<span>Code Snippet</span>
+				<button id="snippetminimize"
+					class="minimize-btn">
+				</button>
+			</div>
+			<div class="snippet-container">
+				<div class="snippet">
+					<span class="snippet-name">Snippet 1</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 2</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 1</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 2</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 1</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 2</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 1</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 2</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 1</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 2</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 1</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 2</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 1</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 2</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 1</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+				<div class="snippet">
+					<span class="snippet-name">Snippet 2</span>
+					<button class="run-btn">RUN</button>
+					<button class="copy-btn">COPY</button>
+					<button class="remove-btn">REMOVE</button>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

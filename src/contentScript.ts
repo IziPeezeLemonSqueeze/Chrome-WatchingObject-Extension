@@ -1,6 +1,7 @@
 import { DOCK } from './utils_content/dockUtils';
 import { APIFIELD } from './utils_content/apiFields';
 import { SNIPPET } from './utils_content/snippet';
+import { DCSNIPPET } from './utils_content/dcSnippet';
 'use strict';
 let spanShowIds: string[] = [];
 
@@ -34,6 +35,8 @@ try
 
 const apiField = new APIFIELD(copyToClipboard);
 
+const dcSnippet = new DCSNIPPET();
+
 (() =>
 {
 	chrome.runtime.onMessage.addListener((obj, sender, response) =>
@@ -45,10 +48,14 @@ const apiField = new APIFIELD(copyToClipboard);
 			switch (obj.response)
 			{
 				case 'devConsole':
-					snippet.consoleIntervalSearch = setInterval(() =>
+					dcSnippet.consoleIntervalSearch = setInterval(() =>
 					{
-						snippet.devConsoleTool();
+						dcSnippet.devConsoleTool();
 					}, 2000);
+					break;
+
+				case 'changeHeightDCS':
+					dcSnippet.changeHeight();
 					break;
 
 				case 'openTextAreaNewSnippet':
