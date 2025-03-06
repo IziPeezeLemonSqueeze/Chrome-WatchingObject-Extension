@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuvoletta Tooltip</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #eef2f7;
+    }
+
+    .nuvoletta {
+      position: relative;
+      background-color: #ffffff;
+      padding: 20px 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      font-size: 1rem;
+      color: #333;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .nuvoletta::before {
+      content: '';
+      position: absolute;
+      bottom: -20px; /* Posizione della punta */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-width: 20px 15px 0 15px; /* altezza e larghezza della punta */
+      border-style: solid;
+      border-color: #ffffff transparent transparent transparent; /* Colore uguale al bg della nuvoletta */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nuvoletta">
+    Ciao! Sono una nuvoletta elegante senza bordi frastagliati.
+  </div>
+
+</body>
+</html>
