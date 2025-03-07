@@ -4,7 +4,8 @@
 	"description": "Developer tool for Salesforce, designed to help and speed up what the developer has to do!",
 	"private": true,
 	"scripts": {
-		"build:tsc": "tsc -p tsconfig.json",
+		"build:vite": "vite build",
+		"build:tsc": "npm run build:vite && tsc -p tsconfig.json && cpx \"src/public/*.{html,css,json,js}\" dist/public -u && cpx \"src/public/icons/*\" dist/public/icons -u --include-empty-dirs && cpx \"src/public/images/*\" dist/public/images -u --include-empty-dirs",
 		"pre:watch": "webpack --mode=development --watch --config config/webpack.config.js",
 		"pre:build": "webpack --mode=production --config config/webpack.config.js",
 		"pre:pack": "node pack.js",
@@ -26,11 +27,18 @@
 		"mini-css-extract-plugin": "^2.9.2",
 		"prettier": "^2.8.8",
 		"typescript": "^5.8.2",
+		"vite": "^6.2.1",
 		"webpack": "^5.97.0",
 		"webpack-cli": "^4.10.0",
 		"webpack-merge": "^5.10.0"
 	},
 	"dependencies": {
+		"@codemirror/basic-setup": "^0.20.0",
+		"@codemirror/lang-javascript": "^6.2.3",
+		"@codemirror/state": "^6.5.2",
+		"@codemirror/view": "^6.36.4",
+		"codemirror": "^6.0.1",
+		"cpx": "^1.2.1",
 		"salesforce-ehnancer": "file:"
 	}
 }

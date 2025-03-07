@@ -29,9 +29,6 @@
 			"js": [
 				"contentScript.js"
 			],
-			"css": [
-				"snippet.css"
-			],
 			"all_frames": true
 		}
 	],
@@ -42,7 +39,8 @@
 				"snippet.html",
 				"snippet.css",
 				"popup.css",
-				"developerConsoleSnippet.html"
+				"developerConsoleSnippet.html",
+				"https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
 			],
 			"matches": [
 				"https://*.force.com/*",

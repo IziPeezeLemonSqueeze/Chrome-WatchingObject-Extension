@@ -21,3 +21,12 @@ interface chunkCompositeApexLog
 	id: string,
 	success: boolean
 }
+
+interface snippetFromStorage
+{
+	[key: string]:
+	{
+		code: string,
+		ivcFound: string[]
+	}
+}

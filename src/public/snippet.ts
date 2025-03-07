@@ -1,20 +1,24 @@
 const root = document.getElementById('snippet_body');
 const btnBackup = document.getElementById('btnBackupSnippets');
-const btnRestore = document.getElementById('btnRestoreSnippets');
+const btnRestore = document.getElementById('btnRestoreSnippets') as HTMLInputElement;
 const btnRestoreSpan = document.getElementById('btnRestoreSnippetsSpan');
 const btnAddSnippet = document.getElementById('btnAddSnippet');
 const btnCloseCS = document.getElementById('btnCloseCS');
-let nButton = [];
+const nButton: {
+	doc: HTMLElement;
+	payload: any;
+	id: string;
+}[] = [];
 let dialog = document.getElementById('dialog');
 let mapValue = new Map();
-var snippetsBackup = [];
+const snippetsBackup: { name: string; code: any; ivcFound: any; }[] = [];
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
 	btnCloseCS.innerText = '❌';
 	btnCloseCS.addEventListener('click', (e) =>
 	{
-		close();
+		closeWindow();
 	})
 
 	btnAddSnippet.innerText = 'New ➕';
@@ -46,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () =>
 
 			reader.addEventListener('load', function (e)
 			{
-				const payloadRestore = JSON.parse(e.target.result);
+				const payloadRestore = JSON.parse(e.target.result as string);
 				//console.log(payloadRestore);
 
 				const checkValidJSON = Object.keys(payloadRestore[0]);
@@ -56,14 +60,14 @@ document.addEventListener("DOMContentLoaded", async () =>
 					return;
 				}
 
-				payloadRestore.forEach(p =>
+				payloadRestore.forEach((p: { name: string | number | (string | number)[] | Partial<{ [key: string]: any; }>; code: any; ivcFound: any; }) =>
 				{
 					chrome.storage.sync.get(p.name, async (items) =>
 					{
 						if (!Object.keys(await items)[0])
 						{
 							chrome.storage.sync.set({
-								[p.name]: {
+								[p.name as string]: {
 									code: p.code,
 									ivcFound: p.ivcFound
 								}
@@ -84,7 +88,7 @@ chrome.storage.onChanged.addListener(async (changes, namespace) =>
 	const obj = Object.entries(changes)[0]
 	if (/* namespace == 'local' &&  */obj[0].includes('snippet_'))
 	{
-		let obj_item = {};
+		let obj_item: any = {};
 		obj_item[obj[0]] = obj[1].newValue;
 		//console.log('RESULT OBJ ', obj_item)
 		await creatorElementList(obj_item);
@@ -117,24 +121,24 @@ const createObjectList = () =>
 	{
 		if (await items)
 		{
-			//console.log('ITEMS ', items);
+			console.log('ITEMS ', items);
 			creatorElementList(items);
 		}
 	});
 }
 
-const close = () =>
+const closeWindow = () =>
 {
 	chrome.runtime.sendMessage({
 		type: 'WO_CODESNIPPET_close'
 	});
 }
 
-const creatorElementList = async (items) =>
+const creatorElementList = async (items: snippetFromStorage) =>
 {
 	//console.log('CREATOR : ', items);
 	const listUL = document.getElementById('list');
-	Object.keys(await items).forEach((k, i) =>
+	Object.keys(items).forEach((k, i) =>
 	{
 		if (k.includes('snippet_'))
 		{
@@ -143,13 +147,13 @@ const creatorElementList = async (items) =>
 
 			let div = document.createElement('div');
 			div.className = 'row';
-			div.style = "display: flex; margin-top: 1%";
+			div.setAttribute('style', "display: flex; margin-top: 1%");
 
 			let btnRun = document.createElement('button');
 			btnRun.innerText = 'Run 🚀';
-			btnRun.style = items[k].ivcFound ?
+			btnRun.setAttribute('style', items[k].ivcFound ?
 				"background-color: darkorange;margin-left: auto;margin-right: 1%;size: unset;max-height: 25px;" :
-				"margin-left: auto;margin-right: 1%;size: unset;max-height: 25px;"
+				"margin-left: auto;margin-right: 1%;size: unset;max-height: 25px;");
 
 			btnRun.id = k + '-run';
 			btnRun.title = items[k].ivcFound ?
@@ -166,18 +170,18 @@ const creatorElementList = async (items) =>
 			btnMod.id = k + '-mod';
 			btnMod.title = 'Copy the code!'
 			btnMod.className = 'slds-button slds-button_outline-brand';
-			btnMod.style = 'max-height: 25px;';
+			btnMod.setAttribute('style', 'max-height: 25px;');
 
 			let btnRemove = document.createElement('button');
 			btnRemove.innerText = '🚽';
 			btnRemove.id = k + '-del';
 			btnRemove.title = 'Trash the code!'
 			btnRemove.className = 'slds-button slds-button_outline-brand';
-			btnRemove.style = 'max-height: 25px;';
+			btnRemove.setAttribute('style', 'max-height: 25px;');
 
 			let span = document.createElement('span');
 			span.innerText = k.replace('snippet_', '');
-			span.style = "margin-left: 1%;"
+			span.setAttribute('style', "margin-left: 1%;");
 			span.title = items[k].code;
 			span.id = k + '-span';
 
@@ -190,7 +194,7 @@ const creatorElementList = async (items) =>
 
 
 			let hr = document.createElement('hr');
-			hr.style = "margin-bottom: -0.2%;margin-top: 0.6%;"
+			hr.setAttribute('style', "margin-bottom: -0.2%;margin-top: 0.6%;");
 			hr.id = k;
 			listUL.appendChild(div);
 			listUL.appendChild(hr);
@@ -234,16 +238,16 @@ const creatorElementList = async (items) =>
 	});
 }
 
-let intervalHideErrorDIalog;
+let intervalHideErrorDIalog: string | number | NodeJS.Timeout;
 let secAutoClose = 5;
 let divErrorDialog = document.createElement('div');
-const showHandlerDialogError = (textObj) =>
+const showHandlerDialogError = (textObj: string) =>
 {
 	//initDialog();
 	console.log('TESTO ERRORE DIALOG', textObj);
 	divErrorDialog.id = 'divErrorDialog';
 	divErrorDialog.className = 'column';
-	divErrorDialog.style = "-webkit-text-stroke-width: medium;text-align-last: center;"
+	divErrorDialog.setAttribute('style', "-webkit-text-stroke-width: medium;text-align-last: center;");
 	let span = document.createElement('span');
 	span.innerText = textObj;
 	let btn = document.createElement('button');
@@ -289,7 +293,7 @@ const hideHandlerDialogError = () =>
 	hideHandlerDialogInfo();
 }
 
-const showHandlerDialogInfo = (textDialog) =>
+const showHandlerDialogInfo = (textDialog: string, p0: any[]) =>
 {
 	dialog.setAttribute('z-index', '2000000000000000000');
 	dialog.innerText = textDialog;
@@ -311,14 +315,14 @@ const hideHandlerDialogInfo = () =>
 	});
 }
 
-const handler_run = (doc, payload, id) =>
+const handler_run = (doc: { id: any; }, payload: { ivcFound: any[]; code: string; }, id: any) =>
 {
 	//console.log('HANDLING RUN BUTTON', payload);
 	showHandlerDialogInfo('Snippet in RUN...Waiting!', [doc.id]);
 
 	if (payload.ivcFound != null && payload.ivcFound.length > 0)
 	{
-		payload.ivcFound.forEach((ivc) =>
+		payload.ivcFound.forEach((ivc: string) =>
 		{
 			//console.log(ivc);
 			if (ivc.includes('@ID'))
@@ -419,7 +423,7 @@ const handler_run = (doc, payload, id) =>
 
 }
 
-const handler_mod = (args) =>
+const handler_mod = (args: string) =>
 {
 	//console.log('HANDLING MOD BUTTON', args);
 	chrome.runtime.sendMessage({
@@ -428,7 +432,7 @@ const handler_mod = (args) =>
 	});
 }
 
-const handler_del = (args) =>
+const handler_del = (args: any) =>
 {
 	chrome.runtime.sendMessage({
 		type: 'WO_CODESNIPPET_delConfirm',
@@ -442,5 +446,5 @@ const handler_addNewSnippet = () =>
 		type: 'WO_CODESNIPPET_addNewSnippet'
 	});
 }
-
 createObjectList();
+

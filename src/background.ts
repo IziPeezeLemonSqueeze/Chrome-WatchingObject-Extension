@@ -147,8 +147,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
 	} */
 });
 
-let apiActive = null;
-
+let editorImported;
 chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 {
 	console.log('ARRIVED BE', obj);
@@ -245,7 +244,6 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 		 */
 		case 'WO_TOOL_requestApiVersion':
 			await retrieveApiVersions(obj, sender, response);
-			apiActive = bckApiActive;
 			break;
 
 		//-------------------------CODE SNIPPET----------------------------------------------
@@ -326,6 +324,12 @@ chrome.runtime.onMessage.addListener(async (obj, sender, response) =>
 			chrome.tabs.sendMessage(sender.tab.id, {
 				response: 'changeHeightDCS',
 			})
+			break;
+
+		case 'DCS_initEditor':
+			chrome.tabs.sendMessage(sender.tab.id, {
+				response: 'initEditorDoneDCS'
+			});
 			break;
 	}
 });

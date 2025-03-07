@@ -1,7 +1,9 @@
+
 import { DOCK } from './utils_content/dockUtils';
 import { APIFIELD } from './utils_content/apiFields';
 import { SNIPPET } from './utils_content/snippet';
 import { DCSNIPPET } from './utils_content/dcSnippet';
+
 'use strict';
 let spanShowIds: string[] = [];
 
@@ -238,19 +240,4 @@ const dcSnippet = new DCSNIPPET();
 		}
 
 	}
-
-
-
-
-	const addCSS = (css: string) =>
-	{
-		let link = document.createElement("link");
-		link.setAttribute('type', 'text/css');
-		link.setAttribute('rel', 'stylesheet');
-
-		link.href = css
-
-		document.head.appendChild(link);
-	}
-	addCSS(chrome.runtime.getURL('./snippet.css'));
 })();

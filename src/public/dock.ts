@@ -11,7 +11,7 @@ const btnBackToMain = document.getElementById('btnBackToMain');
 const apiVersionCombobox = document.getElementById('apiVersionCombobox');
 const currentApiSelected = document.getElementById('currentApiSelected');
 const btnSyncMetadata = document.getElementById('btnSyncMetadata');
-const alwaysShowId = document.getElementById('alwaysShowId');
+const alwaysShowId = document.getElementById('alwaysShowId') as HTMLInputElement;
 
 const btnApiFields = document.getElementById('btnApiFields');
 const btnCodeSnippet = document.getElementById('btnFastCodeSnippet');
@@ -30,17 +30,16 @@ const tutorialPhases = {
 
 document.addEventListener("DOMContentLoaded", async () =>
 {
-	getTutorial(divTutorial);
+	getTutorial();
 
 	labelSettings.innerText = '⚙️ Settings ';
 
 	alwaysShowId.addEventListener('change', (e) =>
 	{
-		const checked = e.currentTarget.checked;
 		//console.log('CHANGE ALWAYS SHOW ID', checked);
 		chrome.runtime.sendMessage({
 			type: 'WO_TOOL_alwaysShowId',
-			payload: checked
+			payload: (<HTMLInputElement>e.target).checked
 		});
 	})
 
@@ -62,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () =>
 				//console.log('DOCK API VERIONS');
 				try
 				{
-					await items['apiVersion'].forEach(opt =>
+					await items['apiVersion'].forEach((opt: string) =>
 					{
 						const option = document.createElement('option');
 						option.value = opt;
@@ -86,9 +85,9 @@ document.addEventListener("DOMContentLoaded", async () =>
 
 	apiVersionCombobox.addEventListener('change', (e) =>
 	{
-		chrome.storage.sync.set({ ['apiVersionSelected']: e.target.value });
-		currentApiSelected.innerText = e.target.value;
-		updateBackgroudWithApiVersion(e.target.value);
+		chrome.storage.sync.set({ ['apiVersionSelected']: (<HTMLSelectElement>e.target).value });
+		currentApiSelected.innerText = (<HTMLSelectElement>e.target).value;
+		updateBackgroudWithApiVersion((<HTMLSelectElement>e.target).value);
 	});
 
 	btnSettings.addEventListener('click', () =>
@@ -163,11 +162,11 @@ const goToDOC = () =>
 
 const getTutorial = () =>
 {
-	divTutorial.style.opacity = 0;
-	divStepOne.style.opacity = 0;
-	divStepTwo.style.opacity = 0;
+	divTutorial.style.opacity = '0';
+	divStepOne.style.opacity = '0';
+	divStepTwo.style.opacity = '0';
 	divStepTwo.style.display = 'none';
-	divStepGreetings.style.opacity = 0;
+	divStepGreetings.style.opacity = '0';
 	divStepGreetings.style.display = 'none';
 	chrome.storage.sync.get(['firstGO'], async (isFirstGo) =>
 	{
@@ -182,8 +181,8 @@ const getTutorial = () =>
 		setTimeout(() =>
 		{
 			tutorialPhases.isOn = true;
-			divTutorial.style.opacity = 1;
-			setupStepOne(divTutorial);
+			divTutorial.style.opacity = '1';
+			setupStepOne();
 		}, 200);
 
 	});
@@ -192,29 +191,29 @@ const getTutorial = () =>
 const setupStepOne = () =>
 {
 	freccia.innerText = '⬇';
-	divStepOne.style.opacity = 1;
+	divStepOne.style.opacity = '1';
 
 }
 
 const setupStepTwo = () =>
 {
-	divStepOne.style.opacity = 0;
+	divStepOne.style.opacity = '0';
 	divStepOne.style.display = 'none';
-	divStepTwo.style.opacity = 1;
+	divStepTwo.style.opacity = '1';
 	divStepTwo.style.display = null;
 }
 
 const setupStepGreetings = () =>
 {
-	divStepTwo.style.opacity = 0;
+	divStepTwo.style.opacity = '0';
 	divStepTwo.style.display = 'none';
-	divStepGreetings.style.opacity = 1;
+	divStepGreetings.style.opacity = '1';
 	divStepGreetings.style.display = null;
 	setTimeout(async () =>
 	{
 		await chrome.storage.sync.set({ firstGO: false });
 		tutorialPhases.isOn = false;
-		divStepGreetings.style.opacity = 0;
+		divStepGreetings.style.opacity = '0';
 		setTimeout(() =>
 		{
 			divStepGreetings.style.display = 'none';
@@ -291,7 +290,7 @@ const requestApiVersions = () =>
 	});
 }
 
-const updateBackgroudWithApiVersion = (apiActive) =>
+const updateBackgroudWithApiVersion = (apiActive: any) =>
 {
 	chrome.runtime.sendMessage({
 		type: 'WO_TOOL_apiVersion',

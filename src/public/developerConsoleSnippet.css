@@ -1,0 +1,258 @@
+::-webkit-scrollbar {
+	width: 10px;
+	margin-left: 1%;
+}
+
+::-webkit-scrollbar-track {
+	border-radius: 8px;
+	background-color: #e7e7e7;
+	border: 1px solid #cacaca;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 8px;
+	background-color: #60bdff;
+}
+
+.iframe {
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.container {
+	display: grid;
+	grid-template-areas:
+		'left content right'
+		'toolbar toolbar toolbar';
+	grid-template-columns: 195px 1fr 150px;
+	grid-template-rows: 1fr auto;
+	gap: 10px;
+	width: 90%;
+	height: 90vh;
+	background-color: #fff;
+	border-radius: 12px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+	padding: 10px;
+}
+
+.sidebar-left {
+	margin-top: 18.5%;
+	height: 373px;
+	grid-area: left;
+	background-color: #e9ecef;
+	border-radius: 0px 0px 8px 8px;
+	overflow-y: auto;
+}
+
+.sidebar-right {
+	grid-area: right;
+	background-color: #e9ecef;
+	padding: 10px;
+	border-radius: 8px;
+	overflow-y: auto;
+}
+
+.editor {
+	grid-area: content;
+	background-color: #f8f9fa;
+	padding: 15px;
+	border-radius: 8px;
+}
+
+.editor-sub {
+	width: 543px;
+	height: 292px;
+}
+
+.toolbar {
+	grid-area: toolbar;
+	background-color: #dee2e6;
+	padding: 5px;
+	display: flex;
+	justify-content: center;
+	gap: 15px;
+	border-radius: 8px;
+}
+
+button {
+	position: relative;
+	z-index: 0;
+	/* stacking context */
+	padding: 6px 14px;
+	font-size: 1rem;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: transform 0.2s ease;
+}
+
+/* Solleva il pulsante in hover */
+button:hover {
+	transform: translateY(-3px);
+}
+
+/* Leggera compressione al click */
+button:active {
+	transform: translateY(1px);
+}
+
+/* Pseudo-elemento: glow dietro, aderente ai bordi */
+button::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	/* copre esattamente il pulsante */
+	border-radius: inherit;
+	box-shadow: 0 0 10px 3px rgba(0, 153, 255, 0.2);
+	opacity: 0;
+	transition: opacity 0.2s ease;
+	z-index: -1;
+	/* dietro al pulsante */
+}
+
+/* Glow visibile solo quando il pulsante è premuto */
+button:active::before {
+	opacity: 1;
+}
+
+ul {
+	height: 100px;
+	list-style: none;
+	padding: 0;
+}
+
+ul li {
+	margin-bottom: 10px;
+}
+
+a {
+	text-decoration: none;
+	color: #007bff;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.object-item {
+	box-shadow: inset 4px -5px 2px #ababab24;
+	background-color: #dee2e6;
+	padding: 10px;
+	margin-bottom: 10px;
+	border-radius: 6px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	cursor: pointer;
+	transition: transform 0.1s, background-color 0.2s;
+}
+
+.object-buttons {
+	margin-left: 12%;
+}
+
+.object-item:active {
+	transform: scale(0.98);
+	background-color: #ced4da;
+}
+
+.runalt-btn {
+	box-shadow: inset 4px -4px 1px #d3600e;
+	background: linear-gradient(135deg, #ff8400, #d3600e);
+	font-size: 0.7rem;
+}
+
+.run-btn {
+	box-shadow: inset 4px -4px 1px #13ac7e;
+	background: linear-gradient(135deg, #2ecc71, #0aa182);
+	font-size: 0.7rem;
+}
+
+.copy-btn {
+	box-shadow: inset 4px -4px 1px #1a66bc;
+	background: linear-gradient(135deg, #17a2b8, #1a66bc);
+	font-size: 0.6rem;
+}
+
+.delete-btn {
+	box-shadow: inset 4px -4px 1px #b10044;
+	background: linear-gradient(135deg, #f10e24, #b10044);
+	font-size: 0.6rem;
+}
+
+.standard-btn {
+	box-shadow: inset 4px -4px 1px #67e5fc;
+	background: linear-gradient(135deg, #35addc, #67e5fc);
+	font-size: 0.5rem;
+}
+
+.listheader {
+	font-variant: unicase;
+	box-shadow: 0px 4px 4px #00000017;
+	z-index: 10;
+	align-content: center;
+	text-align: center;
+	height: 37px;
+	width: 195px;
+	border-radius: 10px 10px 0px 0px;
+	margin-bottom: -5%;
+	position: fixed;
+	top: 0%;
+	background-color: #dee2e6;
+}
+
+.titleGrid {
+	overflow-wrap: anywhere;
+	font-size: small;
+	color: #838383;
+}
+
+.columnSpanLoader {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-content: center;
+	justify-content: space-between;
+	align-items: center;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.loader {
+	display: none;
+}
+
+.module-border-wrap {
+	position: relative;
+	background: linear-gradient(to right, #61def8, #3091b5);
+	box-shadow: inset 1px 0px 2px #67e5fc;
+	border-radius: 30px;
+	display: flex;
+	height: 17px;
+	width: 17px;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+	animation: spin 2s linear infinite;
+}
+
+.module {
+	border-radius: 30px;
+	height: 12px;
+	width: 12px;
+	background: #dee2e6;
+}

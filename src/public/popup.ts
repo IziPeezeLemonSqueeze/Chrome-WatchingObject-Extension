@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use strict';
 
 import 'popup.css';
@@ -12,14 +13,14 @@ import 'popup.css';
 	// More information on Permissions can we found at
 	// https://developer.chrome.com/extensions/declare_permissions
 	const counterStorage = {
-		get: (cb) =>
+		get: (cb: (arg0: any) => void) =>
 		{
 			chrome.storage.sync.get(['count'], (result) =>
 			{
 				cb(result.count);
 			});
 		},
-		set: (value, cb) =>
+		set: (value: any, cb: () => void) =>
 		{
 			chrome.storage.sync.set(
 				{
@@ -54,7 +55,7 @@ import 'popup.css';
 
 	function updateCounter({ type })
 	{
-		counterStorage.get((count) =>
+		counterStorage.get((count: number) =>
 		{
 			let newCount;
 
@@ -100,7 +101,7 @@ import 'popup.css';
 	function restoreCounter()
 	{
 		// Restore count value
-		counterStorage.get((count) =>
+		counterStorage.get((count: number) =>
 		{
 			if (typeof count === 'undefined')
 			{
