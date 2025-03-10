@@ -1,6 +1,3 @@
-// @ts-nocheck
-console.log(window.CodeMirrorBundle)
-const { EditorView, basicSetup, javascript } = window.CodeMirrorBundle;
 
 let snippetsBackupDEV: { name: string; code: any; ivcFound: any; }[] = [];
 let nButtonDEV: { doc: HTMLElement; payload: any; id: string; }[] = [];
@@ -62,12 +59,16 @@ document.addEventListener('DOMContentLoaded', async () =>
 		console.log(editor.selectionStart);
 	}); */
 
+	const oldEditor = document.getElementById('editor') as HTMLTextAreaElement;
+	// @ts-expect-error
+	editorImported = CodeMirror.fromTextArea(oldEditor, {
+		mode: 'text/apexsnippet',
+		tabSize: 4,
+		lineNumbers: true,
+		indentWithTabs: true
+	});
 
-	const view = new EditorView({
-		doc: "Start document",
-		parent: document.getElementById('editor'),
-		extensions: [basicSetup, javascript()]
-	})
+
 	chrome.runtime.sendMessage({
 		type: 'DCS_initEditor'
 	});

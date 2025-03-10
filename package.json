@@ -5,7 +5,7 @@
 	"private": true,
 	"scripts": {
 		"build:vite": "vite build",
-		"build:tsc": "npm run build:vite && tsc -p tsconfig.json && cpx \"src/public/*.{html,css,json,js}\" dist/public -u && cpx \"src/public/icons/*\" dist/public/icons -u --include-empty-dirs && cpx \"src/public/images/*\" dist/public/images -u --include-empty-dirs",
+		"build:tsc": "tsc -p tsconfig.json && cpx \"src/public/*.{html,css,json,js}\" dist/public -u && cpx \"src/public/icons/*\" dist/public/icons -u --include-empty-dirs && cpx \"src/public/images/*\" dist/public/images -u --include-empty-dirs",
 		"pre:watch": "webpack --mode=development --watch --config config/webpack.config.js",
 		"pre:build": "webpack --mode=production --config config/webpack.config.js",
 		"pre:pack": "node pack.js",

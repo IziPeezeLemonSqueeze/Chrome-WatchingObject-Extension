@@ -256,3 +256,23 @@ a:hover {
 	width: 12px;
 	background: #dee2e6;
 }
+
+.cm-custom-random-number {
+	color: #ff4500;
+	font-weight: bold;
+}
+.cm-custom-random-string {
+	color: #2e8b57;
+	font-weight: bold;
+}
+.cm-custom-variable {
+	color: #1e90ff;
+}
+.cm-custom-pck-def {
+	color: #8a2be2; /* ad esempio, viola per definizione */
+	font-style: italic;
+}
+.cm-custom-pck-call {
+	color: rgb(183, 0, 255); /* ad esempio, arancione per richiamo */
+	font-weight: bold;
+}
