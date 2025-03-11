@@ -26,11 +26,26 @@ const snippetStorage = {
 		);
 	},
 };
-
+/* EDITOR */
 let editorImported: any = null;
 const snippetlistobj = document.getElementById('snippetlistobj');
 const oldEditor = document.getElementById('editor') as HTMLTextAreaElement;
-
+const btnSnippetAddVariable = document.getElementById('snippetaddvariable');
+/* MODALE  */
+const modalOverlay = document.getElementById('modalOverlay');
+const btnCloseModalFooter = document.getElementById('closeModalFooter');
+const chipVariable = document.querySelectorAll('.chip');
+const btnChipVariableClose = document.querySelectorAll('.chip-close');
+/* NEW SNIPPET MODAL */
+const btnNVClassicSTR = document.getElementById('btnnvclassicstr');
+/* NEW SNIPPET */
+const btnSnippetNewCode = document.getElementById('snippetnewcode');
+let snippetOnCreating: {
+	name: string,
+	ivcFound: null | string[],
+	variables: null | Ivariable
+};
+const inputSnippetNewName = document.getElementById('snippetnewname') as HTMLInputElement;
 
 chrome.runtime.onMessage.addListener((obj, sender, response) =>
 {
@@ -41,7 +56,6 @@ chrome.runtime.onMessage.addListener((obj, sender, response) =>
 		{
 			case 'initEditorDoneDCS':
 				editorImported = obj.payload;
-				initEditorImported();
 				break;
 		}
 	}
@@ -59,12 +73,76 @@ document.addEventListener('DOMContentLoaded', async () =>
 		console.log(editor.selectionStart);
 	}); */
 
+	initButtonEventListener();
 	initCMistance();
 
 	chrome.runtime.sendMessage({
 		type: 'DCS_initEditor'
 	});
+
+
 });
+
+const initButtonEventListener = () =>
+{
+	btnSnippetNewCode.addEventListener('click', () =>
+	{
+		createNewSnippetCodeEditor();
+	});
+
+	btnCloseModalFooter.addEventListener('click', () =>
+	{
+		modalOverlay.classList.remove('active');
+	});
+
+	btnSnippetAddVariable.addEventListener('click', () =>
+	{
+		openCloseModalVariable();
+	});
+
+	chipVariable.forEach(chip =>
+	{
+		chip.addEventListener('click', function (e)
+		{
+			// Se il clic è sull'icona di chiusura, non attivare la selezione
+			if ((<HTMLDivElement>e.target).classList.contains('chip-close'))
+			{
+				return;
+			}
+			chip.classList.toggle('selected');
+		});
+	});
+
+	btnChipVariableClose.forEach(button =>
+	{
+		button.addEventListener('click', function (e)
+		{
+			e.stopPropagation(); // Impedisce al clic di propagarsi al chip
+			button.parentElement.remove();
+		});
+	});
+
+	inputSnippetNewName.addEventListener('change', (e) =>
+	{
+		const ghostname = document.getElementById('ghostname');
+		const target = (<HTMLInputElement>e.target);
+		if (!target.value || target.value.length == 0)
+		{
+			ghostname.classList.remove('active');
+			inputSnippetNewName.classList.add('empty');
+			return;
+		}
+		ghostname.classList.add('active');
+		inputSnippetNewName.classList.remove('empty');
+
+	});
+
+	btnNVClassicSTR.addEventListener('click', () =>
+	{
+		const strDiv = document.getElementById('nvstring');
+		strDiv.classList.add('active');
+	});
+}
 
 const initCMistance = () =>
 {
@@ -83,81 +161,83 @@ const creatorElementListDEV = async (items: snippetFromStorage) =>
 	console.log('CREATOR DEV : ', items);
 	Object.keys(items).forEach((k, i) =>
 	{
-		if (k.includes('snippet_'))
+		if (!k.includes('snippet_'))
 		{
-			const li = document.createElement('li');
-			li.id = k;
-
-			const divObjectItem = document.createElement('div');
-			divObjectItem.setAttribute('class', 'object-item');
-			divObjectItem.id = k + '-div';
-
-			const divObjectButton = document.createElement('div');
-			divObjectButton.setAttribute('class', 'object-buttons');
-
-			const btnRun = document.createElement('button');
-			btnRun.innerText = 'Run 🚀';
-			items[k].ivcFound ? btnRun.setAttribute('class', 'runalt-btn') : btnRun.setAttribute('class', 'run-btn');
-
-			btnRun.id = k + '-run';
-			btnRun.title = items[k].ivcFound ?
-				'Run the code now!\n--⚠️-- WARNING --⚠️--\n You will insert variables before the actual execution!' :
-				'Run the code now!'
-
-			const btnMod = document.createElement('button');
-			btnMod.innerText = '✒️';
-			btnMod.id = k + '-mod';
-			btnMod.title = 'Edit the code!'
-			btnMod.setAttribute('class', 'copy-btn');
-			btnMod.setAttribute('style', 'margin-left: 1%');
-
-			const btnRemove = document.createElement('button');
-			btnRemove.innerText = '🚽';
-			btnRemove.id = k + '-del';
-			btnRemove.title = 'Trash the code!'
-			btnRemove.setAttribute('class', 'delete-btn');
-			btnRemove.setAttribute('style', 'margin-left: 1%');
-
-			const divCol = document.createElement('div');
-			divCol.setAttribute('class', 'columnSpanLoader');
-
-			const span = document.createElement('span');
-			span.innerText = k.replace('snippet_', '');
-			span.title = items[k].code;
-			span.id = k + '-span';
-			span.setAttribute('class', 'titleGrid');
-
-			const postSpanLoader = document.createElement('div');
-			postSpanLoader.id = k + '-loader';
-			postSpanLoader.setAttribute('class', 'loader');
-
-			const loader = document.createElement('div');
-			loader.setAttribute('class', 'module-border-wrap');
-
-			const moduleOnLoader = document.createElement('div');
-			moduleOnLoader.setAttribute('class', 'module')
-
-			loader.appendChild(moduleOnLoader);
-			postSpanLoader.appendChild(loader);
-
-			divCol.appendChild(span);
-			divCol.appendChild(postSpanLoader);
-
-			divObjectButton.appendChild(btnRun);
-			divObjectButton.appendChild(btnMod);
-			divObjectButton.appendChild(btnRemove);
-
-			divObjectItem.appendChild(divCol);
-			divObjectItem.appendChild(divObjectButton);
-			li.appendChild(divObjectItem);
-
-			snippetlistobj.appendChild(divObjectItem);
-
-			snippetsBackupDEV.push({ "name": k, "code": items[k].code, "ivcFound": items[k].ivcFound });
-			nButtonDEV.push({ doc: document.getElementById(k + '-run'), payload: items[k], id: k });
-			nButtonDEV.push({ doc: document.getElementById(k + '-mod'), payload: items[k], id: k });
-			nButtonDEV.push({ doc: document.getElementById(k + '-del'), payload: null, id: k });
+			return;
 		}
+		const li = document.createElement('li');
+		li.id = k;
+
+		const divObjectItem = document.createElement('div');
+		divObjectItem.setAttribute('class', 'object-item');
+		divObjectItem.id = k + '-div';
+
+		const divObjectButton = document.createElement('div');
+		divObjectButton.setAttribute('class', 'object-buttons');
+
+		const btnRun = document.createElement('button');
+		btnRun.innerText = 'Run 🚀';
+		items[k].ivcFound ? btnRun.setAttribute('class', 'runalt-btn') : btnRun.setAttribute('class', 'run-btn');
+
+		btnRun.id = k + '-run';
+		btnRun.title = items[k].ivcFound ?
+			'Run the code now!\n--⚠️-- WARNING --⚠️--\n You will insert variables before the actual execution!' :
+			'Run the code now!'
+
+		const btnMod = document.createElement('button');
+		btnMod.innerText = '✒️';
+		btnMod.id = k + '-mod';
+		btnMod.title = 'Edit the code!'
+		btnMod.setAttribute('class', 'copy-btn');
+		btnMod.setAttribute('style', 'margin-left: 1%');
+
+		const btnRemove = document.createElement('button');
+		btnRemove.innerText = '🚽';
+		btnRemove.id = k + '-del';
+		btnRemove.title = 'Trash the code!'
+		btnRemove.setAttribute('class', 'delete-btn');
+		btnRemove.setAttribute('style', 'margin-left: 1%');
+
+		const divCol = document.createElement('div');
+		divCol.setAttribute('class', 'columnSpanLoader');
+
+		const span = document.createElement('span');
+		span.innerText = k.replace('snippet_', '');
+		span.title = items[k].code;
+		span.id = k + '-span';
+		span.setAttribute('class', 'titleGrid');
+
+		const postSpanLoader = document.createElement('div');
+		postSpanLoader.id = k + '-loader';
+		postSpanLoader.setAttribute('class', 'loader');
+
+		const loader = document.createElement('div');
+		loader.setAttribute('class', 'module-border-wrap');
+
+		const moduleOnLoader = document.createElement('div');
+		moduleOnLoader.setAttribute('class', 'module')
+
+		loader.appendChild(moduleOnLoader);
+		postSpanLoader.appendChild(loader);
+
+		divCol.appendChild(span);
+		divCol.appendChild(postSpanLoader);
+
+		divObjectButton.appendChild(btnRun);
+		divObjectButton.appendChild(btnMod);
+		divObjectButton.appendChild(btnRemove);
+
+		divObjectItem.appendChild(divCol);
+		divObjectItem.appendChild(divObjectButton);
+		li.appendChild(divObjectItem);
+
+		snippetlistobj.appendChild(divObjectItem);
+
+		snippetsBackupDEV.push({ "name": k, "code": items[k].code, "ivcFound": items[k].ivcFound });
+		nButtonDEV.push({ doc: document.getElementById(k + '-run'), payload: items[k], id: k });
+		nButtonDEV.push({ doc: document.getElementById(k + '-mod'), payload: items[k], id: k });
+		nButtonDEV.push({ doc: document.getElementById(k + '-del'), payload: null, id: k });
+
 	});
 
 	nButtonDEV.forEach(btnIdx =>
@@ -194,9 +274,44 @@ const creatorElementListDEV = async (items: snippetFromStorage) =>
 	});
 }
 
-const initEditorImported = async () =>
+const createNewSnippetCodeEditor = () =>
 {
-	console.log(editorImported);
+	const editorElement = document.getElementsByClassName('editor')[0] as HTMLDivElement;
+	const editorCloseElement = document.getElementsByClassName('editorclose')[0] as HTMLDivElement;
+
+	editorCloseElement.classList.add('deactive');
+	editorElement.classList.add('active');
+
+	snippetOnCreating = {
+		name: (Math.random() * 999).toString().replace('.', ''),
+		ivcFound: null,
+		variables: null
+	};
+	inputSnippetNewName.value = snippetOnCreating.name;
+	const ghostname = document.getElementById('ghostname');
+	ghostname.classList.add('active');
+}
+
+const openCloseModalVariable = () =>
+{
+	snippetStorage.get((snippet: snippetFromStorage) =>
+	{
+		if (!snippet)
+		{
+			return;
+		}
+		Object.keys(snippet).forEach((k, i) =>
+		{
+			if (!k.includes('snippet_'))
+			{
+				return;
+			} //TODO DA FINIRE
+
+
+		});
+	});
+
+	modalOverlay.classList.add('active');
 }
 
 const handler_runDEV = (doc: HTMLElement, payload: any, id: string) =>

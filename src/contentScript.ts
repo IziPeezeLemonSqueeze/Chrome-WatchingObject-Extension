@@ -53,7 +53,7 @@ const dcSnippet = new DCSNIPPET();
 					dcSnippet.consoleIntervalSearch = setInterval(() =>
 					{
 						dcSnippet.devConsoleTool();
-					}, 2000);
+					}, 500);
 					break;
 
 				case 'changeHeightDCS':

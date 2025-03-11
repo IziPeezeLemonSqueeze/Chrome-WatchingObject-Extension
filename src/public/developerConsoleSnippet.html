@@ -20,6 +20,136 @@
 
 	<body>
 
+		<div class="modal-overlay"
+			id="modalOverlay">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 class="modal-title titleGrid">VARIABLES</h2>
+				</div>
+				<div class="modal-body">
+					<span class="modal-header-span">INIT VAR</span>
+					<div id="chips-container">
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 2</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+						<div class="chip">
+							<span class="chip-label">Chip 1</span>
+							<button class="chip-close"
+								title="Delete Variable">&times;</button>
+						</div>
+					</div>
+
+					<span class="modal-header-span"
+						style="top: 28%;">NEW VAR</span>
+					<div class="modal-snippet-new-var"
+						id="snippetnewvariable">
+						<div class="new-var-step-top">
+							<button class="copy-btn"
+								id="btnnvclassicstr">STR</button>
+							<button class="copy-btn"
+								id="btnnvclassicnmb">NMB</button>
+							<button class="copy-btn"
+								id="btnnvclassicbol">BOL</button>
+							<button class="copy-btn"
+								id="btnnvclassicid">ID</button>
+							<button class="copy-btn"
+								id="btnnvclassicv">V</button>
+							<button class="copy-btn"
+								id="btnnvpck">PCK</button>
+							<button class="copy-btn"
+								id="btnnvrnd">RND</button>
+							<button class="copy-btn"
+								id="btnnvrndstr">RNDSTR</button>
+						</div>
+						<div class="new-var-step">
+							<div id="nvstring">
+								<div class="new-var-helper">
+									CREATION OF A NEW VARIABLE OF TYPE <span
+										style="font-size: 1rem;color: #00cf00;">STRING</span>
+									<br>
+									<br>
+									EXAMPLE:
+									${$STRtestvariable}
+								</div>
+								<div class="new-var">
+									<span>${$STR</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="name_variable">
+									<span>}</span>
+								</div>
+								<div class="new-var-sub">
+									<span>DEFAULT VALUE</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="Hello Salesforce Enhancer!">
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button id="closeModalFooter"
+						class="copy-btn">CLOSE</button>
+				</div>
+			</div>
+		</div>
+
+
+
 		<div class="container">
 
 			<div class="sidebar-left">
@@ -38,22 +168,25 @@
 				</ul>
 			</div>
 
+			<div class="editorheader titleGrid"
+				style="margin-top: 1.1%;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: center;align-items: center;">
+				<button id="snippetnewcode"
+					class="run-btn"
+					style="margin-left: 1%;">+ new</button>
+				<h3 style="margin-left: 30%;margin-right: auto;">CODE SNIPPET</h3>
+			</div>
 			<div class="editor">
-				<div class="editorheader titleGrid"
-					style="margin-top: 1.1%;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: center;align-items: center;">
-					<button class="run-btn"
-						style="margin-left: 1%;">+ new</button>
-					<h3 style="margin-left: 30%;margin-right: auto;">CODE SNIPPET</h3>
-				</div>
 				<button id="snippetaddvariable"
 					class="copy-btn"
 					style="margin-top: 6%;margin-left: 2%;">Add variable snippet</button>
 				<div class="editor-sub">
 					<textarea id="editor"
 						style="border-radius: 10px;width: 100%;height: 100%;border: none;resize: none;outline: none;padding: 0px;font-size: 1rem;"></textarea>
-					<div class="snippetnewname"
-						id="snippetnewname">
-						<input class="snippet-name"
+					<div class="snippetnewname">
+						<span id="ghostname"
+							class="ghostname">NAME:</span>
+						<input id="snippetnewname"
+							class="snippet-name"
 							type="text"
 							placeholder="new snippet">
 					</div>
@@ -65,6 +198,11 @@
 					<button class="delete-btn"
 						style="margin-left: 5%;">DELETE</button>
 				</div>
+			</div>
+			<div class="editorclose">
+				<span>Click on the green “+ new” button to create a new CodeSnippet!
+					<br>
+					Should you need help you will find everything here:</span>
 			</div>
 
 			<div class="sidebar-right">
@@ -85,8 +223,8 @@
 				<button class="delete-btn"
 					style="margin-left: auto">CLOSE</button>
 			</div>
-
 		</div>
+
 
 	</body>
 

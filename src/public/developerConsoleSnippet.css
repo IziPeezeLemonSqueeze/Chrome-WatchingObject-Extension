@@ -60,6 +60,35 @@
 	background-color: #e9ecef;
 	padding: 15px;
 	border-radius: 8px;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+	visibile: hidden;
+	opacity: 0;
+}
+
+.editor.active {
+	visibility: visible;
+	opacity: 1;
+}
+
+.editorclose {
+	text-transform: uppercase;
+	font-weight: bold;
+	margin-top: 5%;
+	font-variant: unicase;
+	font-size: 1.5rem;
+	color: #838383;
+	grid-area: content;
+	background-color: #e9ecef;
+	padding: 15px;
+	border-radius: 8px;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+	visibile: visibile;
+	opacity: 1;
+}
+
+.editorclose.deactive {
+	visibility: hidden;
+	opacity: 0;
 }
 
 .editor-sub {
@@ -206,7 +235,6 @@ a:hover {
 }
 
 .editorheader {
-	font-variant: unicase;
 	box-shadow: 0px 4px 4px #00000017;
 	z-index: 10;
 	align-content: center;
@@ -221,6 +249,7 @@ a:hover {
 }
 
 .titleGrid {
+	font-variant: unicase;
 	overflow-wrap: anywhere;
 	font-size: small;
 	color: #838383;
@@ -312,6 +341,7 @@ a:hover {
 }
 
 input[type='text'].snippet-name {
+	color: #838383;
 	justify-items: self-end;
 	font-size: 0.7rem;
 	padding: 4px 4px;
@@ -321,10 +351,34 @@ input[type='text'].snippet-name {
 	transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+input[type='text'].snippet-name.empty {
+	animation: pulseBorder 2s infinite;
+}
+
 /* Al focus, cambia il colore del bordo e avvia l'animazione */
 input[type='text'].snippet-name:focus {
 	border-color: #00aaff;
-	//animation: pulseBorder 2s infinite;
+}
+
+.ghostname {
+	font-weight: bolder;
+	padding-left: 2%;
+	width: 16%;
+	background: white;
+	position: absolute;
+	top: 14%;
+	left: 1.4%;
+	font-size: 0.7rem;
+	color: #cccccc;
+	font-variant: unicase;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+	visibility: hidden;
+	opacity: 0;
+}
+
+.ghostname.active {
+	visibility: visible;
+	opacity: 1;
 }
 
 /* Animazione "pulse" per un bordo che pulsa leggermente */
@@ -338,4 +392,238 @@ input[type='text'].snippet-name:focus {
 	100% {
 		box-shadow: 0 0 0 0 rgba(0, 170, 255, 0.7);
 	}
+}
+
+.modal-overlay {
+	position: fixed;
+	top: 7px;
+	left: 6px;
+	width: 98.7%;
+	height: 94%;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+	z-index: 1000;
+}
+/* Stato attivo: il modal diventa visibile */
+.modal-overlay.active {
+	border-radius: 15px;
+	visibility: visible;
+	opacity: 1;
+}
+/* Contenitore del modale */
+.modal-content {
+	display: flex;
+	background: #e8ecef;
+	padding: 20px;
+	border-radius: 8px;
+	max-width: 500px;
+	width: 90%;
+	height: 90%;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	transform: scale(0.8);
+	transition: transform 0.3s ease;
+	flex-direction: column;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+	align-items: stretch;
+}
+.modal-overlay.active .modal-content {
+	transform: scale(1);
+}
+/* Header del modale con titolo e bottone di chiusura */
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.modal-header-span {
+	font-variant: unicase;
+	overflow-wrap: anywhere;
+	color: #838383;
+	display: flex;
+	height: 14px;
+	padding: 0% 3%;
+	background: #dee1e6;
+	border-radius: 20px;
+	border: 2px solid #959595;
+	font-weight: bold;
+	color: #959595;
+	z-index: 10;
+	position: fixed;
+	top: 12.2%;
+	left: 6%;
+	align-items: center;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+}
+
+.modal-title {
+	font-variant: unicase;
+	box-shadow: 0px 4px 4px #00000017;
+	z-index: 10;
+	align-content: center;
+	text-align: center;
+	height: 37px;
+	width: 540px;
+	border-radius: 10px 10px 0px 0px;
+	position: fixed;
+	top: -2.3%;
+	left: 0%;
+	background-color: #dee2e6;
+}
+
+.modal-close {
+	cursor: pointer;
+	border: none;
+	background: none;
+	font-size: 1.5rem;
+	line-height: 1;
+}
+/* Corpo e footer del modale */
+.modal-body {
+	margin-top: 50px;
+	height: -webkit-fill-available;
+}
+.modal-footer {
+	text-align: right;
+}
+.modal-footer button {
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+
+.modal-snippet-new-var {
+	background: #dee1e6;
+	display: flex;
+	margin-top: 5%;
+	min-height: 75%;
+	height: 75%;
+	box-shadow: inset 2px 2px 10px #7d7d7d3b;
+	border-radius: 15px;
+	border: 2px solid #959595;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+div[id^='nv'] {
+	height: 180px;
+	padding: 1% 3%;
+	border-radius: 8px;
+	border-left: 2px solid #636364;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+	visibility: hidden;
+	opacity: 0;
+}
+
+div[id^='nv'].active {
+	visibility: visible;
+	opacity: 1;
+}
+
+.new-var-step-top {
+	margin-inline: auto;
+	margin-top: 1%;
+}
+
+.new-var-step {
+	margin-inline: 60% 50%;
+	margin-block: auto;
+}
+
+.new-var {
+	font-size: 0.7rem;
+	width: max-content;
+	position: relative;
+	border-top: none;
+	border-bottom: 2px solid #616161;
+	border-left: 2px solid #616161;
+	color: #616161;
+	font-weight: bold;
+	padding: 1%;
+	border-radius: 8px;
+}
+.new-var-sub {
+	margin-top: 3%;
+	font-size: 0.7rem;
+	width: max-content;
+	position: relative;
+	border-top: none;
+	border-bottom: 2px solid #616161;
+	border-left: 2px solid #616161;
+	color: #616161;
+	font-weight: bold;
+	padding: 1%;
+	border-radius: 8px;
+}
+
+.new-var-helper {
+	font-weight: bold;
+	color: #616161;
+	font-variant: unicase;
+	top: 50%;
+	position: absolute;
+	left: 6%;
+	width: 80px;
+}
+
+#chips-container {
+	background: #dee1e6;
+	box-shadow: inset 0px 0px 4px #b7b7b7;
+	scroll-behavior: smooth;
+	clip-path: view-box;
+	border: 2px solid #959595;
+	border-radius: 8px;
+	max-height: 46px;
+	overflow-y: auto;
+}
+/* Stile base del chip */
+.chip {
+	border: 2px solid #71717163;
+	width: 80px;
+	max-width: 80px;
+	max-height: 25px;
+	height: 25px;
+	display: inline-flex;
+	align-items: center;
+	background-color: #e8ecef;
+	border-radius: 20px;
+	margin: 0.5em;
+	font-size: 10px;
+	transition: background-color 0.2s ease, box-shadow 0.2s ease;
+	cursor: pointer;
+	user-select: none;
+}
+/* Stato selezionato */
+.chip.selected {
+	background-color: #1976d2;
+	color: #fff;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+/* Pulsante di rimozione */
+.chip .chip-close {
+	background: none;
+	border: none;
+	color: inherit;
+	font-size: 16px;
+	margin-left: auto;
+	margin-right: 5%;
+	cursor: pointer;
+	padding: 0;
+	color: red;
+}
+.chip .chip-close:hover {
+	opacity: 0.7;
+}
+
+.chip-label {
+	margin-left: 5%;
 }

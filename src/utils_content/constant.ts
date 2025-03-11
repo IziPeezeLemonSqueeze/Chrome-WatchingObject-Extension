@@ -27,6 +27,14 @@ interface snippetFromStorage
 	[key: string]:
 	{
 		code: string,
-		ivcFound: string[]
+		ivcFound: string[],
+		variables: Ivariable[]
 	}
+}
+
+interface Ivariable
+{
+	code: string,
+	choosable: boolean,
+	active: boolean,
 }
