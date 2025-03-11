@@ -28,6 +28,10 @@ const snippetStorage = {
 };
 
 let editorImported: any = null;
+const snippetlistobj = document.getElementById('snippetlistobj');
+const oldEditor = document.getElementById('editor') as HTMLTextAreaElement;
+
+
 chrome.runtime.onMessage.addListener((obj, sender, response) =>
 {
 	console.log('DEV LISTENER', obj)
@@ -43,10 +47,6 @@ chrome.runtime.onMessage.addListener((obj, sender, response) =>
 	}
 });
 
-const snippetlistobj = document.getElementById('snippetlistobj');
-//const editor = document.getElementById('editor') as HTMLTextAreaElement;
-
-
 document.addEventListener('DOMContentLoaded', async () =>
 {
 	snippetStorage.get((snippet: any) =>
@@ -59,7 +59,15 @@ document.addEventListener('DOMContentLoaded', async () =>
 		console.log(editor.selectionStart);
 	}); */
 
-	const oldEditor = document.getElementById('editor') as HTMLTextAreaElement;
+	initCMistance();
+
+	chrome.runtime.sendMessage({
+		type: 'DCS_initEditor'
+	});
+});
+
+const initCMistance = () =>
+{
 	// @ts-expect-error
 	editorImported = CodeMirror.fromTextArea(oldEditor, {
 		mode: 'text/apexsnippet',
@@ -68,11 +76,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 		indentWithTabs: true
 	});
 
-
-	chrome.runtime.sendMessage({
-		type: 'DCS_initEditor'
-	});
-});
+}
 
 const creatorElementListDEV = async (items: snippetFromStorage) =>
 {

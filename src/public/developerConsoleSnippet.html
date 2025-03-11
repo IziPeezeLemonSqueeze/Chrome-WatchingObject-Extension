@@ -39,14 +39,27 @@
 			</div>
 
 			<div class="editor">
-				<h3>Editor di Testo</h3>
+				<div class="editorheader titleGrid"
+					style="margin-top: 1.1%;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: center;align-items: center;">
+					<button class="run-btn"
+						style="margin-left: 1%;">+ new</button>
+					<h3 style="margin-left: 30%;margin-right: auto;">CODE SNIPPET</h3>
+				</div>
+				<button id="snippetaddvariable"
+					class="copy-btn"
+					style="margin-top: 6%;margin-left: 2%;">Add variable snippet</button>
 				<div class="editor-sub">
 					<textarea id="editor"
 						style="border-radius: 10px;width: 100%;height: 100%;border: none;resize: none;outline: none;padding: 0px;font-size: 1rem;"></textarea>
+					<div class="snippetnewname"
+						id="snippetnewname">
+						<input class="snippet-name"
+							type="text"
+							placeholder="new snippet">
+					</div>
 				</div>
 				<div
-					style="margin-right: 5%;margin-top: 2%;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: flex-end;align-items: center;">
-					<button class="run-btn">NEW SNIPPET</button>
+					style="bottom: 16.5%;right: 22%;position: absolute;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: flex-end;align-items: center;">
 					<button class="copy-btn"
 						style="margin-left: 2%;">SAVE/EDIT</button>
 					<button class="delete-btn"
