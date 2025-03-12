@@ -37,4 +37,5 @@ interface Ivariable
 	code: string,
 	choosable: boolean,
 	active: boolean,
+	name: string
 }

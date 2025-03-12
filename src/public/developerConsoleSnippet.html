@@ -137,6 +137,133 @@
 										placeholder="Hello Salesforce Enhancer!">
 								</div>
 							</div>
+							<div id="nvnumber">
+								<div class="new-var-helper">
+									CREATION OF A NEW VARIABLE OF TYPE <span
+										style="font-size: 1rem;color: #00cf00;">NUMBER</span>
+									<br>
+									CAN BE Decimal, Integer, ect..
+									<br>
+									EXAMPLE:
+									${$NMBtestvariable}
+								</div>
+								<div class="new-var">
+									<span>${$NMB</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="name_variable">
+									<span>}</span>
+								</div>
+								<div class="new-var-sub">
+									<span>DEFAULT VALUE</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="Hello Salesforce Enhancer!">
+								</div>
+							</div>
+							<div id="nvboolean">
+								<div class="new-var-helper">
+									CREATION OF A NEW VARIABLE OF TYPE <span
+										style="font-size: 1rem;color: #00cf00;">BOOLEAN</span>
+									<br>
+									CAN BE <span style="font-size: 1rem;color: #8300cf;">true / false</span>
+									<br>
+									EXAMPLE:
+									${$BOLtestvariable}
+								</div>
+								<div class="new-var">
+									<span>${$BOL</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="name_variable">
+									<span>}</span>
+								</div>
+								<div class="new-var-sub">
+									<span>DEFAULT VALUE</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="Hello Salesforce Enhancer!">
+								</div>
+							</div>
+							<div id="nvid">
+								<div class="new-var-helper">
+									CREATION OF A NEW VARIABLE OF TYPE <span
+										style="font-size: 1rem;color: #00cf00;">ID</span>
+									<br>
+									MUST BE <span style="font-size: 1rem;color: #8300cf;">18</span> characters
+									<br>
+									EXAMPLE:
+									${$IDtestvariable}
+								</div>
+								<div class="new-var">
+									<span>${$ID</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="name_variable">
+									<span>}</span>
+								</div>
+								<div class="new-var-sub">
+									<span>DEFAULT VALUE</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="Hello Salesforce Enhancer!">
+								</div>
+							</div>
+							<div id="nvv">
+								<div class="new-var-helper">
+									CREATION OF A NEW VARIABLE OF TYPE <span
+										style="font-size: 1rem;color: #00cf00;">V</span>
+									<br>
+									SHOULD BE <span style="font-size: 1rem;color: #8300cf;">ALL</span>
+									<br>
+									EXAMPLE:
+									${$Vtestvariable}
+								</div>
+								<div class="new-var">
+									<span>${$V</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="name_variable">
+									<span>}</span>
+								</div>
+								<div class="new-var-sub">
+									<span>DEFAULT VALUE</span>
+									<input type="text"
+										style="border: 1px solid #636364;border-radius: 8px;"
+										placeholder="Hello Salesforce Enhancer!">
+								</div>
+							</div>
+							<div id="nvpck">
+								<div class="new-var-helper">
+									CREATION OF A NEW VARIABLE OF TYPE <span
+										style="font-size: 1rem;color: #00cf00;">PICKLIST</span>
+									<br>
+									EXAMPLE:
+									${$PCK(testvariable)[(foo:foov),(bar:barv)]}
+								</div>
+								<div class="new-var">
+									<span>${$PCK(</span>
+									<input id="pckinputname"
+										type="text"
+										style="border-radius: 8px;margin-bottom: 2%;"
+										placeholder="name_variable">
+									<span>)[</span>
+									<br>
+									<span style="margin-left: 18%; color: #76767682;font-size: .6rem;">separate the
+										values by going to a new line</span>
+									<br>
+									<textarea
+										style="resize: block;max-height: 130px;border-radius: 7px;margin-top: 1%;margin-left: 21%;height: 50px;"
+										name="keyvalue"
+										id="pcktextarea"></textarea>
+									<span>]}</span>
+								</div>
+								<div class="new-var-btn">
+									<button style="margin-left: 100%;"
+										id="pcksavebtn"
+										class="run-btn">save</button>
+								</div>
+							</div>
 						</div>
 					</div>
 
