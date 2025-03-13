@@ -39,7 +39,7 @@
 				"snippet.html",
 				"snippet.css",
 				"popup.css",
-				"developerConsoleSnippet.html",
+				"DVCS/developerConsoleSnippet.html",
 				"https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
 			],
 			"matches": [

@@ -91,12 +91,14 @@ const pckTextArea = document.getElementById('pcktextarea') as HTMLTextAreaElemen
 const pckSaveBtn = document.getElementById('pcksavebtn') as HTMLButtonElement;
 
 /* NEW SNIPPET */
-const btnSnippetNewCode = document.getElementById('snippetnewcode');
-let snippetOnCreating: {
+
+let snippetObject: {
 	name: string,
 	ivcFound: null | string[],
 	variables: Ivariable[]
 };
+
+const btnSnippetNewCode = document.getElementById('snippetnewcode');
 const inputSnippetNewName = document.getElementById('snippetnewname') as HTMLInputElement;
 
 chrome.runtime.onMessage.addListener((obj, sender, response) =>
@@ -222,6 +224,10 @@ const initButtonEventListener = () =>
 	initPCK(divNV);
 }
 
+/**
+ * inizializza la struttura per creare un pck
+ * @param divNV
+ */
 const initPCK = (divNV: { strDiv: HTMLElement; nmbDiv: HTMLElement; bolDiv: HTMLElement; idDiv: HTMLElement; vDiv: HTMLElement; vPck: any; }) =>
 {
 	btnNVPCK.addEventListener('click', () =>
@@ -246,7 +252,7 @@ const initPCK = (divNV: { strDiv: HTMLElement; nmbDiv: HTMLElement; bolDiv: HTML
 		{
 			const target = (<HTMLInputElement>e.target);
 
-			if (snippetOnCreating.variables.length > 0 && snippetOnCreating.variables.filter(v => v.name == target.value))
+			if (snippetObject.variables.length > 0 && snippetObject.variables.filter(v => v.name == target.value))
 			{
 				inputValid = false;
 				target.classList.add('nvinvalid');
@@ -301,14 +307,14 @@ const initPCK = (divNV: { strDiv: HTMLElement; nmbDiv: HTMLElement; bolDiv: HTML
 
 		pckSaveBtn.addEventListener('click', () =>
 		{
-			snippetOnCreating.variables.push({
+			snippetObject.variables.push({
 				active: false,
 				choosable: false,
 				code: handleResultVar.handleEdit(),
 				name: handleResultVar.getName()
 			});
 
-			if (snippetOnCreating.variables.length > 0 && snippetOnCreating.variables.filter(v => v.name == handleResultVar.getName()).length === 1)
+			if (snippetObject.variables.length > 0 && snippetObject.variables.filter(v => v.name == handleResultVar.getName()).length === 1)
 			{
 				pckSaveBtn.innerText = 'saved!';
 
@@ -317,7 +323,7 @@ const initPCK = (divNV: { strDiv: HTMLElement; nmbDiv: HTMLElement; bolDiv: HTML
 					pckTextArea.value = null;
 					pckInputName.value = null;
 					pckSaveBtn.innerText = 'save';
-					pckSaveBtn.classList.remove('active');
+					pckSaveBtn.parentElement.classList.remove('active');
 				}, 500)
 			}
 		});
@@ -333,12 +339,12 @@ const createNewSnippetCodeEditor = () =>
 	editorCloseElement.classList.add('deactive');
 	editorElement.classList.add('active');
 
-	snippetOnCreating = {
+	snippetObject = {
 		name: _getRandomName(),
 		ivcFound: null,
 		variables: []
 	};
-	inputSnippetNewName.value = snippetOnCreating.name;
+	inputSnippetNewName.value = snippetObject.name;
 	const ghostname = document.getElementById('ghostname');
 	ghostname.classList.add('active');
 }
@@ -543,4 +549,23 @@ const _checkOkShowBtnSaveNewVariable = (btn: HTMLButtonElement, [...check]: Bool
 		return;
 	}
 	btn.parentElement.classList.add('active');
+}
+
+const chipContainerDiv = document.getElementById('chips-container');
+const _triggerReloadInitVarDIV = () =>
+{
+	if (!snippetObject || !snippetObject.variables || snippetObject.variables.length == 0)
+	{
+		return;
+	}
+
+	const chips: HTMLDivElement[] = [];
+	snippetObject.variables.forEach(v =>
+	{
+		const chip = document.createElement('div');
+		chip.classList.add('chip');
+
+		chipContainerDiv
+
+	});
 }

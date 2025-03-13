@@ -600,6 +600,7 @@ div[id^='nv'].active {
 	border-radius: 8px;
 	max-height: 46px;
 	overflow-y: auto;
+	min-height: 46px;
 }
 /* Stile base del chip */
 .chip {
