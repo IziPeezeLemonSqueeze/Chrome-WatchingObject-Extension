@@ -39,8 +39,10 @@
 				"snippet.html",
 				"snippet.css",
 				"popup.css",
-				"DVCS/developerConsoleSnippet.html",
-				"https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
+				"DVCS/MODAL/mdl.html",
+				"DVCS/MODAL/mdl.js",
+				"DVCS/MODAL/mdl.css",
+				"DVCS/developerConsoleSnippet.html"
 			],
 			"matches": [
 				"https://*.force.com/*",

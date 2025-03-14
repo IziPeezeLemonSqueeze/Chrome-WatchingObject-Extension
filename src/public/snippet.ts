@@ -134,7 +134,7 @@ const closeWindow = () =>
 	});
 }
 
-const creatorElementList = async (items: snippetFromStorage) =>
+const creatorElementList = async (items: IsnippetFromStorage) =>
 {
 	//console.log('CREATOR : ', items);
 	const listUL = document.getElementById('list');

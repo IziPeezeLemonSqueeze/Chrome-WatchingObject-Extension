@@ -1,4 +1,4 @@
-interface MAPVALUE
+interface IMAPVALUE
 {
 
 	type: string,
@@ -8,21 +8,21 @@ interface MAPVALUE
 
 }
 
-interface resApexLog
+interface IresApexLog
 {
 	done: boolean,
-	records: chunkCompositeApexLog[],
+	records: IchunkCompositeApexLog[],
 	totalSize: number
 }
 
-interface chunkCompositeApexLog
+interface IchunkCompositeApexLog
 {
 	errors: [],
 	id: string,
 	success: boolean
 }
 
-interface snippetFromStorage
+interface IsnippetFromStorage
 {
 	[key: string]:
 	{
@@ -32,10 +32,30 @@ interface snippetFromStorage
 	}
 }
 
+type TivcFound = string[]
+
+interface IsnippetObject
+{
+	name: string,
+	ivcFound: null | TivcFound,
+	variables: Ivariable[]
+};
+
 interface Ivariable
 {
 	code: string,
+	defaultValue: string | number | boolean | string[] | { [key: string]: {} }
 	choosable: boolean,
 	active: boolean,
 	name: string
+}
+
+interface IdivNV
+{
+	strDiv: HTMLElement,
+	nmbDiv: HTMLElement,
+	bolDiv: HTMLElement,
+	idDiv: HTMLElement,
+	vDiv: HTMLElement,
+	vPck: HTMLElement
 }

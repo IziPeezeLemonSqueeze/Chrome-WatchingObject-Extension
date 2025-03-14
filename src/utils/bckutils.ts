@@ -182,7 +182,7 @@ export async function goToApexLog(obj: any, sender: chrome.runtime.MessageSender
 		name: "sid",
 		domain: getCurrentUrl(sender.tab).customDomain,
 	});
-	let res: resApexLog = null;
+	let res: IresApexLog = null;
 	await fetch(
 		getCurrentUrl(sender.tab).customDomainHttps +
 		`/services/data/v${apiActive}/query/?q=SELECT+Id+FROM+ApexLog`, {
@@ -201,7 +201,7 @@ export async function goToApexLog(obj: any, sender: chrome.runtime.MessageSender
 		console.log('APEX LOGS', res.totalSize);
 		const urlToSendDelete = getCurrentUrl(sender.tab).customDomainHttps + `/services/data/v${apiActive}/composite/sobjects?ids=`;
 
-		let chunkComposite: chunkCompositeApexLog[][] = [];
+		let chunkComposite: IchunkCompositeApexLog[][] = [];
 		for (let c = 0; c < res.records.length; c += 200)
 		{
 			chunkComposite.push(res.records.slice(c, c + 200));

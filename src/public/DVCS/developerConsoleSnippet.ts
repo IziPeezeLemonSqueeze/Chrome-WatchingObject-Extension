@@ -1,38 +1,55 @@
-class handleResultVarText
+
+class SnippetObject
 {
-	private OUTprefix: string;
-	private OUTname: string;
-	private OUTvalue: string;
-	private OUTsuffix: string;
+	snippet: IsnippetObject;
+	isNew: boolean;
+	isEditing: boolean;
 
-	constructor() { }
+	constructor(isNewer: boolean, isEditing: boolean)
+	{
+		this.isNew = isNewer;
+		this.snippet = {
+			name: this.isNew ? this.generateRandomName() : null,
+			ivcFound: null,
+			variables: new Array<Ivariable>
+		}
+		this.isEditing = isEditing;
+	}
 
-	setPrefix(prefix: string)
+	setName(name: string)
 	{
-		this.OUTprefix = prefix;
-	}
-	setNameText(name: string)
-	{
-		this.OUTname = name;
-	}
-	setValueText(value: string)
-	{
-		this.OUTvalue = value;
-	}
-	setSuffix(suffix: string)
-	{
-		this.OUTsuffix = suffix;
-	}
-	handleEdit()
-	{
-		return `${this.OUTprefix}(${this.OUTname})[${this.OUTvalue}]${this.OUTsuffix}`;
+		this.snippet.name = name;
 	}
 
 	getName()
 	{
-		return this.OUTname;
+		return this.snippet.name;
 	}
 
+	setIVCFound(ivcFound: TivcFound)
+	{
+		this.snippet.ivcFound = ivcFound;
+	}
+
+	getIVCFound()
+	{
+		return this.snippet.ivcFound;
+	}
+
+	setVariables(variables: Ivariable[])
+	{
+		this.snippet.variables = variables;
+	}
+
+	getVariables()
+	{
+		return this.snippet.variables;
+	}
+
+	generateRandomName(): string
+	{
+		return (Math.random() * 999).toString().replace('.', '');
+	}
 }
 
 let snippetsBackupDEV: { name: string; code: any; ivcFound: any; }[] = [];
@@ -62,44 +79,22 @@ const snippetStorage = {
 		);
 	},
 };
+
 /* EDITOR */
 let editorImported: any = null;
 const snippetlistobj = document.getElementById('snippetlistobj');
 const oldEditor = document.getElementById('editor') as HTMLTextAreaElement;
 const btnSnippetAddVariable = document.getElementById('snippetaddvariable');
-/* MODALE  */
-const modalOverlay = document.getElementById('modalOverlay');
-const btnCloseModalFooter = document.getElementById('closeModalFooter');
-const chipVariable = document.querySelectorAll('.chip');
-const btnChipVariableClose = document.querySelectorAll('.chip-close');
-/* NEW SNIPPET MODAL */
-const btnNVClassicSTR = document.getElementById('btnnvclassicstr');
-const btnNVClassicNMB = document.getElementById('btnnvclassicnmb');
-const btnNVClassicBOL = document.getElementById('btnnvclassicbol');
-const btnNVClassicID = document.getElementById('btnnvclassicid');
-const btnNVClassicV = document.getElementById('btnnvclassicv');
-
-/* str */
-/* nmb */
-/* bol */
-/* id */
-/* v */
-/* pck */
-const btnNVPCK = document.getElementById('btnnvpck') as HTMLButtonElement;
-const pckInputName = document.getElementById('pckinputname') as HTMLInputElement;
-const pckTextArea = document.getElementById('pcktextarea') as HTMLTextAreaElement;
-const pckSaveBtn = document.getElementById('pcksavebtn') as HTMLButtonElement;
+const modalOverlay = document.getElementById('modalOverlay') as HTMLDivElement;
 
 /* NEW SNIPPET */
 
-let snippetObject: {
-	name: string,
-	ivcFound: null | string[],
-	variables: Ivariable[]
-};
+let snippetObject: SnippetObject = null;
 
 const btnSnippetNewCode = document.getElementById('snippetnewcode');
 const inputSnippetNewName = document.getElementById('snippetnewname') as HTMLInputElement;
+
+let mdl: HTMLIFrameElement;
 
 chrome.runtime.onMessage.addListener((obj, sender, response) =>
 {
@@ -110,6 +105,25 @@ chrome.runtime.onMessage.addListener((obj, sender, response) =>
 		{
 			case 'initEditorDoneDCS':
 				editorImported = obj.payload;
+				break;
+		}
+	}
+});
+
+window.addEventListener('message', (e: any) =>
+{
+	console.log('message window dcs', e);
+	if (e.data)
+	{
+		switch (e.data.type)
+		{
+			case 'DCS_close_modal':
+				snippetObject.setVariables(e.data.payload);
+				modalOverlay.classList.remove('active');
+				setTimeout(() =>
+				{
+					mdl.remove();
+				}, 300);
 				break;
 		}
 	}
@@ -137,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 
 });
 
-let handleResultVar: handleResultVarText;
+
 const initButtonEventListener = () =>
 {
 	btnSnippetNewCode.addEventListener('click', () =>
@@ -145,37 +159,9 @@ const initButtonEventListener = () =>
 		createNewSnippetCodeEditor();
 	});
 
-	btnCloseModalFooter.addEventListener('click', () =>
-	{
-		//TODO ???? FARE QUALCOSA ALLA CHIUSURA DEL MODALE?
-		modalOverlay.classList.remove('active');
-	});
-
 	btnSnippetAddVariable.addEventListener('click', () =>
 	{
 		openCloseModalVariable();
-	});
-
-	chipVariable.forEach(chip =>
-	{
-		chip.addEventListener('click', function (e)
-		{
-			// Se il clic è sull'icona di chiusura, non attivare la selezione
-			if ((<HTMLDivElement>e.target).classList.contains('chip-close'))
-			{
-				return;
-			}
-			chip.classList.toggle('selected');
-		});
-	});
-
-	btnChipVariableClose.forEach(button =>
-	{
-		button.addEventListener('click', function (e)
-		{
-			e.stopPropagation(); // Impedisce al clic di propagarsi al chip
-			button.parentElement.remove();
-		});
 	});
 
 	inputSnippetNewName.addEventListener('change', (e) =>
@@ -193,142 +179,10 @@ const initButtonEventListener = () =>
 
 	});
 
-	const divNV = {
-		strDiv: document.getElementById('nvstring'),
-		nmbDiv: document.getElementById('nvnumber'),
-		bolDiv: document.getElementById('nvboolean'),
-		idDiv: document.getElementById('nvid'),
-		vDiv: document.getElementById('nvv'),
-		vPck: document.getElementById('nvpck'),
-	}
-	btnNVClassicSTR.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.strDiv);
-	});
-	btnNVClassicNMB.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.nmbDiv);
-	});
-	btnNVClassicBOL.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.bolDiv);
-	});
-	btnNVClassicID.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.idDiv);
-	});
-	btnNVClassicV.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.vDiv);
-	});
-	initPCK(divNV);
+
 }
 
-/**
- * inizializza la struttura per creare un pck
- * @param divNV
- */
-const initPCK = (divNV: { strDiv: HTMLElement; nmbDiv: HTMLElement; bolDiv: HTMLElement; idDiv: HTMLElement; vDiv: HTMLElement; vPck: any; }) =>
-{
-	btnNVPCK.addEventListener('click', () =>
-	{
-		handleResultVar = new handleResultVarText();
-		_classNVToggler(divNV, divNV.vPck);
-		_createNewPCK();
-	});
 
-	pckTextArea.setAttribute('placeholder', `(foo:foovalue)\n(bar:barvalue)`);
-
-	function _createNewPCK()
-	{
-		let inputValid = false;
-		let textareaValid = false;
-
-		handleResultVar.setNameText(_getRandomName());
-		handleResultVar.setPrefix(__PREFIX_CODE_SNIPPET__.PCK);
-		handleResultVar.setSuffix('}');
-
-		pckInputName.addEventListener('input', (e) =>
-		{
-			const target = (<HTMLInputElement>e.target);
-
-			if (snippetObject.variables.length > 0 && snippetObject.variables.filter(v => v.name == target.value))
-			{
-				inputValid = false;
-				target.classList.add('nvinvalid');
-				target.classList.remove('nvvalid');
-				return;
-			}
-			if (target.value.trim().length == 0)
-			{
-				inputValid = false;
-				target.classList.add('nvinvalid');
-				target.classList.remove('nvvalid');
-			} else
-			{
-				inputValid = true;
-				target.classList.add('nvvalid');
-				target.classList.remove('nvinvalid');
-			}
-			console.log('inputValid', inputValid)
-			_checkOkShowBtnSaveNewVariable(pckSaveBtn, [inputValid, textareaValid]);
-			const finalText = target.value.replace(' ', '_');
-			handleResultVar.setNameText(finalText);
-		});
-
-		pckTextArea.addEventListener('input', (e) =>
-		{
-			const target = (<HTMLTextAreaElement>e.target);
-			const values = target.value.split('\n');
-
-			const checkRegex: RegExp = /^(?:\([^:\n]+:[^:\n]+\)(?:\n|$))+$/;
-			const countValid = values.filter(v => v.match(checkRegex));
-			console.log('COUNT VVALID', countValid);
-			if (countValid.length == values.length)
-			{
-				textareaValid = true;
-				target.classList.add('nvvalid');
-				target.classList.remove('nvinvalid');
-			} else
-			{
-				textareaValid = false;
-				target.classList.add('nvinvalid');
-				target.classList.remove('nvvalid');
-			}
-			console.log('textareavalid', textareaValid)
-			_checkOkShowBtnSaveNewVariable(pckSaveBtn, [inputValid, textareaValid]);
-			handleResultVar.setValueText(values.reduce((acc, act) =>
-			{
-				acc += ',' + act;
-				return acc;
-			}));
-		});
-
-
-		pckSaveBtn.addEventListener('click', () =>
-		{
-			snippetObject.variables.push({
-				active: false,
-				choosable: false,
-				code: handleResultVar.handleEdit(),
-				name: handleResultVar.getName()
-			});
-
-			if (snippetObject.variables.length > 0 && snippetObject.variables.filter(v => v.name == handleResultVar.getName()).length === 1)
-			{
-				pckSaveBtn.innerText = 'saved!';
-
-				setTimeout(() =>
-				{
-					pckTextArea.value = null;
-					pckInputName.value = null;
-					pckSaveBtn.innerText = 'save';
-					pckSaveBtn.parentElement.classList.remove('active');
-				}, 500)
-			}
-		});
-	}
-}
 
 
 const createNewSnippetCodeEditor = () =>
@@ -339,19 +193,17 @@ const createNewSnippetCodeEditor = () =>
 	editorCloseElement.classList.add('deactive');
 	editorElement.classList.add('active');
 
-	snippetObject = {
-		name: _getRandomName(),
-		ivcFound: null,
-		variables: []
-	};
-	inputSnippetNewName.value = snippetObject.name;
+	snippetObject = new SnippetObject(true, false);
+
+	inputSnippetNewName.value = snippetObject.getName();
 	const ghostname = document.getElementById('ghostname');
 	ghostname.classList.add('active');
+
 }
 
 const openCloseModalVariable = () =>
 {
-	snippetStorage.get((snippet: snippetFromStorage) =>
+	snippetStorage.get((snippet: IsnippetFromStorage) =>
 	{
 		if (!snippet)
 		{
@@ -368,7 +220,19 @@ const openCloseModalVariable = () =>
 		});
 	});
 
+	mdl = document.createElement('iframe');
+	mdl.src = chrome.runtime.getURL('DVCS/MODAL/mdl.html');
+	mdl.setAttribute('style', 'left: 24%;z-index: 200;position: fixed;height: 100%;width: 57%;overflow-clip-margin: unset;overflow: unset;border: 0px;background: transparent;')
+
+	modalOverlay.appendChild(mdl);
+	setTimeout(() =>
+	{
+		mdl.contentWindow.postMessage({ type: 'MDCS_init_snippetObject', payload: { ...snippetObject } }, '*');
+	}, 500);
+
 	modalOverlay.classList.add('active');
+
+
 }
 
 const initCMistance = () =>
@@ -383,7 +247,7 @@ const initCMistance = () =>
 
 }
 
-const creatorElementListDEV = async (items: snippetFromStorage) =>
+const creatorElementListDEV = async (items: IsnippetFromStorage) =>
 {
 	console.log('CREATOR DEV : ', items);
 	Object.keys(items).forEach((k, i) =>
@@ -511,61 +375,7 @@ const handler_runDEV = (doc: HTMLElement, payload: any, id: string) =>
 
 
 
-/* ------------------------UTILS------------------------ */
-const _classNVToggler = (divNV: { strDiv: HTMLElement; nmbDiv: HTMLElement; bolDiv: HTMLElement; idDiv: HTMLElement; vDiv: HTMLElement; vPck: HTMLElement; }, nameActive: HTMLElement) =>
-{
-	Object.entries(divNV).forEach(([name, value]) =>
-	{
-		if (value.id != nameActive.id)
-		{
-			value.classList.remove('active');
-			return;
-		}
-		value.classList.add('active');
-	});
-}
 
-const __PREFIX_CODE_SNIPPET__ =
-{
-	STR: '${$STR',
-	NMB: '${$NMB',
-	BOL: '${$BOL',
-	ID: '${$ID',
-	V: '${$V',
-	PCK: '${$PCK',
-}
 
-const _getRandomName = (): string =>
-{
-	return (Math.random() * 999).toString().replace('.', '');
-}
 
-const _checkOkShowBtnSaveNewVariable = (btn: HTMLButtonElement, [...check]: Boolean[]) =>
-{
-	const isOk = check.every(b => b === true);
-	if (!isOk)
-	{
-		btn.parentElement.classList.remove('active');
-		return;
-	}
-	btn.parentElement.classList.add('active');
-}
 
-const chipContainerDiv = document.getElementById('chips-container');
-const _triggerReloadInitVarDIV = () =>
-{
-	if (!snippetObject || !snippetObject.variables || snippetObject.variables.length == 0)
-	{
-		return;
-	}
-
-	const chips: HTMLDivElement[] = [];
-	snippetObject.variables.forEach(v =>
-	{
-		const chip = document.createElement('div');
-		chip.classList.add('chip');
-
-		chipContainerDiv
-
-	});
-}

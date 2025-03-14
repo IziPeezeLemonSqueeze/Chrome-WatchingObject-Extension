@@ -250,7 +250,7 @@ export class SNIPPET
 		return this.dialogVarOpen;
 	}
 
-	openDialogVar([mapValue, code, id]: [MAPVALUE[], string, string])
+	openDialogVar([mapValue, code, id]: [IMAPVALUE[], string, string])
 	{
 		const nomeSnippet = id;
 		this.dialogVarOpen = true;
@@ -320,7 +320,7 @@ export class SNIPPET
 		let lastValueInserted = new Map();
 		let codeModified = code;
 
-		Object.entries(mapValue).forEach((elem: [string, MAPVALUE]) =>
+		Object.entries(mapValue).forEach((elem: [string, IMAPVALUE]) =>
 		{
 			let el = elem[1];
 			//console.log(el, idx);

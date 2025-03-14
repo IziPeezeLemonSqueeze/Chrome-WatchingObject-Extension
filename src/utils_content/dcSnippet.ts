@@ -106,7 +106,7 @@ export class DCSNIPPET
 		this.frameSnippet.id = 'DCSFRAME';
 		this.frameSnippet.src = chrome.runtime.getURL('DVCS/developerConsoleSnippet.html');
 		this.frameSnippet.setAttribute('class', 'iframe');
-		this.frameSnippet.setAttribute('style', "z-index: 1000;position: absolute;width: 58.5%;height: 512px;top: 5%;left: 21%;border: none !important;outline: none!important;")
+		this.frameSnippet.setAttribute('style', "z-index: 1000;position: absolute;width: 1095px;height: 512px;top: 5%;left: 0%;border: none !important;outline: none!important;")
 
 		parentElement.appendChild(this.frameSnippet);
 	}
