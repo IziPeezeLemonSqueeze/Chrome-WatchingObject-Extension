@@ -62,43 +62,7 @@ class SnippetObject
 		this.snippet.code = value;
 
 
-	}
-
-	private _checkIVC(text: string)
-	{
-		if (text.match("${$"))
-		{
-			// 1. Pattern per ${$RAND(0-99)} oppure ${$RND(0-99)}
-			if (text.match(/\$\{\$(RAND|RND)\(\d{1,2}\)\}/))
-			{
-				return "custom-random-number";  // Ritorna un token che applicherà lo stile 'cm-custom-random-number'
-			}
-			// 2. Pattern per ${$RANDSTR(0-99)}
-			if (text.match(/\$\{\$RANDSTR\(\d+\)\}/))
-			{
-				return "custom-random-string";
-			}
-			// 3. Pattern per variabili: ${$STRnome_variabile}, ${$NMBnome_variabile}, ${$BOLnome_variabile}, ${$IDnome_variabile}, ${$Vnome_variabile}
-			//    Facoltativamente con valore di default: ad esempio ${$STRnome_variabile : defaultValue}
-			if (text.match(/\(\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z0-9_]+\}:\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z0-9_]+\}\)/))
-			{
-				return "custom-variable";
-			}
-			// 4. Pattern per ${$PCK[(foo : foovalue),(foo1 : foo1value)]}
-			if (text.match("${$PCK"))
-			{
-				// Caso 1: Definizione con picklist, deve contenere la parte tra parentesi tonde e quadre
-				if (text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/))
-				{
-					return "custom-pck-def";  // Questo token verrà stilizzato con .cm-custom-pck-def
-				}
-				// Caso 2: Richiamo senza la parte tra parentesi quadre
-				if (text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/))
-				{
-					return "custom-pck-call"; // Questo token verrà stilizzato con .cm-custom-pck-call
-				}
-			}
-		}
+		console.log('COUNTIVC: ', _checkIVC(this.snippet.code));
 	}
 }
 
@@ -433,6 +397,21 @@ const handler_runDEV = (doc: HTMLElement, payload: any, id: string) =>
 	console.log(doc, payload, id);
 }
 
+const _checkIVC = (text: string) =>
+{
+	console.log('CHECK', text)
+	const countIVC = [];
+	countIVC.push(text.match(/\$\{\$(RAND|RND)\(\d{1,2}\)\}/g));
+
+	countIVC.push(text.match(/\$\{\$RANDSTR\(\d+\)\}/g));
+
+	countIVC.push(text.match(/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+(?::[A-Za-z0-9_ ]+)?\}/g));
+	countIVC.push(text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/g));
+	countIVC.push(text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/g));
+
+
+	return countIVC;
+}
 
 
 

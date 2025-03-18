@@ -14,11 +14,11 @@ CodeMirror.defineMode('apexsnippet', function (config, parserConfig) {
 				if (stream.match(/\$\{\$RANDSTR\(\d+\)\}/)) {
 					return 'custom-random-string';
 				}
-				// 3. Pattern per variabili: ${$STRnome_variabile}, ${$NMBnome_variabile}, ${$BOLnome_variabile}, ${$IDnome_variabile}, ${$Vnome_variabile}
+				// 3. Pattern per variabili: ${$STRnome_variabile}, ${$NMBnome_variabile}, ${$BOLnome_variabile}, ${$IDnome_variabile}, ${$Vnome_variabile}, ${$nome_variabile}
 				//    Facoltativamente con valore di default: ad esempio ${$STRnome_variabile : defaultValue}
 				if (
 					stream.match(
-						/\(\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z0-9_]+\}:\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z0-9_]+\}\)/
+						/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+(?::[A-Za-z0-9_ ]+)?\}/g
 					)
 				) {
 					return 'custom-variable';
