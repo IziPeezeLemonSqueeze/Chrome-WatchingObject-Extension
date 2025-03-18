@@ -1,4 +1,3 @@
-
 class SnippetObject_mdl
 {
 	snippet: IsnippetObject;
@@ -11,8 +10,9 @@ class SnippetObject_mdl
 		this.snippet = {
 			name: this.isNew ? this.generateRandomName() : null,
 			ivcFound: null,
-			variables: new Array<Ivariable>
-		}
+			variables: new Array<Ivariable>(),
+			code: null
+		};
 		this.isEditing = isEditing;
 	}
 
@@ -49,6 +49,16 @@ class SnippetObject_mdl
 	generateRandomName(): string
 	{
 		return (Math.random() * 999).toString().replace('.', '');
+	}
+
+	getCode(): string
+	{
+		return this.snippet.code;
+	}
+
+	setCode(value: string)
+	{
+		this.snippet.code = value;
 	}
 }
 
@@ -97,7 +107,6 @@ class handleResultVarText
 	{
 		return this.OUTvalue;
 	}
-
 }
 
 let handleResultVar: handleResultVarText;
@@ -110,25 +119,51 @@ const btnNVClassicBOL = document.getElementById('btnnvclassicbol');
 const btnNVClassicID = document.getElementById('btnnvclassicid');
 const btnNVClassicV = document.getElementById('btnnvclassicv');
 
-/* str */
+/* STR */
 const btnNVClassicSTR = document.getElementById('btnnvclassicstr');
-const strInputName = document.getElementById('strinputname') as HTMLInputElement;
-const strInputDefaultValue = document.getElementById('strinputdefaultvalue') as HTMLInputElement;
+const strInputName = document.getElementById(
+	'strinputname'
+) as HTMLInputElement;
+const strInputDefaultValue = document.getElementById(
+	'strinputdefaultvalue'
+) as HTMLInputElement;
 const strSaveBtn = document.getElementById('strsavebtn') as HTMLButtonElement;
-/* nmb */
-/* bol */
-/* id */
+/* NMB */
+const nmbInputName = document.getElementById(
+	'nmbinputname'
+) as HTMLInputElement;
+const nmbInputDefaultValue = document.getElementById(
+	'nmbinputdefaultvalue'
+) as HTMLInputElement;
+const nmbSaveBtn = document.getElementById('nmbsavebtn') as HTMLButtonElement;
+/* BOL */
+const bolInputName = document.getElementById(
+	'bolinputname'
+) as HTMLInputElement;
+const bolInputDefaultValue = document.getElementById(
+	'bolinputdefaultvalue'
+) as HTMLInputElement;
+const bolSaveBtn = document.getElementById('bolsavebtn') as HTMLButtonElement;
+/* ID */
+const idInputName = document.getElementById(
+	'idinputname'
+) as HTMLInputElement;
+const idInputDefaultValue = document.getElementById(
+	'idinputdefaultvalue'
+) as HTMLInputElement;
+const idSaveBtn = document.getElementById('idsavebtn') as HTMLButtonElement;
 /* v */
 /* pck */
 const btnNVPCK = document.getElementById('btnnvpck') as HTMLButtonElement;
-const pckInputName = document.getElementById('pckinputname') as HTMLInputElement;
-const pckTextArea = document.getElementById('pcktextarea') as HTMLTextAreaElement;
+const pckInputName = document.getElementById(
+	'pckinputname'
+) as HTMLInputElement;
+const pckTextArea = document.getElementById(
+	'pcktextarea'
+) as HTMLTextAreaElement;
 const pckSaveBtn = document.getElementById('pcksavebtn') as HTMLButtonElement;
 
-
 let snippetObject_modal_ref: SnippetObject;
-
-
 
 document.addEventListener('DOMContentLoaded', async () =>
 {
@@ -152,7 +187,13 @@ document.addEventListener('DOMContentLoaded', async () =>
 
 	btnCloseModalFooter.addEventListener('click', async () =>
 	{
-		window.parent.postMessage({ type: 'DCS_close_modal', payload: snippetObject_modal_ref.getVariables() }, '*');
+		window.parent.postMessage(
+			{
+				type: 'DCS_close_modal',
+				payload: snippetObject_modal_ref.getVariables(),
+			},
+			'*'
+		);
 	});
 
 	const divNV = {
@@ -162,27 +203,329 @@ document.addEventListener('DOMContentLoaded', async () =>
 		idDiv: document.getElementById('nvid'),
 		vDiv: document.getElementById('nvv'),
 		vPck: document.getElementById('nvpck'),
-	}
-	btnNVClassicNMB.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.nmbDiv);
-	});
-	btnNVClassicBOL.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.bolDiv);
-	});
-	btnNVClassicID.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.idDiv);
-	});
+	};
 	btnNVClassicV.addEventListener('click', () =>
 	{
 		_classNVToggler(divNV, divNV.vDiv);
 	});
+	initID(divNV);
+	initBOL(divNV);
+	initNMB(divNV);
 	initSTR(divNV);
 	initPCK(divNV);
+});
 
-})
+/**
+ * inizializza la struttura per creare un pck
+ * @param divNV
+ */
+const initID = (divNV: IdivNV) =>
+{
+	btnNVClassicID.addEventListener('click', () =>
+	{
+		handleResultVar = new handleResultVarText();
+		_classNVToggler(divNV, divNV.idDiv);
+		_createNewID();
+	});
+
+	function _createNewID()
+	{
+		let inputValid = false;
+		let inputDefaultValid = true;
+
+		handleResultVar.setNameText(
+			snippetObject_modal_ref.generateRandomName()
+		);
+		handleResultVar.setPrefix(__PREFIX_CODE_SNIPPET__.ID);
+		handleResultVar.setSuffix('}');
+
+		idInputName.addEventListener('input', (e) =>
+		{
+			inputValid = handleInputNameForNewVariable(e);
+			_checkOkShowBtnSaveNewVariable(idSaveBtn, [
+				inputValid,
+				inputDefaultValid,
+			]);
+		});
+
+		idInputDefaultValue.addEventListener('input', (e) =>
+		{
+			const target = <HTMLInputElement>e.target;
+			if (target.value.length == 0)
+			{
+				_checkOkShowBtnSaveNewVariable(idSaveBtn, [
+					inputValid,
+					true,
+				]);
+				return;
+			}
+			if (isValidSalesforceId(target.value))
+			{
+				inputDefaultValid = true;
+				handleResultVar.setValueText(target.value);
+			} else
+			{
+				inputDefaultValid = false;
+			}
+			_applyNVValidNVInvalidToTarget(target, inputDefaultValid);
+			_checkOkShowBtnSaveNewVariable(idSaveBtn, [
+				inputValid,
+				inputDefaultValid,
+			]);
+
+			function isValidSalesforceId(id: string): boolean
+			{
+				if (/^[a-zA-Z0-9]{15}?$/.test(id)) return true;
+				if (/^[a-zA-Z0-9]{15}([a-zA-Z0-9]{3})?$/.test(id)) return true;
+				return false;
+			}
+
+		});
+
+		idSaveBtn.addEventListener('click', () =>
+		{
+			snippetObject_modal_ref.getVariables().push({
+				active: false,
+				choosable: false,
+				code: !handleResultVar.getValueText()
+					? handleResultVar.handleEditClassic()
+					: handleResultVar.handleEditClassicDefault(),
+				name: handleResultVar.getName(),
+				defaultValue: handleResultVar.getValueText(),
+			});
+
+			if (
+				snippetObject_modal_ref.getVariables().length > 0 &&
+				snippetObject_modal_ref
+					.getVariables()
+					.filter(
+						(v: Ivariable) => v.name == handleResultVar.getName()
+					).length === 1
+			)
+			{
+				idSaveBtn.innerText = 'saved!';
+
+				setTimeout(() =>
+				{
+					idInputDefaultValue.value = null;
+					idInputDefaultValue.classList.toggle('nvinvalid');
+					idInputDefaultValue.classList.toggle('nvvalid');
+					idInputName.value = null;
+					idInputName.classList.toggle('nvinvalid');
+					idInputName.classList.toggle('nvvalid');
+					idSaveBtn.innerText = 'save';
+					inputDefaultValid = true;
+					inputValid = false;
+					idSaveBtn.parentElement.classList.remove('active');
+					_triggerReloadInitVarDIV();
+				}, 500);
+			}
+		});
+	}
+};
+
+/**
+ * inizializza la struttura per creare un pck
+ * @param divNV
+ */
+const initBOL = (divNV: IdivNV) =>
+{
+	btnNVClassicBOL.addEventListener('click', () =>
+	{
+		handleResultVar = new handleResultVarText();
+		_classNVToggler(divNV, divNV.bolDiv);
+		_createNewBOL();
+	});
+
+	function _createNewBOL()
+	{
+		let inputValid = false;
+		let inputDefaultValid = true;
+
+		handleResultVar.setNameText(
+			snippetObject_modal_ref.generateRandomName()
+		);
+		handleResultVar.setPrefix(__PREFIX_CODE_SNIPPET__.BOL);
+		handleResultVar.setSuffix('}');
+
+		bolInputName.addEventListener('input', (e) =>
+		{
+			inputValid = handleInputNameForNewVariable(e);
+			_checkOkShowBtnSaveNewVariable(bolSaveBtn, [
+				inputValid,
+				inputDefaultValid,
+			]);
+		});
+
+		bolInputDefaultValue.addEventListener('input', (e) =>
+		{
+			const target = <HTMLInputElement>e.target;
+			if (target.value.length == 0)
+			{
+				_checkOkShowBtnSaveNewVariable(bolSaveBtn, [
+					inputValid,
+					true,
+				]);
+				return;
+			}
+			if (target.value.toLowerCase() == 'true' || target.value.toLowerCase() == 'false')
+			{
+				inputDefaultValid = true;
+				handleResultVar.setValueText(target.value.toLowerCase());
+			} else
+			{
+				inputDefaultValid = false;
+			}
+			_applyNVValidNVInvalidToTarget(target, inputDefaultValid);
+			_checkOkShowBtnSaveNewVariable(bolSaveBtn, [
+				inputValid,
+				inputDefaultValid,
+			]);
+		});
+
+		bolSaveBtn.addEventListener('click', () =>
+		{
+			snippetObject_modal_ref.getVariables().push({
+				active: false,
+				choosable: false,
+				code: !handleResultVar.getValueText()
+					? handleResultVar.handleEditClassic()
+					: handleResultVar.handleEditClassicDefault(),
+				name: handleResultVar.getName(),
+				defaultValue: handleResultVar.getValueText(),
+			});
+
+			if (
+				snippetObject_modal_ref.getVariables().length > 0 &&
+				snippetObject_modal_ref
+					.getVariables()
+					.filter(
+						(v: Ivariable) => v.name == handleResultVar.getName()
+					).length === 1
+			)
+			{
+				bolSaveBtn.innerText = 'saved!';
+
+				setTimeout(() =>
+				{
+					bolInputDefaultValue.value = null;
+					bolInputDefaultValue.classList.toggle('nvinvalid');
+					bolInputDefaultValue.classList.toggle('nvvalid');
+					bolInputName.value = null;
+					bolInputName.classList.toggle('nvinvalid');
+					bolInputName.classList.toggle('nvvalid');
+					bolSaveBtn.innerText = 'save';
+					inputDefaultValid = true;
+					inputValid = false;
+					bolSaveBtn.parentElement.classList.remove('active');
+					_triggerReloadInitVarDIV();
+				}, 500);
+			}
+		});
+	}
+};
+
+/**
+ * inizializza la struttura per creare un pck
+ * @param divNV
+ */
+const initNMB = (divNV: IdivNV) =>
+{
+	btnNVClassicNMB.addEventListener('click', () =>
+	{
+		handleResultVar = new handleResultVarText();
+		_classNVToggler(divNV, divNV.nmbDiv);
+		_createNewNMB();
+	});
+
+	function _createNewNMB()
+	{
+		let inputValid = false;
+		let inputDefaultValid = true;
+
+		handleResultVar.setNameText(
+			snippetObject_modal_ref.generateRandomName()
+		);
+		handleResultVar.setPrefix(__PREFIX_CODE_SNIPPET__.NMB);
+		handleResultVar.setSuffix('}');
+
+		nmbInputName.addEventListener('input', (e) =>
+		{
+			inputValid = handleInputNameForNewVariable(e);
+			_checkOkShowBtnSaveNewVariable(nmbSaveBtn, [
+				inputValid,
+				inputDefaultValid,
+			]);
+		});
+
+		nmbInputDefaultValue.addEventListener('input', (e) =>
+		{
+			const target = <HTMLInputElement>e.target;
+			if (target.value.length == 0)
+			{
+				_checkOkShowBtnSaveNewVariable(nmbSaveBtn, [
+					inputValid,
+					true,
+				]);
+				return;
+			}
+			if (parseFloat(target.value))
+			{
+				inputDefaultValid = true;
+				handleResultVar.setValueText(target.value.toString());
+			} else
+			{
+				inputDefaultValid = false;
+			}
+
+			_applyNVValidNVInvalidToTarget(target, inputDefaultValid);
+			_checkOkShowBtnSaveNewVariable(nmbSaveBtn, [
+				inputValid,
+				inputDefaultValid,
+			]);
+		});
+
+		nmbSaveBtn.addEventListener('click', () =>
+		{
+			snippetObject_modal_ref.getVariables().push({
+				active: false,
+				choosable: false,
+				code: !handleResultVar.getValueText()
+					? handleResultVar.handleEditClassic()
+					: handleResultVar.handleEditClassicDefault(),
+				name: handleResultVar.getName(),
+				defaultValue: handleResultVar.getValueText(),
+			});
+
+			if (
+				snippetObject_modal_ref.getVariables().length > 0 &&
+				snippetObject_modal_ref
+					.getVariables()
+					.filter(
+						(v: Ivariable) => v.name == handleResultVar.getName()
+					).length === 1
+			)
+			{
+				nmbSaveBtn.innerText = 'saved!';
+
+				setTimeout(() =>
+				{
+					nmbInputDefaultValue.value = null;
+					nmbInputDefaultValue.classList.toggle('nvinvalid');
+					nmbInputDefaultValue.classList.toggle('nvvalid');
+					nmbInputName.value = null;
+					nmbInputName.classList.toggle('nvinvalid');
+					nmbInputName.classList.toggle('nvvalid');
+					nmbSaveBtn.innerText = 'save';
+					inputDefaultValid = true;
+					inputValid = false;
+					nmbSaveBtn.parentElement.classList.remove('active');
+					_triggerReloadInitVarDIV();
+				}, 500);
+			}
+		});
+	}
+};
 
 /**
  * inizializza la struttura per creare un pck
@@ -200,35 +543,52 @@ const initSTR = (divNV: IdivNV) =>
 	function _createNewSTR()
 	{
 		let inputValid = false;
-		let inputDefaultValid = false;
+		let inputDefaultValid = true;
 
-
-		handleResultVar.setNameText(snippetObject_modal_ref.generateRandomName());
+		handleResultVar.setNameText(
+			snippetObject_modal_ref.generateRandomName()
+		);
 		handleResultVar.setPrefix(__PREFIX_CODE_SNIPPET__.STR);
 		handleResultVar.setSuffix('}');
 
 		strInputName.addEventListener('input', (e) =>
 		{
 			inputValid = handleInputNameForNewVariable(e);
-			_checkOkShowBtnSaveNewVariable(strSaveBtn, [inputValid, inputDefaultValid]);
-
+			_checkOkShowBtnSaveNewVariable(strSaveBtn, [
+				inputValid,
+				inputDefaultValid,
+			]);
 		});
 
 		strInputDefaultValue.addEventListener('input', (e) =>
 		{
-			const target = (<HTMLInputElement>e.target);
-			const safeInputRegex: RegExp = /^(?!.*(\/\/|\/\*|\*\/|<!--|-->|#))(?!.*(-->.*<!--))[A-Za-z0-9\s\.,?!;:'"()\-_]+$/;
-			inputDefaultValid;
+			const target = <HTMLInputElement>e.target;
+			if (!target.value || target.value.length == 0)
+			{
+				_checkOkShowBtnSaveNewVariable(strSaveBtn, [
+					inputValid,
+					true,
+				]);
+				return;
+			}
+			const safeInputRegex: RegExp =
+				/^(?!.*(\/\/|\/\*|\*\/|<!--|-->|#))(?!.*(-->.*<!--))[A-Za-z0-9\s\.,?!;:'"()\-_]+$/;
+
+			console.log(safeInputRegex.test(target.value.toString()));
 			if (safeInputRegex.test(target.value.toString()))
 			{
 				inputDefaultValid = true;
 				_applyNVValidNVInvalidToTarget(target, inputDefaultValid);
 				handleResultVar.setValueText(target.value.toString());
-				return;
+			} else
+			{
+				inputDefaultValid = false;
+				_applyNVValidNVInvalidToTarget(target, inputDefaultValid);
 			}
-			inputDefaultValid = false;
-			_applyNVValidNVInvalidToTarget(target, inputDefaultValid);
-			_checkOkShowBtnSaveNewVariable(strSaveBtn, [inputValid, inputDefaultValid]);
+			_checkOkShowBtnSaveNewVariable(strSaveBtn, [
+				inputValid,
+				inputDefaultValid,
+			]);
 		});
 
 		strSaveBtn.addEventListener('click', () =>
@@ -236,12 +596,21 @@ const initSTR = (divNV: IdivNV) =>
 			snippetObject_modal_ref.getVariables().push({
 				active: false,
 				choosable: false,
-				code: !handleResultVar.getValueText() ? handleResultVar.handleEditClassic() : handleResultVar.handleEditClassicDefault(),
+				code: !handleResultVar.getValueText()
+					? handleResultVar.handleEditClassic()
+					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
-				defaultValue: handleResultVar.getValueText()
+				defaultValue: handleResultVar.getValueText(),
 			});
 
-			if (snippetObject_modal_ref.getVariables().length > 0 && snippetObject_modal_ref.getVariables().filter((v: Ivariable) => v.name == handleResultVar.getName()).length === 1)
+			if (
+				snippetObject_modal_ref.getVariables().length > 0 &&
+				snippetObject_modal_ref
+					.getVariables()
+					.filter(
+						(v: Ivariable) => v.name == handleResultVar.getName()
+					).length === 1
+			)
 			{
 				strSaveBtn.innerText = 'saved!';
 
@@ -254,15 +623,15 @@ const initSTR = (divNV: IdivNV) =>
 					strInputName.classList.toggle('nvinvalid');
 					strInputName.classList.toggle('nvvalid');
 					strSaveBtn.innerText = 'save';
-					inputDefaultValid = false;
+					inputDefaultValid = true;
 					inputValid = false;
 					strSaveBtn.parentElement.classList.remove('active');
 					_triggerReloadInitVarDIV();
-				}, 500)
+				}, 500);
 			}
 		});
 	}
-}
+};
 
 /**
  * inizializza la struttura per creare un pck
@@ -283,29 +652,34 @@ const initPCK = (divNV: IdivNV) =>
 	{
 		let inputValid = false;
 		let textareaValid = false;
-		let defaultValue: { [key: string]: {} } = {};
+		let defaultValue: { [ key: string ]: {} } = {};
 
-		handleResultVar.setNameText(snippetObject_modal_ref.generateRandomName());
+		handleResultVar.setNameText(
+			snippetObject_modal_ref.generateRandomName()
+		);
 		handleResultVar.setPrefix(__PREFIX_CODE_SNIPPET__.PCK);
 		handleResultVar.setSuffix('}');
 
 		pckInputName.addEventListener('input', (e) =>
 		{
 			inputValid = handleInputNameForNewVariable(e);
-			_checkOkShowBtnSaveNewVariable(pckSaveBtn, [inputValid, textareaValid]);
-
+			_checkOkShowBtnSaveNewVariable(pckSaveBtn, [
+				inputValid,
+				textareaValid,
+			]);
 		});
 
 		pckTextArea.addEventListener('input', (e) =>
 		{
-			const target = (<HTMLTextAreaElement>e.target);
+			const target = <HTMLTextAreaElement>e.target;
 			const values = target.value.split('\n');
 
 			/*
 			/^\$\{\$PCK\([A-Za-z0-9_]+\)\[(?:\((?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\}):(?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\})\))(?:,(?:\((?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\}):(?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\})\)))*\]\}$/
 			*/
-			const checkRegex: RegExp = /\((?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\}):(?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\})\)/;
-			const countValid = values.filter(v => v.match(checkRegex));
+			const checkRegex: RegExp =
+				/\((?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\}):(?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\})\)/;
+			const countValid = values.filter((v) => v.match(checkRegex));
 			console.log('COUNT VVALID', countValid);
 			if (countValid.length == values.length)
 			{
@@ -318,19 +692,23 @@ const initPCK = (divNV: IdivNV) =>
 				target.classList.add('nvinvalid');
 				target.classList.remove('nvvalid');
 			}
-			console.log('textareavalid', textareaValid)
-			_checkOkShowBtnSaveNewVariable(pckSaveBtn, [inputValid, textareaValid]);
+			console.log('textareavalid', textareaValid);
+			_checkOkShowBtnSaveNewVariable(pckSaveBtn, [
+				inputValid,
+				textareaValid,
+			]);
 
-			handleResultVar.setValueText(values.reduce((acc, act) =>
-			{
-				const [k, v] = act.substring(1, act.length).split(';');
-				defaultValue[k] = v;
+			handleResultVar.setValueText(
+				values.reduce((acc, act) =>
+				{
+					const [ k, v ] = act.substring(1, act.length).split(';');
+					defaultValue[ k ] = v;
 
-				acc += ',' + act;
-				return acc;
-			}));
+					acc += ',' + act;
+					return acc;
+				})
+			);
 		});
-
 
 		pckSaveBtn.addEventListener('click', () =>
 		{
@@ -339,10 +717,18 @@ const initPCK = (divNV: IdivNV) =>
 				choosable: false,
 				code: handleResultVar.handleEditPCK(),
 				name: handleResultVar.getName(),
-				defaultValue: defaultValue
+				defaultValue: defaultValue,
 			});
 
-			if (snippetObject_modal_ref.getVariables().length > 0 && snippetObject_modal_ref.getVariables().filter((v: { name: string; }) => v.name == handleResultVar.getName()).length === 1)
+			if (
+				snippetObject_modal_ref.getVariables().length > 0 &&
+				snippetObject_modal_ref
+					.getVariables()
+					.filter(
+						(v: { name: string }) =>
+							v.name == handleResultVar.getName()
+					).length === 1
+			)
 			{
 				pckSaveBtn.innerText = 'saved!';
 
@@ -359,39 +745,45 @@ const initPCK = (divNV: IdivNV) =>
 					inputValid = false;
 					pckSaveBtn.parentElement.classList.remove('active');
 					_triggerReloadInitVarDIV();
-				}, 500)
+				}, 500);
 			}
 		});
 	}
-}
-
-
-
+};
 
 /* ------------------------UTILS------------------------ */
 
 const handleInputNameForNewVariable = (e: Event) =>
 {
 	let inputValid;
-	const target = (<HTMLInputElement>e.target);
+	const regCheckName: RegExp = /^[a-z][a-zA-Z]{2,}$/;
+	const target = <HTMLInputElement>e.target;
 
-	if (snippetObject_modal_ref.getVariables().length > 0 && snippetObject_modal_ref.getVariables().filter((v: { name: string; }) => v.name == target.value).length == 1)
+
+	if (
+		snippetObject_modal_ref.getVariables().length > 0 &&
+		snippetObject_modal_ref
+			.getVariables()
+			.filter((v: { name: string }) => v.name == target.value).length == 1
+	)
 	{
 		inputValid = false;
-		_applyNVValidNVInvalidToTarget(target, inputValid);
-		return;
+	} else
+	{
+		inputValid = regCheckName.test(target.value);
 	}
 
-	inputValid = target.value.trim().length == 0;
 	_applyNVValidNVInvalidToTarget(target, inputValid);
-	const finalText = target.value.replace(' ', '_');
-	handleResultVar.setNameText(finalText);
+	handleResultVar.setNameText(target.value);
 	return inputValid;
-}
+};
 
-const _applyNVValidNVInvalidToTarget = (target: HTMLElement, isValid: boolean) =>
+const _applyNVValidNVInvalidToTarget = (
+	target: HTMLElement,
+	isValid: boolean
+) =>
 {
-	if (!isValid)
+	if (isValid)
 	{
 		target.classList.add('nvvalid');
 		target.classList.remove('nvinvalid');
@@ -400,11 +792,21 @@ const _applyNVValidNVInvalidToTarget = (target: HTMLElement, isValid: boolean) =
 		target.classList.add('nvinvalid');
 		target.classList.remove('nvvalid');
 	}
-}
+};
 
-const _classNVToggler = (divNV: { strDiv: HTMLElement; nmbDiv: HTMLElement; bolDiv: HTMLElement; idDiv: HTMLElement; vDiv: HTMLElement; vPck: HTMLElement; }, nameActive: HTMLElement) =>
+const _classNVToggler = (
+	divNV: {
+		strDiv: HTMLElement;
+		nmbDiv: HTMLElement;
+		bolDiv: HTMLElement;
+		idDiv: HTMLElement;
+		vDiv: HTMLElement;
+		vPck: HTMLElement;
+	},
+	nameActive: HTMLElement
+) =>
 {
-	Object.entries(divNV).forEach(([name, value]) =>
+	Object.entries(divNV).forEach(([ name, value ]) =>
 	{
 		if (value.id != nameActive.id)
 		{
@@ -413,41 +815,47 @@ const _classNVToggler = (divNV: { strDiv: HTMLElement; nmbDiv: HTMLElement; bolD
 		}
 		value.classList.add('active');
 	});
-}
+};
 
-const __PREFIX_CODE_SNIPPET__ =
-{
+const __PREFIX_CODE_SNIPPET__ = {
 	STR: '${$STR',
 	NMB: '${$NMB',
 	BOL: '${$BOL',
 	ID: '${$ID',
 	V: '${$V',
 	PCK: '${$PCK',
-}
+};
 
-
-const _checkOkShowBtnSaveNewVariable = (btn: HTMLButtonElement, [...check]: Boolean[]) =>
+const _checkOkShowBtnSaveNewVariable = (
+	btn: HTMLButtonElement,
+	[ ...check ]: Boolean[]
+) =>
 {
-	const isOk = check.every(b => b === true);
+	console.log('_checkOkShowBtnSaveNewVariable', check)
+	const isOk = check.every((b) => b === true);
 	if (!isOk)
 	{
 		btn.parentElement.classList.remove('active');
 		return;
 	}
 	btn.parentElement.classList.add('active');
-}
+};
 
 const chipContainerDiv = document.getElementById('chips-container');
 let chipVariable: NodeListOf<Element>;
 const _triggerReloadInitVarDIV = () =>
 {
-	if (!snippetObject_modal_ref || !snippetObject_modal_ref.getVariables() || snippetObject_modal_ref.getVariables().length == 0)
+	if (
+		!snippetObject_modal_ref ||
+		!snippetObject_modal_ref.getVariables() ||
+		snippetObject_modal_ref.getVariables().length == 0
+	)
 	{
 		return;
 	}
 
 	const chipToDelete = document.querySelectorAll('.chip');
-	chipToDelete.forEach(el => el.remove());
+	chipToDelete.forEach((el) => el.remove());
 
 	const chips: HTMLDivElement[] = []; //TODO SE NON SERVE RIMUOVERE!!
 	snippetObject_modal_ref.getVariables().forEach((v: Ivariable) =>
@@ -481,10 +889,9 @@ const _triggerReloadInitVarDIV = () =>
 		chips.push(chip);
 
 		chipContainerDiv.appendChild(chip);
-
 	});
 	chipVariable = document.querySelectorAll('.chip');
-	chipVariable.forEach(chip =>
+	chipVariable.forEach((chip) =>
 	{
 		chip.addEventListener('click', function (e)
 		{
@@ -494,10 +901,9 @@ const _triggerReloadInitVarDIV = () =>
 				return;
 			}
 			chip.classList.toggle('selected');
-			snippetObject_modal_ref.getVariables().forEach(v =>
+			snippetObject_modal_ref.getVariables().forEach((v) =>
 			{
-
-				if (v.name != chip.id.split('_')[1])
+				if (v.name != chip.id.split('_')[ 1 ])
 				{
 					return;
 				}
@@ -508,11 +914,11 @@ const _triggerReloadInitVarDIV = () =>
 				{
 					v.choosable = false;
 				}
-			})
+			});
 		});
 	});
 
-	btnChipVariableClose.forEach(button =>
+	btnChipVariableClose.forEach((button) =>
 	{
 		button.addEventListener('click', function (e)
 		{
@@ -520,4 +926,4 @@ const _triggerReloadInitVarDIV = () =>
 			button.parentElement.remove();
 		});
 	});
-}
+};

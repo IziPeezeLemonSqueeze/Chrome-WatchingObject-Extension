@@ -11,7 +11,8 @@ class SnippetObject
 		this.snippet = {
 			name: this.isNew ? this.generateRandomName() : null,
 			ivcFound: null,
-			variables: new Array<Ivariable>
+			variables: new Array<Ivariable>,
+			code: null
 		}
 		this.isEditing = isEditing;
 	}
@@ -50,12 +51,61 @@ class SnippetObject
 	{
 		return (Math.random() * 999).toString().replace('.', '');
 	}
+
+	getCode(): string
+	{
+		return this.snippet.code;
+	}
+
+	setCode(value: string)
+	{
+		this.snippet.code = value;
+
+
+	}
+
+	private _checkIVC(text: string)
+	{
+		if (text.match("${$"))
+		{
+			// 1. Pattern per ${$RAND(0-99)} oppure ${$RND(0-99)}
+			if (text.match(/\$\{\$(RAND|RND)\(\d{1,2}\)\}/))
+			{
+				return "custom-random-number";  // Ritorna un token che applicherà lo stile 'cm-custom-random-number'
+			}
+			// 2. Pattern per ${$RANDSTR(0-99)}
+			if (text.match(/\$\{\$RANDSTR\(\d+\)\}/))
+			{
+				return "custom-random-string";
+			}
+			// 3. Pattern per variabili: ${$STRnome_variabile}, ${$NMBnome_variabile}, ${$BOLnome_variabile}, ${$IDnome_variabile}, ${$Vnome_variabile}
+			//    Facoltativamente con valore di default: ad esempio ${$STRnome_variabile : defaultValue}
+			if (text.match(/\(\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z0-9_]+\}:\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z0-9_]+\}\)/))
+			{
+				return "custom-variable";
+			}
+			// 4. Pattern per ${$PCK[(foo : foovalue),(foo1 : foo1value)]}
+			if (text.match("${$PCK"))
+			{
+				// Caso 1: Definizione con picklist, deve contenere la parte tra parentesi tonde e quadre
+				if (text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/))
+				{
+					return "custom-pck-def";  // Questo token verrà stilizzato con .cm-custom-pck-def
+				}
+				// Caso 2: Richiamo senza la parte tra parentesi quadre
+				if (text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/))
+				{
+					return "custom-pck-call"; // Questo token verrà stilizzato con .cm-custom-pck-call
+				}
+			}
+		}
+	}
 }
 
 let snippetsBackupDEV: { name: string; code: any; ivcFound: any; }[] = [];
 let nButtonDEV: { doc: HTMLElement; payload: any; id: string; }[] = [];
 const snippetStorage = {
-	get: (cb: (arg0: { [key: string]: any; }) => void) =>
+	get: (cb: (arg0: { [ key: string ]: any; }) => void) =>
 	{
 		chrome.storage.sync.get(null, (result) =>
 		{
@@ -63,13 +113,15 @@ const snippetStorage = {
 			cb(result);
 		});
 	},
-	set: (value: { name: string; code: any; countIVC: any; }, cb: () => void) =>
+	set: (value: SnippetObject, cb: () => void) =>
 	{
 		chrome.storage.sync.set(
 			{
-				['snippet_' + value.name]: {
-					code: value.code,
-					ivcFound: value.countIVC
+				[ 'snippet_' + value.getName() ]: {
+					name: value.getName(),
+					code: value.getCode(),
+					ivcFound: value.getIVCFound(),
+					variables: value.getVariables()
 				}
 			},
 			() =>
@@ -86,6 +138,7 @@ const snippetlistobj = document.getElementById('snippetlistobj');
 const oldEditor = document.getElementById('editor') as HTMLTextAreaElement;
 const btnSnippetAddVariable = document.getElementById('snippetaddvariable');
 const modalOverlay = document.getElementById('modalOverlay') as HTMLDivElement;
+const btnSaveSnippetObject = document.getElementById('btnsavesnippetobject');
 
 /* NEW SNIPPET */
 
@@ -93,6 +146,9 @@ let snippetObject: SnippetObject = null;
 
 const btnSnippetNewCode = document.getElementById('snippetnewcode');
 const inputSnippetNewName = document.getElementById('snippetnewname') as HTMLInputElement;
+
+let editorElement: HTMLElement;
+let editorCloseElement: HTMLElement;
 
 let mdl: HTMLIFrameElement;
 
@@ -136,17 +192,12 @@ document.addEventListener('DOMContentLoaded', async () =>
 		creatorElementListDEV(snippet);
 	});
 
-	/* editor.addEventListener('selectionchange', () =>
-	{
-		console.log(editor.selectionStart);
-	}); */
-
 	initButtonEventListener();
 	initCMistance();
-
-	chrome.runtime.sendMessage({
-		type: 'DCS_initEditor'
-	});
+	/*
+		chrome.runtime.sendMessage({
+			type: 'DCS_initEditor'
+		}); */
 
 
 });
@@ -179,16 +230,34 @@ const initButtonEventListener = () =>
 
 	});
 
+	btnSaveSnippetObject.addEventListener('click', () =>
+	{
+		if (snippetObject.isNew)
+		{
+			if (snippetObject.getCode().length == 0)
+			{
+				return;
+			}
 
+			snippetStorage.set(snippetObject, () =>
+			{
+				editorCloseElement.classList.remove('deactive');
+				editorElement.classList.remove('active');
+				snippetObject = null;
+			});
+		}
+
+		if (snippetObject.isEditing)
+		{
+
+		}
+	});
 }
-
-
-
 
 const createNewSnippetCodeEditor = () =>
 {
-	const editorElement = document.getElementsByClassName('editor')[0] as HTMLDivElement;
-	const editorCloseElement = document.getElementsByClassName('editorclose')[0] as HTMLDivElement;
+	editorElement = document.getElementsByClassName('editor')[ 0 ] as HTMLDivElement;
+	editorCloseElement = document.getElementsByClassName('editorclose')[ 0 ] as HTMLDivElement;
 
 	editorCloseElement.classList.add('deactive');
 	editorElement.classList.add('active');
@@ -203,23 +272,6 @@ const createNewSnippetCodeEditor = () =>
 
 const openCloseModalVariable = () =>
 {
-	snippetStorage.get((snippet: IsnippetFromStorage) =>
-	{
-		if (!snippet)
-		{
-			return;
-		}
-		Object.keys(snippet).forEach((k, i) =>
-		{
-			if (!k.includes('snippet_'))
-			{
-				return;
-			} //TODO DA FINIRE
-
-
-		});
-	});
-
 	mdl = document.createElement('iframe');
 	mdl.src = chrome.runtime.getURL('DVCS/MODAL/mdl.html');
 	mdl.setAttribute('style', 'left: 24%;z-index: 200;position: fixed;height: 100%;width: 57%;overflow-clip-margin: unset;overflow: unset;border: 0px;background: transparent;')
@@ -231,9 +283,8 @@ const openCloseModalVariable = () =>
 	}, 500);
 
 	modalOverlay.classList.add('active');
-
-
 }
+
 
 const initCMistance = () =>
 {
@@ -243,6 +294,16 @@ const initCMistance = () =>
 		tabSize: 4,
 		lineNumbers: true,
 		indentWithTabs: true
+	});
+
+	editorImported.on('change', (cm: { getValue: () => any; }, changeObj: any) =>
+	{
+		/* console.log("Il contenuto è cambiato:", cm.getValue());
+		console.log("Dettagli del cambiamento:", changeObj); */
+		snippetObject.setCode(cm.getValue());
+		//console.log(snippetObject)
+
+
 	});
 
 }
@@ -268,10 +329,10 @@ const creatorElementListDEV = async (items: IsnippetFromStorage) =>
 
 		const btnRun = document.createElement('button');
 		btnRun.innerText = 'Run 🚀';
-		items[k].ivcFound ? btnRun.setAttribute('class', 'runalt-btn') : btnRun.setAttribute('class', 'run-btn');
+		items[ k ].ivcFound ? btnRun.setAttribute('class', 'runalt-btn') : btnRun.setAttribute('class', 'run-btn');
 
 		btnRun.id = k + '-run';
-		btnRun.title = items[k].ivcFound ?
+		btnRun.title = items[ k ].ivcFound ?
 			'Run the code now!\n--⚠️-- WARNING --⚠️--\n You will insert variables before the actual execution!' :
 			'Run the code now!'
 
@@ -294,7 +355,7 @@ const creatorElementListDEV = async (items: IsnippetFromStorage) =>
 
 		const span = document.createElement('span');
 		span.innerText = k.replace('snippet_', '');
-		span.title = items[k].code;
+		span.title = items[ k ].code;
 		span.id = k + '-span';
 		span.setAttribute('class', 'titleGrid');
 
@@ -324,9 +385,9 @@ const creatorElementListDEV = async (items: IsnippetFromStorage) =>
 
 		snippetlistobj.appendChild(divObjectItem);
 
-		snippetsBackupDEV.push({ "name": k, "code": items[k].code, "ivcFound": items[k].ivcFound });
-		nButtonDEV.push({ doc: document.getElementById(k + '-run'), payload: items[k], id: k });
-		nButtonDEV.push({ doc: document.getElementById(k + '-mod'), payload: items[k], id: k });
+		snippetsBackupDEV.push({ "name": k, "code": items[ k ].code, "ivcFound": items[ k ].ivcFound });
+		nButtonDEV.push({ doc: document.getElementById(k + '-run'), payload: items[ k ], id: k });
+		nButtonDEV.push({ doc: document.getElementById(k + '-mod'), payload: items[ k ], id: k });
 		nButtonDEV.push({ doc: document.getElementById(k + '-del'), payload: null, id: k });
 
 	});
@@ -334,7 +395,7 @@ const creatorElementListDEV = async (items: IsnippetFromStorage) =>
 	nButtonDEV.forEach(btnIdx =>
 	{
 		let id = String(btnIdx.doc.id).split('-')
-		switch (id[1])
+		switch (id[ 1 ])
 		{
 			case 'run':
 				//console.log(id[0], 'RUN');

@@ -53,7 +53,7 @@ const dcSnippet = new DCSNIPPET();
 					dcSnippet.consoleIntervalSearch = setInterval(() =>
 					{
 						dcSnippet.devConsoleTool();
-					}, 500);
+					}, 1000);
 					break;
 
 				case 'changeHeightDCS':
@@ -203,9 +203,9 @@ const dcSnippet = new DCSNIPPET();
 					if (match)
 					{
 						const span = document.createElement('span');
-						span.id = `alwayshowid-${match[1]}`;
+						span.id = `alwayshowid-${match[ 1 ]}`;
 						span.setAttribute('style', 'font-size: smaller;display: inline-table;background-color: rgb(1, 118, 211);padding: 5px;border-radius: 3px;color: rgb(255, 255, 255);-webkit-text-stroke: thin rgb(0, 0, 0);font-weight: bold;cursor: pointer;width: fit-content;');
-						span.innerText = match[1];
+						span.innerText = match[ 1 ];
 						element.appendChild(span);
 
 						spanShowIds.push(span.id);

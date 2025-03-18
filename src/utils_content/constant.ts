@@ -24,7 +24,7 @@ interface IchunkCompositeApexLog
 
 interface IsnippetFromStorage
 {
-	[key: string]:
+	[ key: string ]:
 	{
 		code: string,
 		ivcFound: string[],
@@ -38,13 +38,14 @@ interface IsnippetObject
 {
 	name: string,
 	ivcFound: null | TivcFound,
-	variables: Ivariable[]
+	variables: Ivariable[],
+	code: string
 };
 
 interface Ivariable
 {
 	code: string,
-	defaultValue: string | number | boolean | string[] | { [key: string]: {} }
+	defaultValue: string | number | boolean | string[] | { [ key: string ]: {} }
 	choosable: boolean,
 	active: boolean,
 	name: string

@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html>
-
 	<head>
-		<meta charset="utf-8">
-		<link rel="stylesheet"
-			href="../developerConsoleSnippet.css">
-		<link rel="stylesheet"
-			href="mdl.css">
-		<script type="module"
-			src="mdl.js"></script>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="../developerConsoleSnippet.css" />
+		<link rel="stylesheet" href="mdl.css" />
+		<script type="module" src="mdl.js"></script>
 	</head>
 
 	<body>
@@ -18,202 +14,299 @@
 			</div>
 			<div class="modal-body">
 				<span class="modal-header-span">INIT VAR</span>
-				<div id="chips-container">
-				</div>
+				<div id="chips-container"></div>
 
-				<span class="modal-header-span"
-					style="top: 28%;">NEW VAR</span>
-				<div class="modal-snippet-new-var"
-					id="snippetnewvariable">
+				<span class="modal-header-span" style="top: 28%">NEW VAR</span>
+				<div class="modal-snippet-new-var" id="snippetnewvariable">
 					<div class="new-var-step-top">
-						<button class="copy-btn"
-							id="btnnvclassicstr">STR</button>
-						<button class="copy-btn"
-							id="btnnvclassicnmb">NMB</button>
-						<button class="copy-btn"
-							id="btnnvclassicbol">BOL</button>
-						<button class="copy-btn"
-							id="btnnvclassicid">ID</button>
-						<button class="copy-btn"
-							id="btnnvclassicv">V</button>
-						<button class="copy-btn"
-							id="btnnvpck">PCK</button>
-						<button class="copy-btn"
-							id="btnnvrnd">RND</button>
-						<button class="copy-btn"
-							id="btnnvrndstr">RNDSTR</button>
-						<button class="copy-btn"
-							id="btnnvrest">REST</button>
+						<button class="copy-btn" id="btnnvclassicstr">
+							STR
+						</button>
+						<button class="copy-btn" id="btnnvclassicnmb">
+							NMB
+						</button>
+						<button class="copy-btn" id="btnnvclassicbol">
+							BOL
+						</button>
+						<button class="copy-btn" id="btnnvclassicid">ID</button>
+						<button class="copy-btn" id="btnnvclassicv">V</button>
+						<button class="copy-btn" id="btnnvpck">PCK</button>
+						<button class="copy-btn" id="btnnvrnd">RND</button>
+						<button class="copy-btn" id="btnnvrndstr">
+							RNDSTR
+						</button>
+						<button class="copy-btn" id="btnnvrest">REST</button>
 					</div>
 					<div class="new-var-step">
 						<div id="nvstring">
 							<div class="new-var-helper">
-								CREATION OF A NEW VARIABLE OF TYPE <span
-									style="font-size: 1rem;color: #00cf00;">STRING</span>
-								<br>
-								<br>
-								EXAMPLE:
-								${$STRtestvariable}
+								CREATION OF A NEW VARIABLE OF TYPE
+								<span style="font-size: 1rem; color: #00cf00"
+									>STRING</span
+								>
+								<br />
+								<br />
+								EXAMPLE: ${$STRtestvariable}
 							</div>
 							<div class="new-var">
 								<span>${$STR</span>
-								<input type="text"
+								<input
+									class="inputnv"
+									type="text"
 									id="strinputname"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="name_variable">
+									placeholder="name_variable"
+								/>
 								<span>}</span>
 							</div>
 							<div class="new-var-sub">
 								<span>DEFAULT VALUE</span>
-								<input type="text"
+								<input
+									class="inputnv"
+									type="text"
 									id="strinputdefaultvalue"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="Hello Salesforce Enhancer!">
+									placeholder="Hello Salesforce Enhancer!"
+								/>
 							</div>
 							<div class="new-var-btn">
-								<button style="margin-left: 100%;"
+								<button
+									style="margin-left: 100%"
 									id="strsavebtn"
-									class="run-btn">save</button>
+									class="run-btn"
+								>
+									save
+								</button>
 							</div>
 						</div>
 						<div id="nvnumber">
 							<div class="new-var-helper">
-								CREATION OF A NEW VARIABLE OF TYPE <span
-									style="font-size: 1rem;color: #00cf00;">NUMBER</span>
-								<br>
+								CREATION OF A NEW VARIABLE OF TYPE
+								<span style="font-size: 1rem; color: #00cf00"
+									>NUMBER</span
+								>
+								<br />
 								CAN BE Decimal, Integer, ect..
-								<br>
-								EXAMPLE:
-								${$NMBtestvariable}
+								<br />
+								EXAMPLE: ${$NMBtestvariable}
 							</div>
 							<div class="new-var">
 								<span>${$NMB</span>
-								<input type="text"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="name_variable">
+								<input
+									class="inputnv"
+									id="nmbinputname"
+									type="text"
+									placeholder="name_variable"
+								/>
 								<span>}</span>
 							</div>
 							<div class="new-var-sub">
 								<span>DEFAULT VALUE</span>
-								<input type="text"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="Hello Salesforce Enhancer!">
+								<input
+									class="inputnv"
+									id="nmbinputdefaultvalue"
+									type="number"
+									placeholder="123...Salesforce Enhancer!"
+								/>
+							</div>
+							<div class="new-var-btn">
+								<button
+									style="margin-left: 100%"
+									id="nmbsavebtn"
+									class="run-btn"
+								>
+									save
+								</button>
 							</div>
 						</div>
 						<div id="nvboolean">
 							<div class="new-var-helper">
-								CREATION OF A NEW VARIABLE OF TYPE <span
-									style="font-size: 1rem;color: #00cf00;">BOOLEAN</span>
-								<br>
-								CAN BE <span style="font-size: 1rem;color: #8300cf;">true / false</span>
-								<br>
-								EXAMPLE:
-								${$BOLtestvariable}
+								CREATION OF A NEW VARIABLE OF TYPE
+								<span style="font-size: 1rem; color: #00cf00"
+									>BOOLEAN</span
+								>
+								<br />
+								CAN BE
+								<span style="font-size: 1rem; color: #8300cf"
+									>true / false</span
+								>
+								<br />
+								EXAMPLE: ${$BOLtestvariable}
 							</div>
 							<div class="new-var">
 								<span>${$BOL</span>
-								<input type="text"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="name_variable">
+								<input
+									class="inputnv"
+									id="bolinputname"
+									type="text"
+									placeholder="name_variable"
+								/>
 								<span>}</span>
 							</div>
 							<div class="new-var-sub">
 								<span>DEFAULT VALUE</span>
-								<input type="text"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="Hello Salesforce Enhancer!">
+								<input
+									class="inputnv"
+									id="bolinputdefaultvalue"
+									type="text"
+									placeholder="True Salesforce Enhancer!"
+								/>
+							</div>
+							<div class="new-var-btn">
+								<button
+									style="margin-left: 100%"
+									id="bolsavebtn"
+									class="run-btn"
+								>
+									save
+								</button>
 							</div>
 						</div>
 						<div id="nvid">
 							<div class="new-var-helper">
-								CREATION OF A NEW VARIABLE OF TYPE <span
-									style="font-size: 1rem;color: #00cf00;">ID</span>
-								<br>
-								MUST BE <span style="font-size: 1rem;color: #8300cf;">18</span> characters
-								<br>
-								EXAMPLE:
-								${$IDtestvariable}
+								CREATION OF A NEW VARIABLE OF TYPE
+								<span style="font-size: 1rem; color: #00cf00"
+									>ID</span
+								>
+								<br />
+								MUST BE
+								<span style="font-size: 1rem; color: #8300cf"
+									>18</span
+								>
+								characters
+								<br />
+								EXAMPLE: ${$IDtestvariable}
 							</div>
 							<div class="new-var">
 								<span>${$ID</span>
-								<input type="text"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="name_variable">
+								<input
+									class="inputnv"
+									id="idinputname"
+									type="text"
+									placeholder="name_variable"
+								/>
 								<span>}</span>
 							</div>
 							<div class="new-var-sub">
 								<span>DEFAULT VALUE</span>
-								<input type="text"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="Hello Salesforce Enhancer!">
+								<input
+									class="inputnv"
+									id="idinputdefaultvalue"
+									type="text"
+									placeholder="Hello Salesforce Enhancer!"
+								/>
+							</div>
+							<div class="new-var-btn">
+								<button
+									style="margin-left: 100%"
+									id="idsavebtn"
+									class="run-btn"
+								>
+									save
+								</button>
 							</div>
 						</div>
 						<div id="nvv">
 							<div class="new-var-helper">
-								CREATION OF A NEW VARIABLE OF TYPE <span
-									style="font-size: 1rem;color: #00cf00;">V</span>
-								<br>
-								SHOULD BE <span style="font-size: 1rem;color: #8300cf;">ALL</span>
-								<br>
-								EXAMPLE:
-								${$Vtestvariable}
+								CREATION OF A NEW VARIABLE OF TYPE
+								<span style="font-size: 1rem; color: #00cf00"
+									>V</span
+								>
+								<br />
+								SHOULD BE
+								<span style="font-size: 1rem; color: #8300cf"
+									>ALL</span
+								>
+								<br />
+								EXAMPLE: ${$Vtestvariable}
 							</div>
 							<div class="new-var">
 								<span>${$V</span>
-								<input type="text"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="name_variable">
+								<input
+									type="text"
+									style="
+										border: 1px solid #636364;
+										border-radius: 8px;
+									"
+									placeholder="name_variable"
+								/>
 								<span>}</span>
 							</div>
 							<div class="new-var-sub">
 								<span>DEFAULT VALUE</span>
-								<input type="text"
-									style="border: 1px solid #636364;border-radius: 8px;"
-									placeholder="Hello Salesforce Enhancer!">
+								<input
+									type="text"
+									style="
+										border: 1px solid #636364;
+										border-radius: 8px;
+									"
+									placeholder="Hello Salesforce Enhancer!"
+								/>
 							</div>
 						</div>
 						<div id="nvpck">
 							<div class="new-var-helper">
-								CREATION OF A NEW VARIABLE OF TYPE <span
-									style="font-size: 1rem;color: #00cf00;">PICKLIST</span>
-								<br>
+								CREATION OF A NEW VARIABLE OF TYPE
+								<span style="font-size: 1rem; color: #00cf00"
+									>PICKLIST</span
+								>
+								<br />
 								EXAMPLE:
 								${$PCK(testvariable)[(foo:foov),(bar:barv)]}
 							</div>
 							<div class="new-var">
 								<span>${$PCK(</span>
-								<input id="pckinputname"
+								<input
+									class="inputnv"
+									id="pckinputname"
 									type="text"
-									style="border-radius: 8px;margin-bottom: 2%;"
-									placeholder="name_variable">
+									style="
+										border-radius: 8px;
+										margin-bottom: 2%;
+									"
+									placeholder="name_variable"
+								/>
 								<span>)[</span>
-								<br>
-								<span style="margin-left: 18%; color: #76767682;font-size: .6rem;">separate the
-									values by going to a new line</span>
-								<br>
+								<br />
+								<span
+									style="
+										margin-left: 18%;
+										color: #76767682;
+										font-size: 0.6rem;
+									"
+									>separate the values by going to a new
+									line</span
+								>
+								<br />
 								<textarea
-									style="resize: block;max-height: 130px;border-radius: 7px;margin-top: 1%;margin-left: 21%;height: 50px;"
+									style="
+										resize: block;
+										max-height: 130px;
+										border-radius: 7px;
+										margin-top: 1%;
+										margin-left: 21%;
+										height: 50px;
+										background-color: #dee1e6;
+									"
 									name="keyvalue"
-									id="pcktextarea"></textarea>
+									id="pcktextarea"
+								></textarea>
 								<span>]}</span>
 							</div>
 							<div class="new-var-btn">
-								<button style="margin-left: 100%;"
+								<button
+									style="margin-left: 100%"
 									id="pcksavebtn"
-									class="run-btn">save</button>
+									class="run-btn"
+								>
+									save
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
-
 			</div>
 			<div class="modal-footer">
-				<button id="closeModalFooter"
-					class="copy-btn">CLOSE</button>
+				<button id="closeModalFooter" class="copy-btn">CLOSE</button>
 			</div>
 		</div>
-
-
 	</body>
-
 </html>
