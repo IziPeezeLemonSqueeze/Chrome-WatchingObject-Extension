@@ -32,14 +32,21 @@ interface IsnippetFromStorage
 	}
 }
 
-type TivcFound = string[]
+type TivcFound = {
+	randomNumber: RegExpMatchArray,
+	randomText: RegExpMatchArray,
+	classic: RegExpMatchArray,
+	pck: RegExpMatchArray,
+	init: RegExpMatchArray,
+}
 
 interface IsnippetObject
 {
 	name: string,
-	ivcFound: null | TivcFound,
+	ivcFound: null | TivcFound
 	variables: Ivariable[],
-	code: string
+	code: string,
+	initBlock: boolean
 };
 
 interface Ivariable
@@ -48,6 +55,7 @@ interface Ivariable
 	defaultValue: string | number | boolean | string[] | { [ key: string ]: {} }
 	choosable: boolean,
 	active: boolean,
+	varName: string,
 	name: string
 }
 
@@ -57,6 +65,5 @@ interface IdivNV
 	nmbDiv: HTMLElement,
 	bolDiv: HTMLElement,
 	idDiv: HTMLElement,
-	vDiv: HTMLElement,
 	vPck: HTMLElement
 }

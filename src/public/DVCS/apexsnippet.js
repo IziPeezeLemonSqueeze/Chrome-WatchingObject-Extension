@@ -6,6 +6,22 @@ CodeMirror.defineMode('apexsnippet', function (config, parserConfig) {
 		token: function (stream, state) {
 			// Controlla se il token inizia con "${$"
 			if (stream.match('${$', false)) {
+				// 4. Pattern per ${$PCK[(foo : foovalue),(foo1 : foo1value)]}
+				if (stream.match('${$PCK', false)) {
+					// Caso 1: Definizione con picklist, deve contenere la parte tra parentesi tonde e quadre
+					if (
+						stream.match(
+							/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/g
+							//	/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/
+						)
+					) {
+						return 'custom-pck-def'; // Questo token verrà stilizzato con .cm-custom-pck-def
+					}
+					// Caso 2: Richiamo senza la parte tra parentesi quadre
+					if (stream.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/)) {
+						return 'custom-pck-call'; // Questo token verrà stilizzato con .cm-custom-pck-call
+					}
+				}
 				// 1. Pattern per ${$RAND(0-99)} oppure ${$RND(0-99)}
 				if (stream.match(/\$\{\$(RAND|RND)\(\d{1,2}\)\}/)) {
 					return 'custom-random-number'; // Ritorna un token che applicherà lo stile 'cm-custom-random-number'
@@ -22,21 +38,6 @@ CodeMirror.defineMode('apexsnippet', function (config, parserConfig) {
 					)
 				) {
 					return 'custom-variable';
-				}
-				// 4. Pattern per ${$PCK[(foo : foovalue),(foo1 : foo1value)]}
-				if (stream.match('${$PCK', false)) {
-					// Caso 1: Definizione con picklist, deve contenere la parte tra parentesi tonde e quadre
-					if (
-						stream.match(
-							/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/
-						)
-					) {
-						return 'custom-pck-def'; // Questo token verrà stilizzato con .cm-custom-pck-def
-					}
-					// Caso 2: Richiamo senza la parte tra parentesi quadre
-					if (stream.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/)) {
-						return 'custom-pck-call'; // Questo token verrà stilizzato con .cm-custom-pck-call
-					}
 				}
 			}
 			// Se nessun pattern viene riconosciuto, consuma un carattere e passa oltre

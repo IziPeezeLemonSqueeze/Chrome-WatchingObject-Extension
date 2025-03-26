@@ -242,6 +242,58 @@ a:hover {
 	background-color: #dee2e6;
 }
 
+.listheader-right {
+	font-variant: unicase;
+	box-shadow: 0px 4px 4px #00000017;
+	z-index: 10;
+	align-content: center;
+	text-align: center;
+	height: 37px;
+	border-radius: 10px 10px 0px 0px;
+	position: fixed;
+	top: 0%;
+	right: 1.55%;
+	width: 200px;
+	background-color: #dee2e6;
+}
+
+.activated-var {
+	box-shadow: 0px 1px 3px #b5b5b5;
+	margin: 1%;
+	cursor: copy;
+	background: #e9ecef;
+	border: 1px solid #838383;
+	border-radius: 6px;
+	text-align: center;
+	width: -webkit-fill-available;
+}
+
+.tool {
+	clip-path: border-box;
+	border: 1px solid #838383;
+	height: 100px;
+	width: 98%;
+	margin-top: 20%;
+	border-radius: 10px;
+}
+
+.tool span {
+	padding: 2px 44.5px;
+	color: #e9ecef;
+	border-radius: 10px 10px 0px 0px;
+	place-items: center;
+	background: #838383;
+	font-variant: unicase;
+	margin-top: 20%;
+}
+
+.tool ul {
+	scroll-behavior: smooth;
+	height: 60px;
+	overflow-y: auto;
+	margin-inline: 5%;
+}
+
 .editorheader {
 	box-shadow: 0px 4px 4px #00000017;
 	z-index: 10;
@@ -314,6 +366,10 @@ a:hover {
 	border-radius: 15px;
 }
 
+.cm-custom-markInitBlock {
+	background: #ff440057;
+	font-weight: bold;
+}
 .cm-custom-random-number {
 	color: #ff4500;
 	font-weight: bold;

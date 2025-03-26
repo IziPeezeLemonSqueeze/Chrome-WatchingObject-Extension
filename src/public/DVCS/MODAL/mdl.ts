@@ -11,7 +11,8 @@ class SnippetObject_mdl
 			name: this.isNew ? this.generateRandomName() : null,
 			ivcFound: null,
 			variables: new Array<Ivariable>(),
-			code: null
+			code: null,
+			initBlock: false
 		};
 		this.isEditing = isEditing;
 	}
@@ -117,7 +118,6 @@ const btnChipVariableClose = document.querySelectorAll('.chip-close');
 const btnNVClassicNMB = document.getElementById('btnnvclassicnmb');
 const btnNVClassicBOL = document.getElementById('btnnvclassicbol');
 const btnNVClassicID = document.getElementById('btnnvclassicid');
-const btnNVClassicV = document.getElementById('btnnvclassicv');
 
 /* STR */
 const btnNVClassicSTR = document.getElementById('btnnvclassicstr');
@@ -153,7 +153,7 @@ const idInputDefaultValue = document.getElementById(
 ) as HTMLInputElement;
 const idSaveBtn = document.getElementById('idsavebtn') as HTMLButtonElement;
 /* v */
-/* pck */
+/* PCK */
 const btnNVPCK = document.getElementById('btnnvpck') as HTMLButtonElement;
 const pckInputName = document.getElementById(
 	'pckinputname'
@@ -201,13 +201,9 @@ document.addEventListener('DOMContentLoaded', async () =>
 		nmbDiv: document.getElementById('nvnumber'),
 		bolDiv: document.getElementById('nvboolean'),
 		idDiv: document.getElementById('nvid'),
-		vDiv: document.getElementById('nvv'),
 		vPck: document.getElementById('nvpck'),
 	};
-	btnNVClassicV.addEventListener('click', () =>
-	{
-		_classNVToggler(divNV, divNV.vDiv);
-	});
+
 	initID(divNV);
 	initBOL(divNV);
 	initNMB(divNV);
@@ -292,6 +288,7 @@ const initID = (divNV: IdivNV) =>
 					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
 				defaultValue: handleResultVar.getValueText(),
+				varName: `${__PREFIX_CODE_SNIPPET__.ID}${handleResultVar.getName()}`
 			});
 
 			if (
@@ -393,6 +390,7 @@ const initBOL = (divNV: IdivNV) =>
 					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
 				defaultValue: handleResultVar.getValueText(),
+				varName: `${__PREFIX_CODE_SNIPPET__.BOL}${handleResultVar.getName()}`
 			});
 
 			if (
@@ -495,6 +493,7 @@ const initNMB = (divNV: IdivNV) =>
 					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
 				defaultValue: handleResultVar.getValueText(),
+				varName: `${__PREFIX_CODE_SNIPPET__.NMB}${handleResultVar.getName()}`
 			});
 
 			if (
@@ -601,6 +600,7 @@ const initSTR = (divNV: IdivNV) =>
 					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
 				defaultValue: handleResultVar.getValueText(),
+				varName: `${__PREFIX_CODE_SNIPPET__.STR}${handleResultVar.getName()}`
 			});
 
 			if (
@@ -678,7 +678,7 @@ const initPCK = (divNV: IdivNV) =>
 			/^\$\{\$PCK\([A-Za-z0-9_]+\)\[(?:\((?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\}):(?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\})\))(?:,(?:\((?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\}):(?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\})\)))*\]\}$/
 			*/
 			const checkRegex: RegExp =
-				/\((?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\}):(?:[A-Za-z0-9_]+|\$\{\$(?:STR|NMB|BOL|ID|V)?[A-Za-z0-9_]+\})\)/;
+				/\([A-Za-z0-9_]+:[A-Za-z0-9_]+\)(?=\n|$)/;
 			const countValid = values.filter((v) => v.match(checkRegex));
 			console.log('COUNT VVALID', countValid);
 			if (countValid.length == values.length)
@@ -701,9 +701,6 @@ const initPCK = (divNV: IdivNV) =>
 			handleResultVar.setValueText(
 				values.reduce((acc, act) =>
 				{
-					const [ k, v ] = act.substring(1, act.length).split(';');
-					defaultValue[ k ] = v;
-
 					acc += ',' + act;
 					return acc;
 				})
@@ -712,12 +709,21 @@ const initPCK = (divNV: IdivNV) =>
 
 		pckSaveBtn.addEventListener('click', () =>
 		{
+			const values = handleResultVar.getValueText().split(',');
+			console.log('VALUES', values);
+			values.forEach(act =>
+			{
+				const [ k, v ] = act.substring(1, act.length - 1).split(':');
+				defaultValue[ k ] = v;
+			});
+
 			snippetObject_modal_ref.getVariables().push({
 				active: false,
 				choosable: false,
 				code: handleResultVar.handleEditPCK(),
 				name: handleResultVar.getName(),
 				defaultValue: defaultValue,
+				varName: `${__PREFIX_CODE_SNIPPET__.PCK}(${handleResultVar.getName()})}`
 			});
 
 			if (
@@ -795,14 +801,7 @@ const _applyNVValidNVInvalidToTarget = (
 };
 
 const _classNVToggler = (
-	divNV: {
-		strDiv: HTMLElement;
-		nmbDiv: HTMLElement;
-		bolDiv: HTMLElement;
-		idDiv: HTMLElement;
-		vDiv: HTMLElement;
-		vPck: HTMLElement;
-	},
+	divNV: IdivNV,
 	nameActive: HTMLElement
 ) =>
 {

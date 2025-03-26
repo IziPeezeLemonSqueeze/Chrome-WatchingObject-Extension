@@ -12,7 +12,8 @@ class SnippetObject
 			name: this.isNew ? this.generateRandomName() : null,
 			ivcFound: null,
 			variables: new Array<Ivariable>,
-			code: null
+			code: null,
+			initBlock: false
 		}
 		this.isEditing = isEditing;
 	}
@@ -60,9 +61,10 @@ class SnippetObject
 	setCode(value: string)
 	{
 		this.snippet.code = value;
-
-
-		console.log('COUNTIVC: ', _checkIVC(this.snippet.code));
+		const checks = _checkIVC(this.snippet.code);
+		this.snippet.ivcFound = checks.countIVC;
+		this.snippet.initBlock = checks.isInitBlock;
+		console.log('COUNTIVC: ', this.snippet.ivcFound);
 	}
 }
 
@@ -139,6 +141,7 @@ window.addEventListener('message', (e: any) =>
 		{
 			case 'DCS_close_modal':
 				snippetObject.setVariables(e.data.payload);
+				initRightPanelVariables();
 				modalOverlay.classList.remove('active');
 				setTimeout(() =>
 				{
@@ -209,6 +212,8 @@ const initButtonEventListener = () =>
 				editorElement.classList.remove('active');
 				snippetObject = null;
 			});
+
+			initRightPanelVariables();
 		}
 
 		if (snippetObject.isEditing)
@@ -232,6 +237,8 @@ const createNewSnippetCodeEditor = () =>
 	const ghostname = document.getElementById('ghostname');
 	ghostname.classList.add('active');
 
+	editorImported.setValue('/*INIT_BLOCK_{\n	\n}_INIT_BLOCK*/\n\n');
+
 }
 
 const openCloseModalVariable = () =>
@@ -248,7 +255,6 @@ const openCloseModalVariable = () =>
 
 	modalOverlay.classList.add('active');
 }
-
 
 const initCMistance = () =>
 {
@@ -270,6 +276,10 @@ const initCMistance = () =>
 
 	});
 
+	editorImported.on('cursorActivity', (cm: any) =>
+	{
+		console.log('CURSOR ACTIVITY', cm)
+	});
 }
 
 const creatorElementListDEV = async (items: IsnippetFromStorage) =>
@@ -390,6 +400,44 @@ const creatorElementListDEV = async (items: IsnippetFromStorage) =>
 	});
 }
 
+const initRightPanelVariables = () =>
+{
+	if (!snippetObject)
+	{
+		return;
+	}
+
+	const existingVarInput = document.querySelectorAll('li[id^="inpvar_"]');
+	existingVarInput.forEach(ev => ev.remove());
+
+	const listVarInput = document.getElementById('listactivablevar') as HTMLUListElement;
+	snippetObject.getVariables().forEach(v =>
+	{
+		if (v.choosable)
+		{
+			const li = document.createElement('li');
+			li.id = 'inpvar_' + v.name;
+
+			const vinput = document.createElement('input');
+			vinput.value = v.name;
+			vinput.readOnly = true;
+			vinput.classList = 'activated-var';
+			vinput.addEventListener('click', () =>
+			{
+				insertOnCodeMirror(v.code);
+			});
+
+			li.appendChild(vinput);
+			listVarInput.appendChild(li);
+
+		}
+	});
+}
+
+const insertOnCodeMirror = (code: string) =>
+{
+	editorImported.replaceSelection(code, 'start');
+}
 
 /* ------------------------HANDLER------------------------ */
 const handler_runDEV = (doc: HTMLElement, payload: any, id: string) =>
@@ -399,18 +447,87 @@ const handler_runDEV = (doc: HTMLElement, payload: any, id: string) =>
 
 const _checkIVC = (text: string) =>
 {
-	console.log('CHECK', text)
-	const countIVC = [];
-	countIVC.push(text.match(/\$\{\$(RAND|RND)\(\d{1,2}\)\}/g));
+	enum __STANDARD__
+	{
+		STARTBLOCK = '/*INIT_BLOCK_{',
+		ENDBLOCK = '}_INIT_BLOCK*/',
+	}
+	//console.log('CHECK', text)
 
-	countIVC.push(text.match(/\$\{\$RANDSTR\(\d+\)\}/g));
+	let infoInitBlock: {
+		startBlockPos: { from: { line: any; ch: any; }, to: any },
+		endBlockPos: { from: any, to: any },
+	} = { startBlockPos: null, endBlockPos: null };
+	const isInitBlock = text.includes(__STANDARD__.STARTBLOCK) && text.includes(__STANDARD__.ENDBLOCK);
+	if (isInitBlock)
+	{
+		const sSB = editorImported.getSearchCursor(__STANDARD__.STARTBLOCK, 0);
+		const sB = sSB.findNext() ? sSB : null;
+		infoInitBlock.startBlockPos = { from: sB.from(), to: sB.to() };
+		//console.log('infoInitBlock.startBlockPos', infoInitBlock.startBlockPos);
 
-	countIVC.push(text.match(/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+(?::[A-Za-z0-9_ ]+)?\}/g));
-	countIVC.push(text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/g));
-	countIVC.push(text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/g));
+		const sEB = editorImported.getSearchCursor(__STANDARD__.ENDBLOCK, 0);
+		const eB = sEB.findNext() ? sEB : null;
+		infoInitBlock.endBlockPos = { from: eB.from(), to: eB.to() };
+		//console.log('infoInitBlock.endBlockPos', infoInitBlock.endBlockPos);
 
 
-	return countIVC;
+		editorImported.markText(
+			{ // FROM
+				line: infoInitBlock.startBlockPos.from.line,
+				ch: infoInitBlock.startBlockPos.from.ch
+			},
+			{ // TO
+				line: infoInitBlock.endBlockPos.to.line,
+				ch: infoInitBlock.endBlockPos.to.ch
+			},
+			{
+				className: 'cm-custom-markInitBlock'
+			}
+		)
+	}
+
+	let countIVC: TivcFound = {
+		randomNumber: null,
+		randomText: null,
+		classic: null,
+		pck: null,
+		init: null
+	};
+
+	countIVC.randomNumber = text.match(/\$\{\$(RAND|RND)\(\d{1,2}\)\}/g);
+
+	countIVC.randomText = text.match(/\$\{\$RANDSTR\(\d+\)\}/g);
+
+	countIVC.classic = text.match(/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+\}/g);
+
+	countIVC.pck = text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/g);
+
+	if (isInitBlock)
+	{
+		try
+		{
+			countIVC.init = text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/g);
+			if (countIVC.init)
+			{
+				countIVC.init.push(...text.match(/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+:[A-Za-z0-9_ ]+\}/g));
+			} else
+			{
+				countIVC.init = text.match(/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+:[A-Za-z0-9_ ]+\}/g);
+			}
+		} catch (e)
+		{
+			console.log(e);
+		}
+
+	}
+
+	if ((countIVC.pck && countIVC.init) && countIVC.pck.length > 0 && countIVC.pck.length != countIVC.init.length)
+	{
+		const inError = countIVC.pck.filter(ivc => countIVC.init.filter(ivcinit => ivcinit.includes(ivc)));
+
+	}
+	return { countIVC, isInitBlock };
 }
 
 
