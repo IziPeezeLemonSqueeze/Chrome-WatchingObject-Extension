@@ -61,6 +61,16 @@ class SnippetObject_mdl
 	{
 		this.snippet.code = value;
 	}
+
+	setInitBlock(value: boolean)
+	{
+		this.snippet.initBlock = value;
+	}
+
+	getInitBlock()
+	{
+		return this.snippet.initBlock;
+	}
 }
 
 class handleResultVarText
@@ -288,7 +298,7 @@ const initID = (divNV: IdivNV) =>
 					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
 				defaultValue: handleResultVar.getValueText(),
-				varName: `${__PREFIX_CODE_SNIPPET__.ID}${handleResultVar.getName()}`
+				varName: `${__PREFIX_CODE_SNIPPET__.ID}${handleResultVar.getName()}}`
 			});
 
 			if (
@@ -390,7 +400,7 @@ const initBOL = (divNV: IdivNV) =>
 					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
 				defaultValue: handleResultVar.getValueText(),
-				varName: `${__PREFIX_CODE_SNIPPET__.BOL}${handleResultVar.getName()}`
+				varName: `${__PREFIX_CODE_SNIPPET__.BOL}${handleResultVar.getName()}}`
 			});
 
 			if (
@@ -493,7 +503,7 @@ const initNMB = (divNV: IdivNV) =>
 					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
 				defaultValue: handleResultVar.getValueText(),
-				varName: `${__PREFIX_CODE_SNIPPET__.NMB}${handleResultVar.getName()}`
+				varName: `${__PREFIX_CODE_SNIPPET__.NMB}${handleResultVar.getName()}}`
 			});
 
 			if (
@@ -600,7 +610,7 @@ const initSTR = (divNV: IdivNV) =>
 					: handleResultVar.handleEditClassicDefault(),
 				name: handleResultVar.getName(),
 				defaultValue: handleResultVar.getValueText(),
-				varName: `${__PREFIX_CODE_SNIPPET__.STR}${handleResultVar.getName()}`
+				varName: `${__PREFIX_CODE_SNIPPET__.STR}${handleResultVar.getName()}}`
 			});
 
 			if (
@@ -830,7 +840,7 @@ const _checkOkShowBtnSaveNewVariable = (
 	[ ...check ]: Boolean[]
 ) =>
 {
-	console.log('_checkOkShowBtnSaveNewVariable', check)
+	//console.log('_checkOkShowBtnSaveNewVariable', check)
 	const isOk = check.every((b) => b === true);
 	if (!isOk)
 	{

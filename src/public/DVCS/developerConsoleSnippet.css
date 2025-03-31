@@ -90,7 +90,7 @@
 	padding: 15px;
 	border-radius: 8px;
 	transition: opacity 0.3s ease, visibility 0.3s ease;
-	visibile: visibile;
+	visibility: visibile;
 	opacity: 1;
 }
 
@@ -100,6 +100,7 @@
 }
 
 .editor-sub {
+	font-size: 0.8rem;
 	margin-top: 1%;
 	width: 563px;
 	height: 292px;
@@ -289,7 +290,7 @@ a:hover {
 
 .tool ul {
 	scroll-behavior: smooth;
-	height: 60px;
+	height: 64px;
 	overflow-y: auto;
 	margin-inline: 5%;
 }
@@ -366,8 +367,11 @@ a:hover {
 	border-radius: 15px;
 }
 
+.cm-custom-markInitBlock-error {
+	text-decoration-line: spelling-error;
+}
 .cm-custom-markInitBlock {
-	background: #ff440057;
+	background: #ff440048;
 	font-weight: bold;
 }
 .cm-custom-random-number {
@@ -397,6 +401,25 @@ a:hover {
 	top: 14.9%;
 	right: 23%;
 	border-radius: 10px;
+}
+
+.info-code {
+	left: 27%;
+	position: fixed;
+	height: 20px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+}
+
+.error-icon-code {
+
+}
+
+.warning-icon-code {
+	margin-left: 20%;
 }
 
 .CodeMirror-focused {

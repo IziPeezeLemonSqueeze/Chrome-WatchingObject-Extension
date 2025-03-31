@@ -61,10 +61,17 @@ class SnippetObject
 	setCode(value: string)
 	{
 		this.snippet.code = value;
-		const checks = _checkIVC(this.snippet.code);
-		this.snippet.ivcFound = checks.countIVC;
-		this.snippet.initBlock = checks.isInitBlock;
 		console.log('COUNTIVC: ', this.snippet.ivcFound);
+	}
+
+	setInitBlock(value: boolean)
+	{
+		this.snippet.initBlock = value;
+	}
+
+	getInitBlock()
+	{
+		return this.snippet.initBlock;
 	}
 }
 
@@ -99,13 +106,23 @@ const snippetStorage = {
 };
 
 /* EDITOR */
-let editorImported: any = null;
+let editorImported: CodeMirror.EditorFromTextArea = null;
 const snippetlistobj = document.getElementById('snippetlistobj');
 const oldEditor = document.getElementById('editor') as HTMLTextAreaElement;
 const btnSnippetAddVariable = document.getElementById('snippetaddvariable');
 const modalOverlay = document.getElementById('modalOverlay') as HTMLDivElement;
 const btnSaveSnippetObject = document.getElementById('btnsavesnippetobject');
+let isCursorOnInitBlock = false;
+let isCursorOnInvalidPos = false;
 
+const pError = document.getElementById('pError');
+const pWarning = document.getElementById('pWarning');
+const pErrorIcon = document.getElementById('pErrorIcon');
+const pWarningIcon = document.getElementById('pWarningIcon');
+
+
+let errorsOnCode: ImsgInfoCode[] = [];
+let warningOnCode: ImsgInfoCode[] = [];
 /* NEW SNIPPET */
 
 let snippetObject: SnippetObject = null;
@@ -154,6 +171,9 @@ window.addEventListener('message', (e: any) =>
 
 document.addEventListener('DOMContentLoaded', async () =>
 {
+	pErrorIcon.textContent = '🛑';
+	pWarningIcon.textContent = '⚠️';
+
 	snippetStorage.get((snippet: any) =>
 	{
 		creatorElementListDEV(snippet);
@@ -190,36 +210,18 @@ const initButtonEventListener = () =>
 		{
 			ghostname.classList.remove('active');
 			inputSnippetNewName.classList.add('empty');
+			errorsOnCode.push({ label: __MSGINFOCODE.SNIPPETNAME, body: 'Missing Snippet name.' });
 			return;
 		}
 		ghostname.classList.add('active');
 		inputSnippetNewName.classList.remove('empty');
-
+		errorsOnCode = errorsOnCode.filter(e => e.label != __MSGINFOCODE.SNIPPETNAME);
+		warningOnCode = warningOnCode.filter(e => e.label != __MSGINFOCODE.SNIPPETNAME);
 	});
 
 	btnSaveSnippetObject.addEventListener('click', () =>
 	{
-		if (snippetObject.isNew)
-		{
-			if (snippetObject.getCode().length == 0)
-			{
-				return;
-			}
-
-			snippetStorage.set(snippetObject, () =>
-			{
-				editorCloseElement.classList.remove('deactive');
-				editorElement.classList.remove('active');
-				snippetObject = null;
-			});
-
-			initRightPanelVariables();
-		}
-
-		if (snippetObject.isEditing)
-		{
-
-		}
+		saveSnippetObject();
 	});
 }
 
@@ -239,6 +241,7 @@ const createNewSnippetCodeEditor = () =>
 
 	editorImported.setValue('/*INIT_BLOCK_{\n	\n}_INIT_BLOCK*/\n\n');
 
+	warningOnCode.push({ label: __MSGINFOCODE.SNIPPETNAME, body: 'Rename Snippet.' });
 }
 
 const openCloseModalVariable = () =>
@@ -258,7 +261,7 @@ const openCloseModalVariable = () =>
 
 const initCMistance = () =>
 {
-	// @ts-expect-error
+
 	editorImported = CodeMirror.fromTextArea(oldEditor, {
 		mode: 'text/apexsnippet',
 		tabSize: 4,
@@ -266,19 +269,132 @@ const initCMistance = () =>
 		indentWithTabs: true
 	});
 
-	editorImported.on('change', (cm: { getValue: () => any; }, changeObj: any) =>
+	editorImported.on('change', (cm, changeObj) =>
 	{
-		/* console.log("Il contenuto è cambiato:", cm.getValue());
-		console.log("Dettagli del cambiamento:", changeObj); */
-		snippetObject.setCode(cm.getValue());
+		console.log("Il contenuto è cambiato:", cm.getValue());
+		console.log("Dettagli del cambiamento:", changeObj);
+		if (isCursorOnInvalidPos)
+		{
+			return;
+		}
+
 		//console.log(snippetObject)
 
 
 	});
 
-	editorImported.on('cursorActivity', (cm: any) =>
+	editorImported.on('cursorActivity', (cm) =>
 	{
-		console.log('CURSOR ACTIVITY', cm)
+		snippetObject.setCode(cm.getValue());
+
+		editorImported.getAllMarks().forEach(m => m.clear());
+
+		enum __STANDARD__
+		{
+			STARTBLOCK = '/*INIT_BLOCK_{',
+			ENDBLOCK = '}_INIT_BLOCK*/',
+		}
+		//console.log('CURSOR ACTIVITY', cm)
+		console.log('CURSOR POS', cm.getCursor());
+		const cursor = cm.getCursor();
+		const text = cm.getValue();
+		//console.log('CHECK', text)
+
+		let infoInitBlock: {
+			startBlockPos: { from: { line: number; ch: number; }, to: { line: number; ch: number; } },
+			endBlockPos: { from: { line: number; ch: number; }, to: { line: number; ch: number; } },
+		} = { startBlockPos: null, endBlockPos: null };
+		let textInitBlock = '';
+
+		const isInitBlock = text.includes(__STANDARD__.STARTBLOCK) && text.includes(__STANDARD__.ENDBLOCK);
+		if (isInitBlock)
+		{
+			const sSB = (<any>editorImported).getSearchCursor(__STANDARD__.STARTBLOCK, 0);
+			const sB = sSB.findNext() ? sSB : null;
+			infoInitBlock.startBlockPos = { from: sB.from(), to: sB.to() };
+			//console.log('infoInitBlock.startBlockPos', infoInitBlock.startBlockPos);
+
+			const sEB = (<any>editorImported).getSearchCursor(__STANDARD__.ENDBLOCK, 0);
+			const eB = sEB.findNext() ? sEB : null;
+			infoInitBlock.endBlockPos = { from: eB.from(), to: eB.to() };
+			//console.log('infoInitBlock.endBlockPos', infoInitBlock.endBlockPos);
+
+
+			editorImported.markText(
+				{ // FROM
+					line: infoInitBlock.startBlockPos.from.line,
+					ch: infoInitBlock.startBlockPos.from.ch
+				},
+				{ // TO
+					line: infoInitBlock.endBlockPos.to.line,
+					ch: infoInitBlock.endBlockPos.to.ch
+				},
+				{
+					className: 'cm-custom-markInitBlock'
+				}
+			);
+
+			textInitBlock = editorImported.getRange(infoInitBlock.startBlockPos.to, infoInitBlock.endBlockPos.from);
+
+			if (cursor.line > infoInitBlock.startBlockPos.to.line &&
+				cursor.line < infoInitBlock.endBlockPos.from.line)
+			{
+				isCursorOnInitBlock = true;
+			} else
+			{
+				isCursorOnInitBlock = false;
+			}
+
+			if (cursor.line == infoInitBlock.startBlockPos.to.line ||
+				cursor.line == infoInitBlock.endBlockPos.to.line)
+			{
+				isCursorOnInvalidPos = true;
+				cm.getLineHandle(infoInitBlock.startBlockPos.to.line).text = __STANDARD__.STARTBLOCK;
+				cm.getLineHandle(infoInitBlock.endBlockPos.to.line).text = __STANDARD__.ENDBLOCK;
+
+			} else
+			{
+				isCursorOnInvalidPos = false;
+			}
+
+			console.log('isCursorOnInvalidPos', isCursorOnInvalidPos);
+		}
+		snippetObject.setInitBlock(isInitBlock);
+
+		/* ---- VALIDATION AND PRE COMPILE ----  */
+		snippetObject.setIVCFound(_checkIVC(cm.getValue(), textInitBlock));
+
+		const resultPreCompile = _preCompile();
+		console.log('@@@ resultPreCompile', resultPreCompile);
+
+		if (resultPreCompile)
+		{
+			resultPreCompile.forEach((v, k) =>
+			{
+				if (!v)
+				{
+					const f = (<any>editorImported).getSearchCursor(k, 0);
+					const fB = f.findNext() ? f : null;
+					editorImported.markText(
+						{ // FROM
+							line: fB.from().line,
+							ch: fB.from().ch
+						},
+						{ // TO
+							line: fB.to().line,
+							ch: fB.to().ch
+						},
+						{
+							className: 'cm-custom-markInitBlock-error'
+						});
+				}
+			});
+		}
+
+		__updateInfoCode();
+
+
+
 	});
 }
 
@@ -424,7 +540,7 @@ const initRightPanelVariables = () =>
 			vinput.classList = 'activated-var';
 			vinput.addEventListener('click', () =>
 			{
-				insertOnCodeMirror(v.code);
+				insertOnCodeMirror(v);
 			});
 
 			li.appendChild(vinput);
@@ -434,9 +550,46 @@ const initRightPanelVariables = () =>
 	});
 }
 
-const insertOnCodeMirror = (code: string) =>
+const insertOnCodeMirror = (v: Ivariable) =>
 {
-	editorImported.replaceSelection(code, 'start');
+	if (isCursorOnInvalidPos)
+	{
+		return;
+	}
+	if (isCursorOnInitBlock)
+	{
+		if (v.defaultValue && v.defaultValue.toString().length > 0)
+		{
+			editorImported.replaceSelection(v.code, 'start');
+		}
+		return;
+	}
+	editorImported.replaceSelection(v.varName, 'start');
+}
+
+const saveSnippetObject = () =>
+{
+	if (snippetObject.isNew)
+	{
+		if (snippetObject.getCode().length == 0)
+		{
+			return;
+		}
+
+		snippetStorage.set(snippetObject, () =>
+		{
+			editorCloseElement.classList.remove('deactive');
+			editorElement.classList.remove('active');
+			snippetObject = null;
+		});
+
+		initRightPanelVariables();
+	}
+
+	if (snippetObject.isEditing)
+	{
+
+	}
 }
 
 /* ------------------------HANDLER------------------------ */
@@ -445,48 +598,9 @@ const handler_runDEV = (doc: HTMLElement, payload: any, id: string) =>
 	console.log(doc, payload, id);
 }
 
-const _checkIVC = (text: string) =>
+/* ------------------------HELPERS------------------------ */
+const _checkIVC = (text: string, textInitBlock: string) =>
 {
-	enum __STANDARD__
-	{
-		STARTBLOCK = '/*INIT_BLOCK_{',
-		ENDBLOCK = '}_INIT_BLOCK*/',
-	}
-	//console.log('CHECK', text)
-
-	let infoInitBlock: {
-		startBlockPos: { from: { line: any; ch: any; }, to: any },
-		endBlockPos: { from: any, to: any },
-	} = { startBlockPos: null, endBlockPos: null };
-	const isInitBlock = text.includes(__STANDARD__.STARTBLOCK) && text.includes(__STANDARD__.ENDBLOCK);
-	if (isInitBlock)
-	{
-		const sSB = editorImported.getSearchCursor(__STANDARD__.STARTBLOCK, 0);
-		const sB = sSB.findNext() ? sSB : null;
-		infoInitBlock.startBlockPos = { from: sB.from(), to: sB.to() };
-		//console.log('infoInitBlock.startBlockPos', infoInitBlock.startBlockPos);
-
-		const sEB = editorImported.getSearchCursor(__STANDARD__.ENDBLOCK, 0);
-		const eB = sEB.findNext() ? sEB : null;
-		infoInitBlock.endBlockPos = { from: eB.from(), to: eB.to() };
-		//console.log('infoInitBlock.endBlockPos', infoInitBlock.endBlockPos);
-
-
-		editorImported.markText(
-			{ // FROM
-				line: infoInitBlock.startBlockPos.from.line,
-				ch: infoInitBlock.startBlockPos.from.ch
-			},
-			{ // TO
-				line: infoInitBlock.endBlockPos.to.line,
-				ch: infoInitBlock.endBlockPos.to.ch
-			},
-			{
-				className: 'cm-custom-markInitBlock'
-			}
-		)
-	}
-
 	let countIVC: TivcFound = {
 		randomNumber: null,
 		randomText: null,
@@ -495,44 +609,234 @@ const _checkIVC = (text: string) =>
 		init: null
 	};
 
-	countIVC.randomNumber = text.match(/\$\{\$(RAND|RND)\(\d{1,2}\)\}/g);
+	countIVC.randomNumber = text.match(__REGEX_IVC__.RND);
 
-	countIVC.randomText = text.match(/\$\{\$RANDSTR\(\d+\)\}/g);
+	countIVC.randomText = text.match(__REGEX_IVC__.RNDSTR);
 
-	countIVC.classic = text.match(/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+\}/g);
+	countIVC.classic = text.match(__REGEX_IVC__.CLASSIC);
 
-	countIVC.pck = text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/g);
+	countIVC.pck = text.match(__REGEX_IVC__.PCK);
 
-	if (isInitBlock)
+	if (snippetObject.getInitBlock())
 	{
 		try
 		{
-			countIVC.init = text.match(/\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/g);
+			countIVC.init = textInitBlock.match(__REGEX_IVC__.PCK_INIT);
 			if (countIVC.init)
 			{
-				countIVC.init.push(...text.match(/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+:[A-Za-z0-9_ ]+\}/g));
+				countIVC.init.push(...textInitBlock.match(__REGEX_IVC__.CLASSIC_INIT));
 			} else
 			{
-				countIVC.init = text.match(/\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+:[A-Za-z0-9_ ]+\}/g);
+				countIVC.init = textInitBlock.match(__REGEX_IVC__.CLASSIC_INIT);
 			}
 		} catch (e)
 		{
+			//TODO COMMENTO L'ERRORE NON IMPORTANTE!
 			console.log(e);
 		}
 
 	}
+	return countIVC;
+}
 
-	if ((countIVC.pck && countIVC.init) && countIVC.pck.length > 0 && countIVC.pck.length != countIVC.init.length)
+const _preCompile = (): Map<string, boolean> =>
+{
+	console.log('_preCompile()')
+	let mapCheckValues = new Map<string, boolean>();
+
+	if (snippetObject.getIVCFound().init)
 	{
-		const inError = countIVC.pck.filter(ivc => countIVC.init.filter(ivcinit => ivcinit.includes(ivc)));
-
+		try
+		{
+			const pckIn = __preCompilePCK_inInit();
+			pckIn.forEach((v, k) =>
+			{
+				mapCheckValues.set(k, v);
+			});
+		} catch (e)
+		{ }
 	}
-	return { countIVC, isInitBlock };
+
+	try
+	{
+		const pckOut = __preCompilePCK_outInit();
+		pckOut.forEach((v, k) =>
+		{
+			mapCheckValues.set(k, v);
+		});
+	} catch (e)
+	{ }
+
+	errorsOnCode = [];
+	mapCheckValues.forEach((v, k) =>
+	{
+		if (!v)
+		{
+			errorsOnCode.push({ label: __MSGINFOCODE.ERRORONCODE + k, body: 'Missing initialization variable for: ' + k });
+		} else
+		{
+			errorsOnCode = errorsOnCode.filter(e => e.label != __MSGINFOCODE.ERRORONCODE + k)
+		}
+	});
+	return mapCheckValues;
+}
+
+const __preCompilePCK_outInit = (): Map<string, boolean> =>
+{
+	console.log('@@@ PRECOMPILE OUT')
+	const mapCheckValues = new Map<string, boolean>();
+	if (!snippetObject.getIVCFound().pck)
+	{
+		return mapCheckValues;
+	}
+	snippetObject.getIVCFound().pck.forEach(mv =>
+	{
+		console.log('@@@MV ', mv);
+		const v = mv.substring(0, mv.length - 1);
+		console.log('@@@V ', v);
+
+		let founded = false;
+		if (snippetObject.getIVCFound().init)
+		{
+			snippetObject.getIVCFound().init.forEach(vinit =>
+			{
+				console.log('@@@vinit ', vinit);
+				if (vinit.includes(v))
+				{
+					founded = true;
+				}
+			});
+		}
+		if (founded)
+		{
+			mapCheckValues.set(mv, true);
+		} else
+		{
+			mapCheckValues.set(mv, false);
+		}
+		console.log('@@@mapCheckValues ', mapCheckValues);
+	});
+	return mapCheckValues;
+}
+
+const __preCompilePCK_inInit = (): Map<string, boolean> =>
+{
+	const mapCheckValues = new Map<string, boolean>();
+	const ivcInitFound: string[] = [];
+
+	snippetObject.getIVCFound().init.forEach(v =>
+	{
+		const founded = v.match(__REGEX_IVC__.PCK_INIT);
+		if (founded)
+		{
+			ivcInitFound.push(...founded);
+		}
+	});
+
+	ivcInitFound.forEach(ivc =>
+	{
+		let prevalues = ivc.substring(ivc.indexOf('[') + 1, ivc.indexOf(']'));
+		//console.log('@@@IVC VALUES', prevalues);
+		const valuesOnParentesis: string[] = [];
+		if (prevalues.includes(','))
+		{
+			valuesOnParentesis.push(...prevalues.split(','));
+		} else
+		{
+			valuesOnParentesis.push(prevalues);
+		}
+		//console.log('@@@IVC valuesOnParentesis', valuesOnParentesis);
+		const mapValues = new Map<string, string>();
+		valuesOnParentesis.forEach(val =>
+		{
+			const preMap = val.replace('(', '').replace(')', '').split(':');
+			mapValues.set(preMap[ 0 ], preMap[ 1 ]);
+		});
+
+		//console.log('@@@IVC mapValues', mapValues);
+
+		for (let mv of mapValues.values())
+		{
+			const v = mv.substring(0, mv.length - 1);
+			//console.log('@@@IVC V', v);
+			if (!v.includes('${$'))
+			{
+				continue;
+			}
+
+			const foundedInit: string[] = [];
+			snippetObject.getIVCFound().init.forEach(vinit =>
+			{
+				//console.log('@@@IVC vinit', vinit);
+				if (!vinit.includes('PCK') && vinit.includes(v) && vinit.includes(':'))
+				{
+					foundedInit.push(vinit);
+				}
+			});
+			//console.log('@@@IVC foundedInit', foundedInit);
+
+			if (foundedInit && foundedInit.length == 1)
+			{
+				mapCheckValues.set(mv, true);
+			} else
+			{
+				mapCheckValues.set(mv, false);
+			}
+
+			//console.log('@@@IVC mapCheckValues', mapCheckValues);
+		}
+	});
+	return mapCheckValues;
+}
+
+const __updateInfoCode = () =>
+{
+	pError.textContent = '0';
+	pError.title = null;
+	pWarning.textContent = '0';
+	pWarning.title = null;
+
+	if (errorsOnCode.length > 0)
+	{
+		let errorsString = '';
+		pError.textContent = errorsOnCode.length.toString();
+		errorsOnCode.forEach(err =>
+		{
+			errorsString += ` --> ${err.body}\n`;
+		});
+
+		pError.title = errorsString;
+	}
+
+	if (warningOnCode.length > 0)
+	{
+		let warningString = '';
+		pWarning.textContent = warningOnCode.length.toString();
+		warningOnCode.forEach(war =>
+		{
+			warningString += ` --> ${war.body}\n`;
+		});
+
+		pWarning.title = warningString;
+	}
 }
 
 
+const __REGEX_IVC__ =
+{
+	PCK: /\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\}/g,
+	PCK_INIT: /\$\{\$PCK\(\s*[a-zA-Z_]\w*\s*\)\s*\[\s*(\([^)]*\)(\s*,\s*\([^)]*\))*)\s*\]\}/g,
+	CLASSIC_INIT: /\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+:[A-Za-z0-9_ ]+\}/g,
+	CLASSIC: /\$\{\$(?:STR|NMB|BOL|ID|V)[A-Za-z]+\}/g,
+	RNDSTR: /\$\{\$RANDSTR\(\d+\)\}/g,
+	RND: /\$\{\$(RAND|RND)\(\d{1,2}\)\}/g
+}
 
+enum __MSGINFOCODE
+{
+	SNIPPETNAME = 'SNIPPETNAME',
+	ERRORONCODE = 'ERRORONCODE'
 
-
+}
 
 

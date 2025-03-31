@@ -1,11 +1,15 @@
 interface IMAPVALUE
 {
-
 	type: string,
 	name: string,
 	ivc: string,
 	value: string | null,
+}
 
+interface ImsgInfoCode
+{
+	label: string,
+	body: string
 }
 
 interface IresApexLog

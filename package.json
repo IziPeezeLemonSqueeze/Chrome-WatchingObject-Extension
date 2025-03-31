@@ -41,6 +41,7 @@
 		"@codemirror/lang-javascript": "^6.2.3",
 		"@codemirror/state": "^6.5.2",
 		"@codemirror/view": "^6.36.4",
+		"@types/codemirror": "^5.60.15",
 		"codemirror": "^6.0.1",
 		"cpx": "^1.2.1",
 		"salesforce-ehnancer": "file:"
