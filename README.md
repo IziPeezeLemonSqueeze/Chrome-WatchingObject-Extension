@@ -1,8 +1,8 @@
 # Salesforce Enhancer
+
 Salesforce Enhancer is a chrome extension to aid in development and helps keep track of records that are waiting for a change, updating the affected tab only the moment there is a change to the record, whether due to an integration or something else, so that you don't have to be always hitting F5 to refresh the page.
 
 When there is a change to the record, Salesforce Enhancer will notify you with a notification and update the affected tab, plus it helps you navigate by taking you directly to the tab of the record among the dozens of tabs you have open!
-
 
 # Security and Privacy
 
@@ -17,10 +17,16 @@ To acquire this access token the Salesforce Enhancer requires permission to read
 
 To validate the accuracy of this description, inspect the source code, monitor the network traffic in your browser or take my word.
 
-About
------
+## About
+
 By Stefano Pastore
 
-License
------
+## License
+
 MIT
+
+---
+
+[text](https://jsforce.github.io/document/#bulk-v2-query)
+[text](https://github.com/pozil/pub-sub-api-node-client?)tab=readme-ov-file#user-supplied-authentication
+[text](https://www.npmjs.com/package/salesforce-pubsub-api-client#oauth-20-client-credentials-flow-client_credentials)

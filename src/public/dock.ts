@@ -28,8 +28,17 @@ const tutorialPhases = {
 	isOn: false,
 }
 
+import jsforce from 'jsforce';
 document.addEventListener("DOMContentLoaded", async () =>
 {
+	const sid = await chrome.cookies.getAll({ name: 'sid', domain: window.location.host.replace('https://', '') })
+	const connSFDC = new jsforce.Connection({
+		instanceUrl: window.location.host,
+		serverUrl: window.location.host,
+		sessionId: sid[ 0 ].value
+	});
+
+
 	getTutorial();
 
 	labelSettings.innerText = '⚙️ Settings ';
@@ -46,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () =>
 	chrome.storage.sync.get('apiVersion', async (items) =>
 	{
 		//console.log('apiVersion', items);
-		if (!Object.keys(await items)[0])
+		if (!Object.keys(await items)[ 0 ])
 		{
 			requestApiVersions();
 		}
@@ -56,12 +65,12 @@ document.addEventListener("DOMContentLoaded", async () =>
 	{
 		chrome.storage.sync.get('apiVersion', async (items) =>
 		{
-			if (Object.keys(await items)[0])
+			if (Object.keys(await items)[ 0 ])
 			{
 				//console.log('DOCK API VERIONS');
 				try
 				{
-					await items['apiVersion'].forEach((opt: string) =>
+					await items[ 'apiVersion' ].forEach((opt: string) =>
 					{
 						const option = document.createElement('option');
 						option.value = opt;
@@ -75,7 +84,7 @@ document.addEventListener("DOMContentLoaded", async () =>
 
 		chrome.storage.sync.get('apiVersionSelected', async (items) =>
 		{
-			if (Object.keys(await items)[0])
+			if (Object.keys(await items)[ 0 ])
 			{
 				//console.log('ALREADY SELECTED API VERSION', await items);
 				currentApiSelected.innerText = await items.apiVersionSelected
@@ -85,7 +94,7 @@ document.addEventListener("DOMContentLoaded", async () =>
 
 	apiVersionCombobox.addEventListener('change', (e) =>
 	{
-		chrome.storage.sync.set({ ['apiVersionSelected']: (<HTMLSelectElement>e.target).value });
+		chrome.storage.sync.set({ [ 'apiVersionSelected' ]: (<HTMLSelectElement>e.target).value });
 		currentApiSelected.innerText = (<HTMLSelectElement>e.target).value;
 		updateBackgroudWithApiVersion((<HTMLSelectElement>e.target).value);
 	});
@@ -168,7 +177,7 @@ const getTutorial = () =>
 	divStepTwo.style.display = 'none';
 	divStepGreetings.style.opacity = '0';
 	divStepGreetings.style.display = 'none';
-	chrome.storage.sync.get(['firstGO'], async (isFirstGo) =>
+	chrome.storage.sync.get([ 'firstGO' ], async (isFirstGo) =>
 	{
 		const resp = await isFirstGo;
 		//console.log('TUT RESP', resp)

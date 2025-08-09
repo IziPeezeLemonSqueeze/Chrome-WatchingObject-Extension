@@ -1,37 +1,49 @@
 <!DOCTYPE html>
 <html>
-
 	<head>
-		<link href="salesforce-lightning-design-system.min.css"
+		<link
+			href="salesforce-lightning-design-system.min.css"
 			rel="stylesheet"
-			type="text/css" />
-		<script type="module"
-			src="dock.js"></script>
+			type="text/css"
+		/>
+		<script type="module" src="dock.js"></script>
+		<script src="jsforce.min.js"></script>
 	</head>
 
 	<body>
-		<div class="slds-page-header"
-			style="padding: 0.2rem;">
+		<div class="slds-page-header" style="padding: 0.2rem">
 			<div class="slds-page-header__row">
 				<div class="slds-page-header__col-title">
 					<div class="slds-media">
 						<div class="slds-media__figure">
-							<span class="slds-icon_container slds-icon-standard-opportunity"
-								style="background: #f3f3f3;">
-								<img src="/images/icon.png"
-									style="background: #f3f3f3; margin-left: 14px"
+							<span
+								class="slds-icon_container slds-icon-standard-opportunity"
+								style="background: #f3f3f3"
+							>
+								<img
+									src="/images/icon.png"
+									style="
+										background: #f3f3f3;
+										margin-left: 14px;
+									"
 									width="35px"
-									height="35px" />
+									height="35px"
+								/>
 							</span>
 						</div>
-						<div class="slds-media__body"
-							style="align-self: center;">
+						<div
+							class="slds-media__body"
+							style="align-self: center"
+						>
 							<div class="slds-page-header__name">
 								<div class="slds-page-header__name-title">
 									<h1>
-										<span class="slds-page-header__title slds-truncate"
-											style="font-style: italic;"
-											title="Salesforce Enhancer">Salesforce Enhancer</span>
+										<span
+											class="slds-page-header__title slds-truncate"
+											style="font-style: italic"
+											title="Salesforce Enhancer"
+											>Salesforce Enhancer</span
+										>
 									</h1>
 								</div>
 							</div>
@@ -50,212 +62,332 @@
 				<p>Select API</p>
 				<p>Version</p>
 			</div>
-			<div id="stepGreetings">
-				Thank You!
-			</div>
+			<div id="stepGreetings">Thank You!</div>
 		</div>
-		<div id="main"
+		<div
+			id="main"
 			class="slds-align_absolute-center"
-			style="text-align: center; height: 25rem">
+			style="text-align: center; height: 25rem"
+		>
 			<ul class="slds-has-block-links_space">
 				<li style="margin: 1px">
-					<button title="Show the api name of the object fields"
+					<button
+						title="Show the api name of the object fields"
 						class="slds-button slds-button_brand pulsante"
 						style="text-wrap: nowrap; width: 150px"
-						id="btnApiFields">
+						id="btnApiFields"
+					>
 						Show API name FIELDS
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Show the CODE SNIPPET screen"
+					<button
+						title="Show the CODE SNIPPET screen"
 						class="slds-button slds-button_brand pulsante"
 						style="text-wrap: nowrap; width: 150px"
-						id="btnFastCodeSnippet">
+						id="btnFastCodeSnippet"
+					>
 						CODE SNIPPET
 					</button>
 				</li>
-				<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+				<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem" />
 				<div
-					style="padding: 1px;background-clip: text;background-color: #eef4ff;-webkit-text-stroke-width: medium;z-index: 100;position: absolute;bottom: 67%;left: 39%;">
-					Shortcuts</div>
+					style="
+						padding: 1px;
+						background-clip: text;
+						background-color: #eef4ff;
+						-webkit-text-stroke-width: medium;
+						z-index: 100;
+						position: absolute;
+						bottom: 67%;
+						left: 39%;
+					"
+				>
+					Shortcuts
+				</div>
 				<li style="margin: 1px">
-					<button title="Open a new tab in the Object Manager settings"
+					<button
+						title="Open a new tab in the Object Manager settings"
 						class="slds-button slds-button_brand pulsante"
 						style="width: 150px"
-						id="btnObjectManager">
+						id="btnObjectManager"
+					>
 						Object Manager
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Open a new tab in the Custom Metadata settings"
+					<button
+						title="Open a new tab in the Custom Metadata settings"
 						class="slds-button slds-button_brand pulsante"
 						style="width: 150px"
-						id="btnMdt">
+						id="btnMdt"
+					>
 						Custom Metadata
 					</button>
+				</li>
+
 				<li style="margin: 1px">
-					<button title="Open a new tab in the Flow settings"
+					<button
+						title="Open a new tab in the Flow settings"
 						class="slds-button slds-button_brand pulsante"
 						style="width: 150px"
-						id="btnFlw">
+						id="btnFlw"
+					>
 						Flows
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Open a new tab in the Apex Jobs (Batch) settings"
+					<button
+						title="Open a new tab in the Apex Jobs (Batch) settings"
 						class="slds-button slds-button_brand pulsante"
 						style="width: 150px"
-						id="btnApexJobs">
+						id="btnApexJobs"
+					>
 						Apex Jobs
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Open a new tab in the USERS settings"
+					<button
+						title="Open a new tab in the USERS settings"
 						class="slds-button slds-button_brand pulsante"
 						style="width: 150px"
-						id="btnUsers">
+						id="btnUsers"
+					>
 						Setup Users
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Open a new tab in the Deploy"
+					<button
+						title="Open a new tab in the Deploy"
 						class="slds-button slds-button_brand pulsante"
 						style="width: 150px"
-						id="btnDeploy">
+						id="btnDeploy"
+					>
 						Deploy Status
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="Delete all Apex Logs"
+					<button
+						title="Delete all Apex Logs"
 						class="slds-button slds-button_destructive pulsante"
 						style="width: 150px"
-						id="btnApexLog">
+						id="btnApexLog"
+					>
 						Delete Apex Logs
 					</button>
 				</li>
-				<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+				<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem" />
 				<li style="margin: 1px">
-					<button title="Settings"
+					<button
+						title="Settings"
 						class="slds-button slds-button_outline-brand pulsante"
-						style="width: 150px; height: 20px;"
-						id="btnSettings">
+						style="width: 150px; height: 20px"
+						id="btnSettings"
+					>
 						Settings
 					</button>
 				</li>
 			</ul>
 		</div>
-		<div id="settings"
+		<div
+			id="settings"
 			class="slds-align_absolute-center"
-			style="display: flex;width: -webkit-fill-available;text-align: center;height: 25rem;position:fixed;justify-content: flex-start;flex-direction: column;flex-wrap: nowrap;align-content: center;align-items: center;">
-			<label class="slds-form-element__label"
-				style="text-shadow: -2px 0px 9px #00000054;font-weight: bold;font-size: small;top: 0%;position: absolute;"
-				id="labelSettings"></label>
-			<ul class="slds-has-block-links_space"
-				style="width: -webkit-fill-available;margin-top: 12%;">
+			style="
+				display: flex;
+				width: -webkit-fill-available;
+				text-align: center;
+				height: 25rem;
+				position: fixed;
+				justify-content: flex-start;
+				flex-direction: column;
+				flex-wrap: nowrap;
+				align-content: center;
+				align-items: center;
+			"
+		>
+			<label
+				class="slds-form-element__label"
+				style="
+					text-shadow: -2px 0px 9px #00000054;
+					font-weight: bold;
+					font-size: small;
+					top: 0%;
+					position: absolute;
+				"
+				id="labelSettings"
+			></label>
+			<ul
+				class="slds-has-block-links_space"
+				style="width: -webkit-fill-available; margin-top: 12%"
+			>
 				<li
-					style="box-shadow: 0px 14px 20px #00000012;font-weight: bolder;font-family: monospace;border-width: thin;margin-bottom: 0%;">
-					<label class="slds-form-element__label"
-						id="combobox-label-id-131">Api Versions</label>
+					style="
+						box-shadow: 0px 14px 20px #00000012;
+						font-weight: bolder;
+						font-family: monospace;
+						border-width: thin;
+						margin-bottom: 0%;
+					"
+				>
+					<label
+						class="slds-form-element__label"
+						id="combobox-label-id-131"
+						>Api Versions</label
+					>
 					<br />
-					<select name="ApiVersions"
-						style="border-radius: 15px;width: 90px;text-align: -webkit-match-parent;"
-						id="apiVersionCombobox">
-					</select>
+					<select
+						name="ApiVersions"
+						style="
+							border-radius: 15px;
+							width: 90px;
+							text-align: -webkit-match-parent;
+						"
+						id="apiVersionCombobox"
+					></select>
 					<br />
 					<label class="slds-form-element__label">Current Api</label>
 					<br />
-					<label class="slds-form-element__label"
-						style="margin-bottom: 3%;padding: 1.5%;border-radius: 8px;background-color: #a2ccec;"
-						id="currentApiSelected">00.0</label>
+					<label
+						class="slds-form-element__label"
+						style="
+							margin-bottom: 3%;
+							padding: 1.5%;
+							border-radius: 8px;
+							background-color: #a2ccec;
+						"
+						id="currentApiSelected"
+						>00.0</label
+					>
 				</li>
 				<ul>
-					<div id="scrollable"
+					<div
+						id="scrollable"
 						class="slds-scrollable_y"
-						style="margin-top: 2%;width: -webkit-fill-available;overflow-y: scroll;min-height: 150px;max-height: 150px;">
-						<li style="margin-bottom: 5%;">
-							<input type="checkbox"
+						style="
+							margin-top: 2%;
+							width: -webkit-fill-available;
+							overflow-y: scroll;
+							min-height: 150px;
+							max-height: 150px;
+						"
+					>
+						<li style="margin-bottom: 5%">
+							<input
+								type="checkbox"
 								title="(WIP)"
 								name="Always show ID"
-								id="alwaysShowId">
-							<label for="alwaysShowId">Always SHOW ID</label><br>
+								id="alwaysShowId"
+							/>
+							<label for="alwaysShowId">Always SHOW ID</label
+							><br />
 						</li>
-						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem" />
 						<li style="margin: 15px">
-							<button title="Sync Metadata (WIP)"
+							<button
+								title="Sync Metadata (WIP)"
 								class="slds-button slds-button_outline-brand pulsante"
 								style="width: 190px"
-								id="btnSyncMetadata">
+								id="btnSyncMetadata"
+							>
 								Sync Metadata
 							</button>
 							<br />
 						</li>
-						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem" />
 						<li style="margin: 15px">
-							<button title="Sync Metadata (WIP)"
+							<button
+								title="Sync Metadata (WIP)"
 								class="slds-button slds-button_outline-brand pulsante attivo"
 								style="width: 190px"
-								id="">
+								id=""
+							>
 								Page Lightening (ALPHA)
-								<div id="help"
-									title="lightens the page in an EXPERIMENTAL way, removes parts of obsolete HTML elements">
+								<div
+									id="help"
+									title="lightens the page in an EXPERIMENTAL way, removes parts of obsolete HTML elements"
+								>
 									<div id="subHelp">?</div>
 								</div>
 							</button>
 							<br />
 						</li>
-						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem" />
 						<li style="margin: 15px">
-							<button title="Sync Metadata (WIP)"
+							<button
+								title="Sync Metadata (WIP)"
 								class="slds-button slds-button_outline-brand pulsante inattivo"
 								style="width: 190px"
-								id="">
+								id=""
+							>
 								Auto reload on Nav
-								<div id="help"
-									title="Forces the site to reload each time it is browsed">
+								<div
+									id="help"
+									title="Forces the site to reload each time it is browsed"
+								>
 									<div id="subHelp">?</div>
 								</div>
 							</button>
 							<br />
 						</li>
-						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem" />
 						<li style="margin: 15px">
-							<button title="Sync Metadata (WIP)"
+							<button
+								title="Sync Metadata (WIP)"
 								class="slds-button slds-button_outline-brand pulsante inattivo"
 								style="width: 190px"
-								id="">
+								id=""
+							>
 								Automations
 							</button>
 							<br />
 						</li>
-						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem;" />
+						<hr style="margin-top: 0.8rem; margin-bottom: 0.8rem" />
 					</div>
 				</ul>
-				<li style="box-shadow: -1px -9px 20px 0px #00000014;">
-					<button title="Settings"
+				<li style="box-shadow: -1px -9px 20px 0px #00000014">
+					<button
+						title="Settings"
 						class="slds-button slds-button_outline-brand pulsante"
-						style="margin-top: 5%;width: 150px;"
-						id="btnBackToMain">
+						style="margin-top: 5%; width: 150px"
+						id="btnBackToMain"
+					>
 						Back
 					</button>
 				</li>
 				<li style="margin: 1px">
-					<button title="FAQ/DOC"
+					<button
+						title="FAQ/DOC"
 						class="slds-button slds-button_outline-brand pulsante"
-						style="left: 6%;width: 70px;position: absolute;bottom: 2%;"
-						id="btnGoToDOC">
+						style="
+							left: 6%;
+							width: 70px;
+							position: absolute;
+							bottom: 2%;
+						"
+						id="btnGoToDOC"
+					>
 						FAQ/DOC
 					</button>
-					<a href="https://www.buymeacoffee.com/IziPeezeLemonSqueeze"
-						target="_blank">
-						<img class="pulsante"
+					<a
+						href="https://www.buymeacoffee.com/IziPeezeLemonSqueeze"
+						target="_blank"
+					>
+						<img
+							class="pulsante"
 							src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
 							alt="Buy Me A Coffee"
-							style="bottom: 1%;scale: 0.75;right: 0%;position: absolute;height: 40px !important;width: 140px !important;"></a>
+							style="
+								bottom: 1%;
+								scale: 0.75;
+								right: 0%;
+								position: absolute;
+								height: 40px !important;
+								width: 140px !important;
+							"
+					/></a>
 				</li>
 			</ul>
 		</div>
-
-
 	</body>
 	<style>
 		#tutorial {
@@ -401,10 +533,9 @@
 			box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 		}
 
-
 		#scrollable::-webkit-scrollbar {
 			width: 10px;
-			margin-left: 1%
+			margin-left: 1%;
 		}
 
 		#scrollable::-webkit-scrollbar-track {
@@ -434,12 +565,10 @@
 			margin-bottom: 20%;
 		}
 
-
 		#subHelp {
 			position: absolute;
 			bottom: -22%;
 			left: 37%;
 		}
 	</style>
-
 </html>
